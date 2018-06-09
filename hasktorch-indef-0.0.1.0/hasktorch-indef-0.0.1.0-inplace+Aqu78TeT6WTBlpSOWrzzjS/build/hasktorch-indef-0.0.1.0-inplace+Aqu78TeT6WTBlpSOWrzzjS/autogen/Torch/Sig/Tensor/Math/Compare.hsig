@@ -1,2 +1,0 @@
-{-# LANGUAGE NoImplicitPrelude #-}
-signature Torch.Sig.Tensor.Math.Compare where
