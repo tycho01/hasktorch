@@ -134,7 +134,7 @@ gridSearchConfig = GridSearchConfig
     <*> bestOfOpt
     -- <*> dropoutRateOpt
     <*> evalFreqOpt
-    <*> learningRateOpt
+    -- <*> learningRateOpt
     <*> checkWindowOpt
     <*> convergenceThresholdOpt
     <*> resultFolderOpt
@@ -163,7 +163,7 @@ evolutionaryConfig = EvolutionaryConfig
     <*> bestOfOpt
     -- <*> dropoutRateOpt
     <*> evalFreqOpt
-    <*> learningRateOpt
+    -- <*> learningRateOpt
     <*> checkWindowOpt
     <*> convergenceThresholdOpt
     <*> resultFolderOpt
