@@ -57,6 +57,7 @@ let
       codegen
       examples
       experimental
+      synthesis
       ;
 
     checks = recurseIntoAttrs {
