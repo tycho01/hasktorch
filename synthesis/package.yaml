@@ -20,6 +20,7 @@ ghc-options:
   - -rtsopts
   - -threaded
   - -with-rtsopts=-N
+  - -fconstraint-solver-iterations=8
 
 default-extensions:
   - LambdaCase
