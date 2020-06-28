@@ -1,0 +1,105 @@
+name: synthesis
+version: '0.0.0'
+github: "tycho01/synthesis"
+license: MIT
+author: "Kiara Grouwstra"
+maintainer: "Kiara Grouwstra"
+synopsis: typed neural program synthesis
+description: code-base for my UvA MSc AI thesis on typed neural program synthesis
+category: Machine Learning
+
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
+
+ghc-options:
+  - -Wall
+  - -rtsopts
+  - -threaded
+  - -with-rtsopts=-N
+
+default-extensions:
+  - LambdaCase
+  - ScopedTypeVariables
+  - UnicodeSyntax
+  - RankNTypes
+
+dependencies:
+  - base
+  - haskell-src-exts
+  - hint
+  - containers
+  - unordered-containers
+  - ghc-lib-parser
+  - random
+  - mtl
+  - hasktorch
+  - libtorch-ffi
+  - ghc-typelits-knownnat
+  - ghc-typelits-extra
+  - ghc-typelits-natnormalise
+  - aeson
+  - yaml
+  - cassava
+  - directory
+  - split
+  - text
+  - terminal-progress-bar
+  - hashable
+  - hslogger
+  - bytestring
+  - prettyprinter
+  - store
+  - optparse-applicative
+  - io-memoize
+  - GA
+
+library:
+  dependencies: []
+  source-dirs: library
+
+executables:
+
+  generator:
+    source-dirs: generator
+    main: Main.hs
+    dependencies:
+    - synthesis
+
+  synthesizer:
+    source-dirs: synthesizer
+    main: Main.hs
+    dependencies:
+    - synthesis
+
+  view-dataset:
+    source-dirs: view-dataset
+    main: Main.hs
+    dependencies:
+    - synthesis
+
+  grid-search:
+    source-dirs: grid-search
+    main: Main.hs
+    dependencies:
+    - synthesis
+
+  evolutionary:
+    source-dirs: evolutionary
+    main: Main.hs
+    dependencies:
+    - synthesis
+
+tests:
+  synthesis-test-suite:
+    source-dirs: test-suite
+    main: Main.hs
+    dependencies:
+    - synthesis
+    - tasty
+    - tasty-hspec
+    - HUnit
+    - tasty-hunit
