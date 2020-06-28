@@ -37,6 +37,8 @@ extra-deps:
 - streaming-cassava-0.1.0.1@sha256:2d1dfeb09af62009e88311fe92f44d06dafb5cdd38879b437ea6adb3bc40acfe,1739
 - GA-1.0@sha256:27841fbfc401097da63562e6a7d1cdd2460e9888026c365d023329da6169605b,1610
 - store-0.7.4@sha256:ad89cd2f525bccece875423147d8a1f35cdf7a1fef1eb32a1db896e61848b70a,7825
+- store-core-0.4.4.2@sha256:11403cad88cf4f3675d49baf76cb5dd56363e786c7e25ef00fa57296af29a7b2,1444
+- th-utilities-0.2.4.0@sha256:ba19cd8441aa43dbaed40e9055bb5a7cbd7cf9e154f5253c6bf9293af8b1f96b,1869
 
 nix:
   shell-file: nix/stack-shell.nix
