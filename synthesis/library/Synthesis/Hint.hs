@@ -110,29 +110,21 @@ interpretIO crash_on_error cmd =
 fnIoPairs :: Bool -> Int -> Expr -> Tp -> Expr -> Interpreter [(Expr, Either String Expr)]
 fnIoPairs crash_on_error n fn_ast in_tp ins = do
   let unCurry = genUncurry n
-  -- let cmd = "do; ios :: [(" ++ pp in_tp ++ ", Either SomeException _)] <- zip (" ++ ins ++ ") <$> (sequence $ try . evaluate . UNCURRY (" ++ fn_str ++ ") <$> (" ++ ins ++ " :: [" ++ pp in_tp ++ "])); return . show $ second (first show) <$> ios"
+  -- let cmd = "do; outs :: [Either SomeException _] <- sequence $ try . evaluate . UNCURRY (" ++ fn_str ++ ") <$> (" ++ ins ++ " :: [" ++ pp in_tp ++ "]); return . show $ first show <$> outs"
   let cmd =
         pp $
           Do l
             [ Generator l
                 ( PatTypeSig l
-                    (pvar "ios")
+                    (pvar "outs")
                     $ tyList
-                    $ TyTuple l
-                      Boxed
-                      [ in_tp,
-                        tyApp (tyApp (tyCon "Either") (tyCon "SomeException")) wildcard
-                      ]
+                    $ tyApp (tyApp (tyCon "Either") (tyCon "SomeException")) wildcard
                 )
-                ( infixApp
-                    (app (var "zip") ins)
-                    (symbol "<$>")
-                    (paren $ infixApp (var "sequence") dollar $ infixApp (infixApp (var "try") dot (infixApp (var "evaluate") dot $ app (paren unCurry) $ paren fn_ast)) (symbol "<$>") $ expTypeSig ins $ tyList in_tp)
-                ),
-              Qualifier l $ infixApp (infixApp (var "return") dot $ var "show") dollar $ infixApp (app (var "second") $ app (var "first") $ var "show") (symbol "<$>") $ var "ios"
+                (infixApp (var "sequence") dollar $ infixApp (infixApp (var "try") dot (infixApp (var "evaluate") dot $ app (paren unCurry) $ paren fn_ast)) (symbol "<$>") $ expTypeSig ins $ tyList in_tp),
+              Qualifier l $ infixApp (infixApp (var "return") dot $ var "show") dollar $ infixApp (app (var "first") $ var "show") (symbol "<$>") $ var "outs"
             ]
   -- say cmd
-  second unEitherString . unTuple2 <.> unList . parseExpr . fromRight "[]" <$> interpretIO crash_on_error cmd
+  zip (unList ins) . fmap unEitherString . unList . parseExpr . fromRight "[]" <$> interpretIO crash_on_error cmd
 
 -- | get the type of an expression
 exprType :: Expr -> Interpreter Tp
