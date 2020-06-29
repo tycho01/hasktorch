@@ -23,4 +23,4 @@ source-repository-package
     location: https://github.com/well-typed/cborg
     tag: 44163bd78da5e80e5ec90f7c66f3ebf4d19db6f8
     subdir: cborg
-    --sha256: ?
+    --sha256: 0pga52a1fai8f8fdxzj6ll93yi5lvfv91rz092gblxasq67hhsyx
