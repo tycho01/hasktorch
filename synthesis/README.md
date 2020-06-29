@@ -16,10 +16,15 @@
 You can build and run this project using [Nix](https://nixos.org/nix/) + [Cabal](https://www.haskell.org/cabal/).
 
 ``` sh
+# cabal
 ghcup install latest
 ghcup set latest
 ./setup-cabal.sh
 cabal v1-update
+
+# stack
+# workaround for https://github.com/commercialhaskell/stack/issues/5134
+stack build --test --file-watch 2>&1 | sed '/^Warning:/,/Invalid magic: e49ceb0f$/d'
 
 # install Nix, Cachix:
 bash <(curl https://nixos.org/nix/install)
