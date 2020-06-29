@@ -161,8 +161,6 @@ initR3nn :: forall m symbols rules maxStringLength batch_size h device maxChar f
          => [(String, Expr)]
          -> Int
          -> Double
-         -> Int
-         -> Int
          -> HashMap Char Int
          -> (R3NNSpec device m symbols rules maxStringLength batch_size h maxChar featMult)
 initR3nn variants batch_size dropoutRate charMap = R3NNSpec @device @m @symbols @rules @maxStringLength @batch_size @h @maxChar @featMult
