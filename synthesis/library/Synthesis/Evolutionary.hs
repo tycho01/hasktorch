@@ -100,7 +100,7 @@ instance (Fractional a) => Variable (Continuous a) a where
 -- now apply this variable logic to our HparComb parameters
 -- nope, I ain't using discrete/continuous, much too expensive!
 
-learningRateVar   :: Ordinal Double = Ordinal learningRateOpts
+learningRateVar   :: Ordinal Float  = Ordinal learningRateOpts
 dropoutRateVar    :: Ordinal Double = Ordinal dropoutRateOpts
 regularizationVar :: Ordinal Float  = Ordinal regularizationOpts
 -- | skip `m=1`: must be an even number for H.
