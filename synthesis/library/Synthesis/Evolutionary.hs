@@ -100,6 +100,7 @@ instance (Fractional a) => Variable (Continuous a) a where
 -- now apply this variable logic to our HparComb parameters
 -- nope, I ain't using discrete/continuous, much too expensive!
 
+learningRateVar   :: Ordinal Double = Ordinal learningRateOpts
 dropoutRateVar    :: Ordinal Double = Ordinal dropoutRateOpts
 regularizationVar :: Ordinal Float  = Ordinal regularizationOpts
 -- | skip `m=1`: must be an even number for H.
@@ -109,6 +110,7 @@ hVar              :: Ordinal Int    = Ordinal hOpts
 instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
 
   genRandom () seed = return $ HparComb
+        (genRand seed learningRateVar)
         (genRand seed dropoutRateVar)
         (genRand seed regularizationVar)
         (genRand seed mVar)
@@ -118,18 +120,20 @@ instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
     where
       anE = \bl -> if bl then e1 else e2
       g = mkStdGen seed
-      [b1,b2,b3,b4] =
-          take 4 $ randoms g
+      [b1,b2,b3,b4,b5] =
+          take 5 $ randoms g
       e = HparComb
-        (dropoutRate    $ anE b1)
-        (regularization $ anE b2)
-        (m              $ anE b3)
-        (h              $ anE b4)
+        (learningRate   $ anE b1)
+        (dropoutRate    $ anE b2)
+        (regularization $ anE b3)
+        (m              $ anE b4)
+        (h              $ anE b5)
 
   mutation () _p seed e = return $ Just e' where
       HparComb{..} = e
       mutations :: [HparComb -> HparComb] =
-          [ \e -> e { dropoutRate    = mutate seed dropoutRateVar dropoutRate }
+          [ \e -> e { learningRate   = mutate seed learningRateVar learningRate }
+          , \e -> e { dropoutRate    = mutate seed dropoutRateVar dropoutRate }
           , \e -> e { regularization = mutate seed regularizationVar regularization }
           , \e -> e { m              = mutate seed mVar m }
           , \e -> e { h              = mutate seed hVar h }
