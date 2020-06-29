@@ -114,7 +114,7 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
                 -> Tensor device 'D.Float '[]
     patchLoss = patchR3nnLoss . r3nn
 
-nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch maxChar h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat maxChar, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> Int -> Int -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch maxChar h featMult
+nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch maxChar h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat maxChar, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch maxChar h featMult
 nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
     useTypes = natValI @featMult > 1
     charMap = if useTypes then bothCharMap else exprCharMap
