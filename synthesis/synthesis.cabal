@@ -21,48 +21,47 @@ source-repository head
 common config
   default-language:    Haskell2010
   ghc-options:         -fplugin GHC.TypeLits.Normalise -fplugin GHC.TypeLits.KnownNat.Solver -fplugin GHC.TypeLits.Extra.Solver -fconstraint-solver-iterations=0 -rtsopts
-  build-depends:       base >= 4.7 && < 5
-                     , hasktorch
-                    --  , ghc-typelits-extra >= 0.3.1
-                    --  , ghc-typelits-knownnat >= 0.7
-                    --  , ghc-typelits-natnormalise >= 0.7
-                     , ghc-typelits-extra
-                     , ghc-typelits-knownnat
-                     , ghc-typelits-natnormalise
-                     , mtl
   default-extensions: LambdaCase ScopedTypeVariables UnicodeSyntax RankNTypes
   ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N
   other-modules:
       Paths_synthesis
-  build-depends:
-      GA
-    , aeson
-    , base
-    , bytestring
-    , cassava
-    , containers
-    , directory
-    , ghc-lib-parser
-    , ghc-typelits-extra
-    , ghc-typelits-knownnat
-    , ghc-typelits-natnormalise
-    , hashable
-    , haskell-src-exts
-    , hasktorch
-    , hint
-    , hslogger
-    , io-memoize
-    , libtorch-ffi
-    , mtl
-    , optparse-applicative
-    , prettyprinter
-    , random
-    , split
-    , store
-    , terminal-progress-bar
-    , text
-    , unordered-containers
-    , yaml
+  build-depends:      base >= 4.7 && < 5
+                    , hasktorch
+                    -- , ghc-typelits-extra >= 0.3.1
+                    -- , ghc-typelits-knownnat >= 0.7
+                    -- , ghc-typelits-natnormalise >= 0.7
+                    , ghc-typelits-extra
+                    , ghc-typelits-knownnat
+                    , ghc-typelits-natnormalise
+                    , mtl
+                    , GA
+                    , aeson
+                    , base
+                    , bytestring
+                    , cassava
+                    , containers
+                    , directory
+                    , ghc-lib-parser
+                    , ghc-typelits-extra
+                    , ghc-typelits-knownnat
+                    , ghc-typelits-natnormalise
+                    , hashable
+                    , haskell-src-exts
+                    , hint
+                    , hslogger
+                    , io-memoize
+                    , libtorch-ffi
+                    , mtl
+                    , optparse-applicative
+                    , prettyprinter
+                    , random
+                    , split
+                    , store
+                    , terminal-progress-bar
+                    , text
+                    , unordered-containers
+                    , yaml
+                    , hasktorch
 
 library
   import: config
