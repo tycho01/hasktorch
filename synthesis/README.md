@@ -21,10 +21,13 @@ ghcup install latest
 ghcup set latest
 ./setup-cabal.sh
 cabal v1-update
+cabal v1-run gaussian-process
+# Encountered missing or private dependencies: hasktorch -any, libtorch-ffi -any
 
 # stack
 # workaround for https://github.com/commercialhaskell/stack/issues/5134
 stack build --test --file-watch 2>&1 | sed '/^Warning:/,/Invalid magic: e49ceb0f$/d'
+# undefined symbol: libtorchzmffizm1zi5zi0zi0zm7kKkDiddGcR9Lto2O1DHo0_TorchziInternalziClass_CZCCastable_con_info
 
 # install Nix, Cachix:
 bash <(curl https://nixos.org/nix/install)
