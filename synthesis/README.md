@@ -16,6 +16,11 @@
 You can build and run this project using [Nix](https://nixos.org/nix/) + [Cabal](https://www.haskell.org/cabal/).
 
 ``` sh
+ghcup install latest
+ghcup set latest
+./setup-cabal.sh
+cabal v1-update
+
 # install Nix, Cachix:
 bash <(curl https://nixos.org/nix/install)
 . ~/.nix-profile/etc/profile.d/nix.sh
@@ -37,26 +42,18 @@ nixGLNvidia nix-shell --arg cudaVersion 10
 hpack --force
 
 # basic commands
-cabal v1-build --ghc-options="-fconstraint-solver-iterations=8"
-cabal v1-test  --ghc-options="-fconstraint-solver-iterations=8"
-cabal v1-repl  --ghc-options="-fconstraint-solver-iterations=8" lib:synthesis
-cabal v1-run   --ghc-options="-fconstraint-solver-iterations=8" generator   -- --help
-cabal v1-run   --ghc-options="-fconstraint-solver-iterations=8" synthesizer -- --help
-
-# command-line auto-complete
-# bash
-cabal v1-run generator   -- --bash-completion-script `cabal v1-exec which generator` >> ~/.bash_completion
-cabal v1-run synthesizer -- --bash-completion-script `cabal v1-exec which synthesizer` >> ~/.bash_completion
-# fish
-cabal v1-run generator   -- --fish-completion-script (cabal v1-exec which generator) > ~/.config/fish/completions/generator.fish
-cabal v1-run synthesizer -- --fish-completion-script (cabal v1-exec which synthesizer) > ~/.config/fish/completions/synthesizer.fish
+stack build
+stack test
+stack repl lib:synthesis
+stack run generator   -- --help
+stack run synthesizer -- --help
 
 # Generate documentation.
-cabal v1-build --enable-documentation
+stack build --enable-documentation
 
 # Profile
-cabal v1-build --enable-profiling --ghc-options="-fno-prof-auto"
-`cabal v1-exec which generator` +RTS -p
+stack build --enable-profiling --ghc-options="-fno-prof-auto"
+`stack exec which generator` +RTS -p
 
 # viz profiling
 stack install ghc-prof-flamegraph
@@ -71,9 +68,3 @@ cd ../
 python plotting/plot.py
 # makes plots for ./results/*.csv
 ```
-
-questions for NSPS authors:
-- why not concatenate i/o features directly to symbol features?
-- tanh activation: XCorrIO too, so for any LSTMs too?
-- how does batching work in the R3NN?
-- given the complexity limit of 13 ops on generation, did NSPS also limit complexity during synthesis?
