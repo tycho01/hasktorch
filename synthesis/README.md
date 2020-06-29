@@ -20,53 +20,28 @@ You can build and run this project using [Nix](https://nixos.org/nix/) + [Cabal]
 ghcup install latest
 ghcup set latest
 ./setup-cabal.sh
-cabal v1-update
-cabal v1-run gaussian-process
-# Encountered missing or private dependencies: hasktorch -any, libtorch-ffi -any
-
-# stack
-# workaround for https://github.com/commercialhaskell/stack/issues/5134
-stack build --test --file-watch 2>&1 | sed '/^Warning:/,/Invalid magic: e49ceb0f$/d'
-# undefined symbol: libtorchzmffizm1zi5zi0zi0zm7kKkDiddGcR9Lto2O1DHo0_TorchziInternalziClass_CZCCastable_con_info
-
-# install Nix, Cachix:
-bash <(curl https://nixos.org/nix/install)
-. ~/.nix-profile/etc/profile.d/nix.sh
-nix-env -iA cachix -f https://cachix.org/api/v1/install
-# nixGL for GPU thru Nix: https://github.com/guibou/nixGL
-
-# increase the solver limit in Cabal
-vim ~/.cabal/config
-# under `program-default-options` uncomment `ghc-options` and add: `-fconstraint-solver-iterations=8`
-
-# enter dev shell
-cachix use tycho01
-nix-build # | cachix push tycho01
-# cpu:
-nix-shell
-# gpu:
-nixGLNvidia nix-shell --arg cudaVersion 10
-# remake Cabal file any time you add/move files in package.yml:
-hpack --force
+cabal update
+source setenv
+cabal install
 
 # basic commands
-stack build
-stack test
-stack repl lib:synthesis
-stack run generator   -- --help
-stack run synthesizer -- --help
+cabal build
+cabal test
+cabal repl lib:synthesis
+cabal run generator   -- --help
+cabal run synthesizer -- --help
 
 # Generate documentation.
-stack build --enable-documentation
+cabal build --enable-documentation
 
 # Profile
-stack build --enable-profiling --ghc-options="-fno-prof-auto"
-`stack exec which generator` +RTS -p
+cabal build --enable-profiling --ghc-options="-fno-prof-auto"
+`cabal exec which generator` +RTS -p
 
 # viz profiling
-stack install ghc-prof-flamegraph
+cabal install ghc-prof-flamegraph
 ghc-prof-flamegraph generator.prof
-stack install profiterole
+cabal install profiterole
 profiterole generator.prof
 
 # plot synthesis results
