@@ -18,9 +18,9 @@ source-repository-package
     tag: 3dd3d9519306ea06f0c15ad71bdf57e1dfd0b747
     --sha256: 1vp2jzn3yrwiwmy2ji859gbd788snygflnbyvyvp3d09x4p2xx2b
 
-source-repository-package
-    type: git
-    location: https://github.com/well-typed/cborg
-    tag: 44163bd78da5e80e5ec90f7c66f3ebf4d19db6f8
-    subdir: cborg
-    --sha256: 0s4hvn3b3addm1fb9g8dkrkqihpv2h0vmiqdz6f6px24hsh4w5kb
+--source-repository-package
+--    type: git
+--    location: https://github.com/well-typed/cborg
+--    tag: 44163bd78da5e80e5ec90f7c66f3ebf4d19db6f8
+--    subdir: cborg
+--    --sha256: 0s4hvn3b3addm1fb9g8dkrkqihpv2h0vmiqdz6f6px24hsh4w5kb
