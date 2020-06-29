@@ -22,6 +22,7 @@ ghcup set latest
 ./setup-cabal.sh
 cabal update
 source setenv
+cd synthesis
 cabal install
 
 # basic commands
@@ -29,6 +30,7 @@ cabal build
 cabal test
 cabal repl lib:synthesis
 cabal run generator   -- --help
+cabal run generator   -- --crashOnError --maxHoles=1
 cabal run synthesizer -- --help
 
 # Generate documentation.
