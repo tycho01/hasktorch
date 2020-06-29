@@ -38,6 +38,7 @@ mlp MLP{..} input =
     -- . linear l2
     -- . tanh
     -- . linear l1
-    . tanh
+    -- . tanh
+    tanh
     . linear l0
     $ input
