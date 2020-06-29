@@ -9,11 +9,8 @@ description: code-base for my UvA MSc AI thesis on typed neural program synthesi
 category: Machine Learning
 
 extra-source-files:
-- CHANGELOG.md
-- LICENSE.md
 - package.yaml
 - README.md
-- stack.yaml
 
 ghc-options:
   - -Wall
