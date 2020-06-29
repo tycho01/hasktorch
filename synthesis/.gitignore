@@ -12,7 +12,7 @@
 ### Haskell ###
 dist
 dist-*
-/*.cabal
+# /*.cabal
 cabal-dev
 *.o
 *.hi
