@@ -9,7 +9,7 @@ import Synthesis.Data
 typesByArity :: HashMap Int [String]
 typesByArity =
   insert 2 ["(,)", "Either", "HashMap"] $
-  insert 1 ["[]", "Maybe", "Set"] $
+  insert 1 ["[]", "Maybe"] $ -- , "Set"
   singleton 0 ["Bool", "Int", "Char"]
 
 -- | building blocks
