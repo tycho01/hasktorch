@@ -132,7 +132,6 @@ nsps = parallel $ let
         enc_model :: LstmEncoder Device MaxStringLength EncoderBatch' MaxChar H FeatMult <- A.sample $ LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropOut
         sampled_feats :: Tensor device 'D.Float '[R3nnBatch', MaxStringLength * (2 * FeatMult * Dirs * H)]
                 <- sampleTensor @0 @R3nnBatch' (length io_pairs) . toDynamic $ lstmEncoder enc_model tp_io_pairs
-        putStrLn $ "sampled_feats: " <> show sampled_feats
         r3nn_model :: R3NN Device M Symbols Rules MaxStringLength R3nnBatch' H MaxChar FeatMult <- A.sample $ initR3nn variants r3nnBatch' dropOut ruleCharMap
         let symbolIdxs :: HashMap String Int = indexList $ "undefined" : keys dsl
         let ppt :: Expr = parseExpr "not (not (undefined :: Bool))"
