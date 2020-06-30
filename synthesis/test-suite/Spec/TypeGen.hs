@@ -82,8 +82,9 @@ typeGen = parallel $ let
 
     it "randomType" $ do
         GenerationConfig{..} <- liftIO parseGenerationConfig
-        tp <- randomType types_by_arity False False nestLimit empty 0
-        [tyCon "Bool", tyCon "Int"] `shouldContain` [tp]
+        let nestLimit' :: Int = 0
+        tp <- randomType types_by_arity False False nestLimit' empty 0
+        [tyCon "Bool", tyCon "Int", tyCon "Char"] `shouldContain` [tp]
 
     it "randomFnType" $ do
         GenerationConfig{..} <- liftIO parseGenerationConfig
