@@ -106,8 +106,10 @@ synth = let
                 TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropOut
         model :: NSPS Device M Symbols Rules MaxStringLength EncoderBatch' R3nnBatch' MaxChar H FeatMult
                 <- A.sample $ NSPSSpec encoder_spec type_encoder_spec r3nn_spec
-        sampled_feats :: Tensor Device 'D.Float '[R3nnBatch', MaxStringLength * (2 * FeatMult * Dirs * H)]
-                <- encode @Device @'[R3nnBatch', MaxStringLength * (2 * FeatMult * Dirs * H)] @Rules model tp_io_pairs
+        
+        let gen :: StdGen = mkStdGen seedDef
+        let (_gen, sampled_feats) :: (StdGen, Tensor Device 'D.Float '[R3nnBatch', MaxStringLength * (2 * FeatMult * Dirs * H)])
+                = encode @Device @'[R3nnBatch', MaxStringLength * (2 * FeatMult * Dirs * H)] @Rules model gen tp_io_pairs
 
         let ruleIdxs :: HashMap String Int = indexList $ fst <$> variants
         let synth_max_holes = 3
