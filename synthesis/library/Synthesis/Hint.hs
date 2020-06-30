@@ -129,3 +129,9 @@ fnIoPairs crash_on_error n fn_ast (in_tp, out_tp) ins = do
 -- | get the type of an expression
 exprType :: Expr -> Interpreter Tp
 exprType = parseType <.> typeOf . pp
+
+-- | try to get the type of an expression, falling back to a star type * when this fails due to compilation issues, intended to patch the Hint bug of unresolved type variables as in `show undefined`.
+-- tryType :: Expr -> Interpreter Tp
+-- tryType = parseType . fromRight star <.> typeOf . pp
+tryType :: Expr -> IO Tp
+tryType = fromRight star <.> interpretSafe . exprType

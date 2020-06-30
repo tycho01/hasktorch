@@ -118,10 +118,9 @@ tyFun = TyFun l
 tyForall :: Maybe [TyVarBind L] -> Maybe (Context L) -> Tp -> Tp
 tyForall = TyForall l
 
--- -- | star type node: *
--- -- | deprecated, not in use
--- star :: Tp
--- star = TyStar l
+-- | star type node: *
+star :: Tp
+star = TyStar l
 
 -- | wildcard type node: _
 wildcard :: Tp
