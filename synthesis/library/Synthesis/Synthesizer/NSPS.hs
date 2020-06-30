@@ -84,15 +84,16 @@ import           Synthesis.Synthesizer.Synthesizer
 instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat maxChar, KnownNat h, KnownNat featMult, shape ~ '[r3nnBatch, maxStringLength * (2 * featMult * Dirs * h)], ruleFeats ~ (maxStringLength * m) ) => Synthesizer device shape rules ruleFeats (NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch maxChar h featMult) where
 
     encode :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch maxChar h featMult
-            -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-            -> IO (Tensor device 'D.Float shape)
+                -> StdGen
+                -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
+                -> (StdGen, Tensor device 'D.Float shape)
     -- | sampling embedded features to guarantee a static output size
     -- | to allow R3NN a fixed number of samples for its LSTMs, I'm sampling the actual features to make up for potentially multiple type instances giving me a variable number of i/o samples.
     -- | I opted to pick sampling with replacement, which both more naturally handles sample sizes exceeding the number of items, while also seeming to match the spirit of mini-batching by providing more stochastic gradients.
     -- | for my purposes, being forced to pick a fixed sample size means simpler programs with few types may potentially be learned more easily than programs with e.g. a greater number of type instances.
     -- | there should be fancy ways to address this like giving more weight to hard programs (/ samples).
     -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, maxStringLength * (2 * featMult * Dirs * h)]
-    encode mdl io_pairs = sampleTensor @0 @r3nnBatch (length io_pairs) . toDynamic $ lstmEncoder @encoderBatch @maxStringLength @maxChar @r3nnBatch @device @h (encoder mdl) io_pairs
+    encode mdl gen io_pairs = sampleTensorWithoutReplacement @0 @r3nnBatch gen (length io_pairs) . toDynamic $ lstmEncoder @encoderBatch @maxStringLength @maxChar @r3nnBatch @device @h (encoder mdl) io_pairs
 
     rule_encode :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch maxChar h featMult
                 -> [Tp]

@@ -203,9 +203,10 @@ taskPathOpt = strOption
     <> showDefault
     <> help "the file path from which to load generated datasets" )
 
+seedDef :: Int = 123
 seedOpt = option auto
     ( long "seed"
-    <> value (123 :: Int)
+    <> value seedDef
     <> showDefault
     <> help "random seed" )
 

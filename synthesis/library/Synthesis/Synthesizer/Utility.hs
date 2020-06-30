@@ -18,6 +18,7 @@
 module Synthesis.Synthesizer.Utility (module Synthesis.Synthesizer.Utility) where
 
 import Prelude hiding (lookup, exp)
+import System.Random (StdGen, mkStdGen)
 import System.ProgressBar
 import GHC.Stack
 import GHC.TypeLits
@@ -26,7 +27,7 @@ import System.Random (RandomGen, Random, random)
 import Debug.Trace (trace)
 import Data.Int (Int64)
 import Data.Maybe (fromJust)
-import Data.List (findIndex)
+import Data.List (findIndex, cycle)
 import Data.Foldable (toList)
 import Data.Monoid
 import Data.Hashable (Hashable)
@@ -489,10 +490,18 @@ instance A.Parameterized (Parameter device dtype shape) where
   replaceOwnParameters _ = UnsafeMkParameter <$> A.nextParameter
 
 -- | sample (with replacement) from a tensor in a given dimension
-sampleTensor :: forall dim size device dtype shape' . (KnownNat dim, KnownNat size, TensorOptions shape' dtype device, KnownShape shape') => Int -> D.Tensor -> IO (Tensor device dtype shape')
-sampleTensor n tensor = do
+sampleTensorWithReplacement :: forall dim size device dtype shape' . (KnownNat dim, KnownNat size, TensorOptions shape' dtype device, KnownShape shape') => Int -> D.Tensor -> IO (Tensor device dtype shape')
+sampleTensorWithReplacement n tensor = do
     sampled_idxs :: D.Tensor <- D.toDevice (D.device tensor) . F.toDType D.Int64 <$> D.randintIO' 0 n [natValI @size]
     return . UnsafeMkTensor $ D.indexSelect tensor (natValI @dim) sampled_idxs
+
+-- | sample (without replacement) from a tensor in a given dimension
+sampleTensorWithoutReplacement :: forall dim size device dtype shape' . (KnownNat dim, KnownNat size, TensorOptions shape' dtype device, KnownShape shape') => StdGen -> Int -> D.Tensor -> (StdGen, Tensor device dtype shape')
+sampleTensorWithoutReplacement gen n tensor = (gen', t) where
+    (idxs', gen') = fisherYates gen $ [0 .. n - 1]
+    idxs :: [Int] = take (natValI @size) . cycle $ idxs'
+    sampled_idxs :: D.Tensor = D.toDevice (D.device tensor) . F.toDType D.Int64 . D.asTensor $ idxs
+    t = UnsafeMkTensor $ D.indexSelect tensor (natValI @dim) sampled_idxs
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String

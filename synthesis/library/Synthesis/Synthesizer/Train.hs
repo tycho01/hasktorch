@@ -192,6 +192,8 @@ prep_dsl TaskFnDataset{..} = do
     -- without this, blocks identical to their keys are seen as recursive, causing non-termination
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
+foldrM_ x xs f = foldrM f x xs
+
 -- | train a NSPS model and return results
 train :: forall device rules shape ruleFeats synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
@@ -219,8 +221,7 @@ train synthesizerConfig taskFnDataset init_model = do
         -- TRAIN LOOP
         let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model_ variantTypes
-        let foldrM_ x xs f = foldrM f x xs
-        (train_losses, model', optim') :: ([D.Tensor], synthesizer, D.Adam) <- foldrM_ ([], model_, optim_) train_set' $ \ task_fn (train_losses, model, optim) -> do
+        (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
             -- putStrLn $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = fnTypes ! task_fn
             -- putStrLn $ "taskType: " <> pp taskType
@@ -229,13 +230,13 @@ train synthesizerConfig taskFnDataset init_model = do
             -- putStrLn $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
-            io_feats :: Tensor device 'D.Float shape <- liftIO $ encode @device @shape @rules @ruleFeats model target_tp_io_pairs
+            let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
             loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
             -- TODO: do once for each mini-batch / fn?
             -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
             let model' :: synthesizer = A.replaceParameters model newParam
-            return (toDynamic loss : train_losses, model', optim')
+            return (toDynamic loss : train_losses, model', optim', gen'')
 
         -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
         let loss_train :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ train_losses
@@ -244,9 +245,9 @@ train synthesizerConfig taskFnDataset init_model = do
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
 
         -- EVAL
-        (earlyStop, eval_results') <- whenOrM (False, eval_results) (mod epoch evalFreq == 0) $ do
+        (earlyStop, eval_results', gen''') <- whenOrM (False, eval_results, gen'') (mod epoch evalFreq == 0) $ do
 
-            (acc_valid, loss_valid) <- evaluate @device @rules @shape @ruleFeats taskFnDataset prepped_dsl bestOf maskBad model' validation_set
+            (acc_valid, loss_valid, gen_) <- evaluate @device @rules @shape @ruleFeats gen'' taskFnDataset prepped_dsl bestOf maskBad model' validation_set
 
             liftIO $ printf
                 "Epoch: %03d. Train loss: %.4f. Validation loss: %.4f. Validation accuracy: %.4f.\n"
@@ -270,7 +271,7 @@ train synthesizerConfig taskFnDataset init_model = do
                     in earlyStop
             when earlyStop $ debug "validation loss has converged, stopping early!"
 
-            return $ (earlyStop, eval_results')
+            return $ (earlyStop, eval_results', gen_)
 
         let acc_valid :: Float = accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
@@ -280,7 +281,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 return . divScalar learningDecay $ lr
             False -> pure lr
 
-        return (gen', model', optim', earlyStop, eval_results', lr', acc_valid)
+        return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid)
 
     -- write results to csv
     liftIO $ createDirectoryIfMissing True resultFolder
@@ -293,17 +294,19 @@ train synthesizerConfig taskFnDataset init_model = do
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer)
-         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> synthesizer -> [Expr] -> Interpreter (Tensor device 'D.Float '[], Tensor device 'D.Float '[])
-evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
+         => StdGen -> TaskFnDataset -> PreppedDSL -> Int -> Bool -> synthesizer -> [Expr] -> Interpreter (Tensor device 'D.Float '[], Tensor device 'D.Float '[], StdGen)
+evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
-    eval_stats :: [(Bool, Tensor device 'D.Float '[])] <- forM dataset $ \task_fn -> do
+
+    (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \task_fn (gen_, eval_stats) -> do
+
         let taskType :: Tp = fnTypes ! task_fn
         let type_ins :: HashMap (Tp, Tp) [Expr] = task_type_ins ! task_fn
         let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = fnTypeIOs ! task_fn
         let target_outputs :: [Either String Expr] = task_outputs ! task_fn
 
-        io_feats :: Tensor device 'D.Float shape <- liftIO $ encode @device @shape @rules @ruleFeats model target_tp_io_pairs
+        let (gen', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
         loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
 
         -- sample for best of 100 predictions
@@ -348,8 +351,8 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
 
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
-        return (best_works, loss)
+        return (gen', (best_works, loss) : eval_stats)
 
     let acc  :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . F.toDType D.Float . D.asTensor $ fst <$> eval_stats
     let loss :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ toDynamic           . snd <$> eval_stats
-    return (acc, loss)
+    return (acc, loss, gen')

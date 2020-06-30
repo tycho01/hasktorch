@@ -80,8 +80,9 @@ import           Synthesis.Synthesizer.Params
 
 class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules ruleFeats synthesizer where
     encode    :: synthesizer
+                -> StdGen
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-                -> IO (Tensor device 'D.Float shape)
+                -> (StdGen, Tensor device 'D.Float shape)
     rule_encode :: synthesizer
                 -> [Tp]
                 -> Tensor device 'D.Float '[rules, ruleFeats]
