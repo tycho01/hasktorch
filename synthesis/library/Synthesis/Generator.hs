@@ -55,9 +55,7 @@ main = do
     programs :: [Expr] <- interpretUnsafe $ genFns maxHoles variants dsl
     putStrLn "\nprograms:"
     putStrLn $ pp_ programs
-    -- sample task functions from all programs
-    let (task_fns', _gen) = fisherYates gen programs
-    let task_fns = take maxDataset task_fns'
+    let task_fns = programs
     fn_types :: HashMap Expr Tp <- interpretUnsafe $ fromKeysM exprType task_fns
     putStrLn "\nfn_types:"
     putStrLn $ pp_ fn_types
@@ -124,7 +122,11 @@ main = do
     putStrLn "\nkept_fns_:"
     putStrLn $ pp_ kept_fns_
     -- ensure sets contain no fns w/ behavior identical to any in other sets to prevent cheating
-    let kept_fns :: [Expr] = dedupeFunctions kept_fns_ fn_type_ios
+    let kept_fns' :: [Expr] = dedupeFunctions kept_fns_ fn_type_ios
+    putStrLn "\nkept_fns':"
+    putStrLn $ pp_ kept_fns'
+    -- sample task functions from any remaining programs
+    let (kept_fns, _gen) = take maxDataset . fisherYates gen $ kept_fns'
     putStrLn "\nkept_fns:"
     putStrLn $ pp_ kept_fns
     let fn_types_ = pickKeys kept_fns fn_types
