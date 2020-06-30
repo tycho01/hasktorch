@@ -126,7 +126,8 @@ main = do
     putStrLn "\nkept_fns':"
     putStrLn $ pp_ kept_fns'
     -- sample task functions from any remaining programs
-    let (kept_fns, _gen) = take maxDataset . fisherYates gen $ kept_fns'
+    let (shuffled, _gen) = fisherYates gen $ kept_fns'
+    let kept_fns = take maxDataset shuffled
     putStrLn "\nkept_fns:"
     putStrLn $ pp_ kept_fns
     let fn_types_ = pickKeys kept_fns fn_types
