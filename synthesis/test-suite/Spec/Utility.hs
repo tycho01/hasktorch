@@ -114,9 +114,10 @@ util = parallel $ do
         GridSearchConfig{..} <- parseGridSearchConfig
         let optCfg = OptimizationConfig{..}
         let hparComb = HparComb
-                { dropoutRate = 0.0
-                , regularization = 0.0
-                , m = 20
-                , h = 30
+                { learningRate = learningRateDef
+                , dropoutRate = dropoutRateDef
+                , regularization = regularizationDef
+                , m = mDef
+                , h = hDef
                 }
         combineConfig optCfg hparComb `shouldBe` synthCfg
