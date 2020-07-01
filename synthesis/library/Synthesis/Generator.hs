@@ -165,6 +165,7 @@ main = do
         rest_instantiation_inputs
         datasets
         variants
+        variantTypes
         longest_expr_string
         longest_string
         exprCharMap

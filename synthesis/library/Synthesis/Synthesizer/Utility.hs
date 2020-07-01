@@ -238,6 +238,7 @@ lookupRule hm k = case (lookup k hm) of
     Nothing -> error $ "the DSL does not contain rule " ++ show k ++ "!"
 
 -- | get holed variants for a DSL
+-- | deprecated, not in use
 dslVariants :: HashMap String Expr -> Interpreter [(String, Expr)]
 dslVariants dsl = do
     fn_types :: HashMap String Tp <- exprType `mapM` dsl

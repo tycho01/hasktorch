@@ -188,7 +188,7 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     -- finally re-evaluate the chosen hyperparameters on our test set
     manual_seed_L $ fromIntegral seed
     let test_set :: [Expr] = thdOf3 datasets
-    prepped_dsl <- interpretUnsafe $ prep_dsl taskFnDataset
+    let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
     let useTypes = natValI @featMult > 1
     let charMap = if useTypes then bothCharMap else exprCharMap

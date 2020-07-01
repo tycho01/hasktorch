@@ -171,10 +171,9 @@ calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs vari
     return loss
 
 -- | pre-calculate DSL stuff
-prep_dsl :: TaskFnDataset -> Interpreter PreppedDSL
-prep_dsl TaskFnDataset{..} = do
-    variantTypes :: [Tp] <- (exprType . letIn dsl' . snd) `mapM` variants
-    return $ PreppedDSL variants variant_sizes task_type_ins task_io_map task_outputs symbolIdxs ruleIdxs variantMap max_holes dsl' variantTypes
+prep_dsl :: TaskFnDataset -> PreppedDSL
+prep_dsl TaskFnDataset{..} =
+    PreppedDSL variants variant_sizes task_type_ins task_io_map task_outputs symbolIdxs ruleIdxs variantMap max_holes dsl'
     where
     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
     variant_sizes :: HashMap String Int = fromList $ variantInt . snd <$> variants
@@ -208,7 +207,7 @@ train synthesizerConfig taskFnDataset init_model = do
     let modelFolder = resultFolder <> "/" <> ppCfg synthesizerConfig
     liftIO $ createDirectoryIfMissing True modelFolder
 
-    prepped_dsl <- prep_dsl taskFnDataset
+    let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
 
     -- MODELS
