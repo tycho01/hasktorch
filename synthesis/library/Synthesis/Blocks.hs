@@ -50,8 +50,8 @@ blockAstsCategoryTheory =
     -- -- Set
     -- -- TODO: having this definition in a let-in construction errors as it suddenly wants a monomorphic type for some reason. should I manually type-annotate all of these myself?
     -- $ insert "insertSet" "Set.insert"
-    -- HashMap
-    $ insert "insert" "insert"
+    -- -- HashMap
+    -- $ insert "insert" "insert"
     -- Enum
     $ insert "succ" "succ"
     $ insert "toEnum" "toEnum"
