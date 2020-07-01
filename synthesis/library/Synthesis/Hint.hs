@@ -112,10 +112,18 @@ interpretStr crash_on_error cmd =
 -- | the reason this function needs to be run through the interpreter is I only have the function/inputs as AST,
 -- | meaning I also only know the types at run-time (which is when my programs are constructed).
 fnIoPairs :: Bool -> Int -> Expr -> (Tp, Tp) -> Expr -> Interpreter [(Expr, Either String Expr)]
-fnIoPairs crash_on_error n fn_ast (in_tp, _out_tp) ins = do
+fnIoPairs crash_on_error n fn_ast (in_tp, out_tp) ins = do
   let unCurry = genUncurry n
-  -- let cmd = "show $ spork . UNCURRY (" ++ fn_str ++ ") <$> (" ++ ins ++ " :: [" ++ pp in_tp ++ "])"
-  let cmd = pp $ infixApp (infixApp (var "show") dollar (infixApp (var "spork") dot $ app (paren unCurry) $ paren fn_ast)) (symbol "<$>") $ expTypeSig ins $ tyList in_tp
+  -- let cmd = "show $ (spork . UNCURRY (" ++ fn_str ++ ") <$> (" ++ ins ++ " :: [" ++ pp in_tp ++ "])) :: [Either String " ++ pp out_tp ++ "]"
+  let cmd = pp $
+        infixApp (var "show") dollar $
+        expTypeSig (
+            paren $ infixApp
+                 (infixApp (var "spork") dot $
+                    app (paren unCurry) $ paren fn_ast)
+                 (symbol "<$>")
+                 $ expTypeSig ins $ tyList in_tp)
+        (tyList $ tyApp (tyApp (tyCon "Either") (tyCon "String")) out_tp)
   debug cmd
   zip (unList ins) . fmap unEitherString . unList . parseExpr . fromRight "[]" <$> interpretStr crash_on_error cmd
 
