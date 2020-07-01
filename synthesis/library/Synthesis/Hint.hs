@@ -123,7 +123,7 @@ fnIoPairs crash_on_error n fn_ast (in_tp, out_tp) ins = do
                 (infixApp (var "sequence") dollar $ infixApp (infixApp (var "try") dot (infixApp (var "evaluate") dot $ app (paren unCurry) $ paren fn_ast)) (symbol "<$>") $ expTypeSig ins $ tyList in_tp),
               Qualifier l $ infixApp (infixApp (var "return") dot $ var "show") dollar $ infixApp (app (var "first") $ var "show") (symbol "<$>") $ var "outs"
             ]
-  -- say cmd
+  debug cmd
   zip (unList ins) . fmap unEitherString . unList . parseExpr . fromRight "[]" <$> interpretIO crash_on_error cmd
 
 -- | get the type of an expression
