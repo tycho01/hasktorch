@@ -8,8 +8,8 @@ import Synthesis.Data
 -- | synthesized types, categorized by arity
 typesByArity :: HashMap Int [String]
 typesByArity =
---   insert 2 ["(,)", "Either"] $  -- , "HashMap"
---   insert 1 ["[]"] $ -- , "Maybe", "Set"
+  insert 2 ["(,)", "Either"] $  -- , "HashMap"
+  insert 1 ["[]"] $ -- , "Maybe", "Set"
   singleton 0 ["Bool"] -- , "Int", "Char"
 
 -- | building blocks
@@ -39,14 +39,14 @@ blockAstsCategoryTheory =
     -- -- Maybe
     -- $ insert "just" "Just"
     -- $ insert "maybe" "maybe"
-    -- -- List
-    -- $ insert "(:)" "(:)"
-    -- $ insert "null" "null"
-    -- $ insert "length" "length"
-    -- -- (,)
-    -- $ insert "(,)" "(,)"
-    -- $ insert "zip" "zip"
-    -- $ insert "unzip" "unzip"
+    -- List
+    $ insert "(:)" "(:)"
+    $ insert "null" "null"
+    $ insert "length" "length"
+    -- (,)
+    $ insert "(,)" "(,)"
+    $ insert "zip" "zip"
+    $ insert "unzip" "unzip"
     -- -- Set
     -- -- TODO: having this definition in a let-in construction errors as it suddenly wants a monomorphic type for some reason. should I manually type-annotate all of these myself?
     -- $ insert "insertSet" "Set.insert"
@@ -66,8 +66,8 @@ blockAstsCategoryTheory =
     -- $ insert "sequenceA" "sequenceA"
     -- $ insert "mapM" "mapM"
     -- $ insert "sequence" "sequence"
-    -- -- Functor
-    -- $ insert "fmap" "fmap"
+    -- Functor
+    $ insert "fmap" "fmap"
     -- -- Monad
     -- $ insert "(>>=)" "(>>=)"
     -- -- Applicative
