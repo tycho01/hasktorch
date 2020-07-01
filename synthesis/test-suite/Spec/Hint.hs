@@ -83,9 +83,9 @@ hint = let
             _ -> ""
         not (null s) @?= True
 
-    , TestLabel "interpretIO" $ TestCase $ do
+    , TestLabel "interpretStr" $ TestCase $ do
         GenerationConfig { crashOnError = crashOnError } :: GenerationConfig <- parseGenerationConfig
-        x <- interpretUnsafe (fromRight "" <$> interpretIO crashOnError "return \"foo\"")
+        x <- interpretUnsafe (fromRight "" <$> interpretStr crashOnError "\"foo\"")
         x @?= "foo"
 
     , TestLabel "fnIoPairs" $ TestCase $ do
