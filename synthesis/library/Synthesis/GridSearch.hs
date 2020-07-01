@@ -98,7 +98,7 @@ gridSearch = do
     let cfg = OptimizationConfig{..}
     taskFnDataset :: TaskFnDataset <- decodeFileThrow taskPath
     let TaskFnDataset{..} = taskFnDataset
-    putStrLn . show $ generationCfg
+    say_ . show $ generationCfg
     pb <- newProgressBar pgStyle 1 (Progress 0 (length hparCombs) ("grid-search" :: Text))
     let stdGen :: StdGen = mkStdGen seed
     let hparCombs' :: [(HparComb, IO (EvalResult, IO ()))] =
@@ -114,7 +114,7 @@ gridSearch = do
     -- write results to csv
     let resultPath = printf "%s/gridsearch-%s.csv" resultFolder $ ppCfg cfg
     liftIO $ writeCsv resultPath gridSearchHeader $ second fst <$> hparResults
-    putStrLn $ "data written to " <> resultPath
+    say_ $ "data written to " <> resultPath
 
     -- could show tie-breakers by `monad-loops`'s `minimaOnM`, but... just visualize.
     snd . minBy (lossValid . fst) $ snd <$> hparResults
@@ -167,9 +167,9 @@ evalHparComb taskFnDataset cfg hparComb = do
     let SynthesizerConfig{..} = cfg'
     let TaskFnDataset{..} = taskFnDataset
     let variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
-    putStrLn ""  -- don't touch the progress bar line
-    putStrLn . show $ hparComb
-    -- putStrLn . show $ cfg'
+    say_ ""  -- don't touch the progress bar line
+    say_ . show $ hparComb
+    -- say_ . show $ cfg'
     manual_seed_L $ fromIntegral seed
     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch maxChar h featMult
             <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate

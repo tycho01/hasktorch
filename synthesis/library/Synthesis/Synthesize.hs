@@ -50,12 +50,12 @@ main = if False -- hasCuda
 synthesize :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64) => IO ()
 synthesize = do
     cfg :: SynthesizerConfig <- parseSynthesizerConfig
-    putStrLn $ show cfg
+    say_ $ show cfg
     let SynthesizerConfig{..} = cfg
     updateGlobalLogger logger . setLevel $ logPriority verbosity
     taskFnDataset :: TaskFnDataset <- decodeFileThrow taskPath
     let TaskFnDataset{..} = taskFnDataset
-    putStrLn $ show generationCfg
+    say_ $ show generationCfg
     manual_seed_L $ fromIntegral seed
     (!! length exprBlocks) $
         -- featMult

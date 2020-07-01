@@ -53,22 +53,31 @@ logger = "my_logger"
 -- | print in the Interpreter monad
 say, debug, info, notice, warning, err, critical, alert, emergency :: String -> Interpreter ()
 say = warning
+say_ = warning_
 -- | log: debug
-debug     = liftIO . debugM     logger
+debug_     = debugM     logger
+debug      = liftIO . debug_
 -- | log: info
-info      = liftIO . infoM      logger
+info_      = infoM      logger
+info       = liftIO . info_
 -- | log: notice
-notice    = liftIO . noticeM    logger
+notice_    = noticeM    logger
+notice     = liftIO . notice_
 -- | log: warning
-warning   = liftIO . warningM   logger
+warning_   = warningM   logger
+warning    = liftIO . warning_
 -- | log: error
-err       = liftIO . errorM     logger
+err_       = errorM     logger
+err        = liftIO . err_
 -- | log: critical
-critical  = liftIO . criticalM  logger
+critical_  = criticalM  logger
+critical   = liftIO . critical_
 -- | log: alert
-alert     = liftIO . alertM     logger
+alert_     = alertM     logger
+alert      = liftIO . alert_
 -- | log: emergency
-emergency = liftIO . emergencyM logger
+emergency_ = emergencyM logger
+emergency  = liftIO . emergency_
 
 -- | run-time Language.Haskell.Interpreter compilation error
 errorString :: InterpreterError -> String

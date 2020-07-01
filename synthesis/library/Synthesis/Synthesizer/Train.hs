@@ -119,7 +119,7 @@ predictHole variants ppt used hole_expansion_probs = do
     let (_hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
     let ppt' :: Expr = hole_setter ppt rule_expr
-    -- putStrLn . show $ (hole_idx, rule_idx, pp ppt')
+    -- say_ . show $ (hole_idx, rule_idx, pp ppt')
     return (ppt', used')
 
 -- | fill a random non-terminal leaf node as per `task_fn`
@@ -162,7 +162,7 @@ calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs vari
                             `mapM` findHolesExpr ppt
                         return . Torch.Typed.Tensor.toDevice @device . asUntyped (F.mul $ toDynamic mask) $ predicted
                     (ppt', gold) <- liftIO $ fillHoleTrain variantMap ruleIdxs task_fn ppt predicted'
-                    -- putStrLn $ "ppt': " <> pp ppt'
+                    -- say_ $ "ppt': " <> pp ppt'
                     return (ppt', toDynamic gold : golds, toDynamic predicted' : predictions, filled + 1)
             in while (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
     let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
@@ -222,12 +222,12 @@ train synthesizerConfig taskFnDataset init_model = do
         let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model_ variantTypes
         (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
-            -- putStrLn $ "task_fn: \n" <> pp task_fn
+            -- say_ $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = fnTypes ! task_fn
-            -- putStrLn $ "taskType: " <> pp taskType
+            -- say_ $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     fnTypeIOs ! task_fn
-            -- putStrLn $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+            -- say_ $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
             let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs

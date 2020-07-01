@@ -82,7 +82,7 @@ optim = parallel $ do
         (length $ (flip (!!) $ head mOpts) $ getM @Device @FeatMult @0 @0 @0 @0 @0 @0 cfg taskFnDataset hparCombs) `shouldBe` (length hparCombs `div` length mOpts)
         (length . join        $ pickIdxs mOpts $ getM @Device @FeatMult @0 @0 @0 @0 @0 @0 cfg taskFnDataset hparCombs) `shouldBe` length hparCombs
         (length . join . join $ pickIdxs hOpts $ getH @Device @FeatMult @0 @0 @0 @0 @0    cfg taskFnDataset hparCombs) `shouldBe` length hparCombs * length mOpts
-        -- putStrLn . show $ length hparCombs * length mOpts * length hOpts
+        -- say_ . show $ length hparCombs * length mOpts * length hOpts
         -- (length . join . join $ (!! longestString) $ getMaxStringLength @Device @FeatMult @0 @0 @0 @0 cfg taskFnDataset hparCombs) `shouldBe` length hparCombs * length mOpts * length hOpts
         -- (length . join . join $ (!! (size dsl + natValI @LhsSymbols)) $ getSymbols @Device @FeatMult @0 @0 @0 cfg taskFnDataset hparCombs) `shouldBe` length hparCombs * length mOpts * length hOpts
         -- (length . join . join $ (!! (size charMap + 1)) $ getMaxChar @Device @FeatMult @0 @0 cfg taskFnDataset hparCombs) `shouldBe` length hparCombs * length mOpts * length hOpts

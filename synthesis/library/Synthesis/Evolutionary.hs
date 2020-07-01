@@ -44,6 +44,7 @@ import qualified Torch.NN                      as A
 import Synthesis.Data hiding (SynthesizerConfig(..))
 import Synthesis.Configs
 import Synthesis.Utility
+import Synthesis.Hint
 import Synthesis.Synthesizer.Utility
 import Synthesis.GridSearch hiding (main)
 
@@ -156,7 +157,7 @@ evolutionary = do
     let cfg = OptimizationConfig{..}
     taskFnDataset :: TaskFnDataset <- decodeFileThrow taskPath
     let TaskFnDataset{..} = taskFnDataset
-    putStrLn . show $ generationCfg
+    say_ . show $ generationCfg
     let len = length hparCombs
     let g = mkStdGen seed
     let hparCombs' :: [(HparComb, IO (EvalResult, IO ()))] = join . fmap join $ (!! length exprBlocks) $
@@ -180,12 +181,12 @@ evolutionary = do
             False -- don't rescore archive in each generation
     es <- evolveVerbose g gaCfg () getIO
     bests :: [(HparComb, (EvalResult, IO ()))] <- mapM (traverseToSnd getIO . snd) es
-    putStrLn $ "best entities (GA): " <> show (second fst <$> bests)
+    say_ $ "best entities (GA): " <> show (second fst <$> bests)
 
     -- write results to csv
     let resultPath = printf "%s/evolutionary-%s.csv" resultFolder $ ppCfg cfg
     writeCsv resultPath gridSearchHeader $ second fst <$> bests
-    putStrLn $ "data written to " <> resultPath
+    say_ $ "data written to " <> resultPath
 
     -- finally evaluate the best-performing configuration on our test set
     snd . snd $ head bests
