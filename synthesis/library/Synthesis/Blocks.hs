@@ -90,8 +90,8 @@ blockAstsCategoryTheory =
     -- $ insert "bifoldr" "bifoldr"
     -- -- Bitraversable
     -- $ insert "bitraverse" "bitraverse"
-    -- -- misc
-    -- $ insert "const" "const"
+    -- misc
+    $ insert "const" "const"
     -- $ insert "" ""
     $ singleton "(.)" "(.)"
 
