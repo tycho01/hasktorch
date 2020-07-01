@@ -37,6 +37,7 @@ data TaskFnDataset = TaskFnDataset
     , restInstantiationInputs :: HashMap Tp [Expr]
     , datasets :: ([Expr], [Expr], [Expr])
     , exprBlocks :: [(String, Expr)]
+    , variantTypes :: [Tp]
     , longestExprString :: Int
     , longestString :: Int
     , exprCharMap :: HashMap Char Int
@@ -234,5 +235,4 @@ data PreppedDSL = PreppedDSL
     , variantMap :: HashMap String Expr
     , max_holes :: Int
     , dsl' :: HashMap String Expr
-    , variantTypes :: [Tp]
     }
