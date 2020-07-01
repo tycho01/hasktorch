@@ -58,14 +58,13 @@ common config
                     , text
                     , unordered-containers
                     , yaml
-                    , deepseq
+                    , spork
 
 library
   import: config
   hs-source-dirs:
       library
   exposed-modules:
-      Control.Spork
       Synthesis.Ast
       Synthesis.Blocks
       Synthesis.Configs
