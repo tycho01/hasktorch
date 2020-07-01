@@ -5,6 +5,7 @@
 -- | generator logic
 module Synthesis.Generator (module Synthesis.Generator) where
 
+import System.Log.Logger
 import Control.Monad (join, filterM, forM_)
 import Data.Bifunctor (first)
 import Data.HashMap.Lazy
@@ -41,6 +42,7 @@ main = do
     cfg :: GenerationConfig <- parseGenerationConfig
     putStrLn $ show cfg
     let GenerationConfig {..} = cfg
+    updateGlobalLogger logger . setLevel $ logPriority verbosity
     let gen :: StdGen = mkStdGen seed
     let split = (training, validation, test)
     putStrLn "\ntypesByArity:"

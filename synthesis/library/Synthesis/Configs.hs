@@ -84,6 +84,7 @@ generationConfig = GenerationConfig
         <> value 1000
         <> showDefault
         <> help "the maximum number of programs we will consider for use in our dataset (before further filtering)" )
+    <*> verbosityOpt
 
 parseGenerationConfig :: IO GenerationConfig
 parseGenerationConfig = execParser opts
