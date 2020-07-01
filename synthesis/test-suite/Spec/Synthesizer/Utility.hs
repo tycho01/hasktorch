@@ -106,11 +106,11 @@ synth_util = parallel $ do
         toFloat loss > 0.0 `shouldBe` True
 
     -- it "gpu" $ do
-    --     putStrLn $ "availableDevices: " <> show availableDevices
+    --     say_ $ "availableDevices: " <> show availableDevices
     --     dev <- getDevice
-    --     putStrLn $ "dev: " <> show dev
+    --     say_ $ "dev: " <> show dev
     --     let t = D.toCUDA $ D.asTensor $ [1,2,3::Int]
-    --     putStrLn $ "t: " <> show t
+    --     say_ $ "t: " <> show t
     --     False `shouldBe` True
 
     it "pickIdxs" $ do

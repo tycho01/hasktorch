@@ -98,7 +98,7 @@ nsps = parallel $ let
     in do
 
     it "LstmEncoder" $ do
-        -- putStrLn . show $ size charMap + 1
+        -- say_ . show $ size charMap + 1
         enc_model :: LstmEncoder Device MaxStringLength EncoderBatch' MaxChar H FeatMult <- A.sample $ LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropOut
         let (_gen, io_feats) :: (StdGen, Tensor Device 'D.Float '[R3nnBatch', 2 * FeatMult * Dirs * H * MaxStringLength]) = sampleTensorWithoutReplacement @0 @R3nnBatch' gen (length io_pairs) . toDynamic $ lstmEncoder enc_model tp_io_pairs
         D.shape (toDynamic io_feats) `shouldBe` [natValI @R3nnBatch', natValI @(2 * FeatMult * Dirs * H * MaxStringLength)]
@@ -137,7 +137,7 @@ nsps = parallel $ let
         let symbolIdxs :: HashMap String Int = indexList $ "undefined" : keys dsl
         let ppt :: Expr = parseExpr "not (not (undefined :: Bool))"
         rule_encoder <- A.sample type_encoder_spec
-        -- putStrLn $ "rule_tp_emb : " <> show rule_tp_emb
+        -- say_ $ "rule_tp_emb : " <> show rule_tp_emb
         let rule_tp_emb :: Tensor Device 'D.Float '[Rules, MaxStringLength * M] =
                 typeEncoder @Rules rule_encoder variantTypes
         let hole_expansion_probs :: Tensor Device 'D.Float '[NumHoles, Rules] = runR3nn r3nn_model symbolIdxs ppt rule_tp_emb sampled_feats
