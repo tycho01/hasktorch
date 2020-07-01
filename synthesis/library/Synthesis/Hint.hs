@@ -7,7 +7,6 @@ import Control.Monad (join)
 import Data.Bifunctor (bimap)
 import Data.Either (fromRight)
 import Data.Functor ((<&>))
-import Data.Bifunctor (second)
 import Data.List (intercalate)
 import GHC.Stack
 import Language.Haskell.Exts.Syntax
@@ -22,14 +21,13 @@ import System.Log.Logger
 imports :: [ModuleImport]
 imports =
   [ ModuleImport "Prelude"             NotQualified                   NoImportList
-  , ModuleImport "Data.Bifunctor"      NotQualified                   $ ImportList ["first", "second"]
-  -- , ModuleImport "Data.Set"            NotQualified                   $ ImportList ["Set"]
-  -- , ModuleImport "Data.Set"            (QualifiedAs $ Just "Set")     $ ImportList ["insert"]
+  , ModuleImport "Control.Spork"       NotQualified                   $ ImportList ["spork"]
+  , ModuleImport "Data.Hashable"       NotQualified                   $ ImportList ["Hashable"]
   , ModuleImport "Data.HashMap.Lazy"   NotQualified                   $ ImportList ["HashMap", "insert", "fromList"]
   , ModuleImport "Data.HashMap.Lazy"   (QualifiedAs $ Just "HashMap") $ ImportList ["fromList"]
   , ModuleImport "Control.Applicative" NotQualified                   $ ImportList ["empty"]
-  , ModuleImport "Data.Hashable"       NotQualified                   $ ImportList ["Hashable"]
-  , ModuleImport "Control.Spork"       NotQualified                   $ ImportList ["spork"]
+  -- , ModuleImport "Data.Set"            NotQualified                   $ ImportList ["Set"]
+  -- , ModuleImport "Data.Set"            (QualifiedAs $ Just "Set")     $ ImportList ["insert"]
   ]
 
 -- | test an interpreter monad, printing errors, returning values
