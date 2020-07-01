@@ -8,9 +8,9 @@ import Synthesis.Data
 -- | synthesized types, categorized by arity
 typesByArity :: HashMap Int [String]
 typesByArity =
-  insert 2 ["(,)", "Either"] $  -- , "HashMap"
-  insert 1 ["[]"] $ -- , "Maybe", "Set"
-  singleton 0 ["Bool"] -- , "Int", "Char"
+  insert 2 ["(,)", "Either", "HashMap"] $
+  insert 1 ["[]", "Maybe"] $ -- , "Set"
+  singleton 0 ["Bool", "Int", "Char"]
 
 -- | building blocks
 -- | cf. NSPS: A DSL can be considered a context-free grammar with a start symbol S and a
@@ -36,9 +36,9 @@ blockAstsCategoryTheory =
   fmap parseExpr
     -- scalars
     $ insert "zero" "0"
-    -- -- Maybe
-    -- $ insert "just" "Just"
-    -- $ insert "maybe" "maybe"
+    -- Maybe
+    $ insert "just" "Just"
+    $ insert "maybe" "maybe"
     -- List
     $ insert "(:)" "(:)"
     $ insert "null" "null"
@@ -50,37 +50,37 @@ blockAstsCategoryTheory =
     -- -- Set
     -- -- TODO: having this definition in a let-in construction errors as it suddenly wants a monomorphic type for some reason. should I manually type-annotate all of these myself?
     -- $ insert "insertSet" "Set.insert"
-    -- -- HashMap
-    -- $ insert "insert" "insert"
+    -- HashMap
+    $ insert "insert" "insert"
     -- Enum
     $ insert "succ" "succ"
     $ insert "toEnum" "toEnum"
     $ insert "fromEnum" "fromEnum"
-    -- -- Foldable
-    -- $ insert "foldMap" "foldMap"
-    -- $ insert "foldr" "foldr"
-    -- $ insert "foldr1" "foldr1"
-    -- $ insert "elem" "elem"
-    -- -- Traversable
-    -- $ insert "traverse" "traverse"
-    -- $ insert "sequenceA" "sequenceA"
-    -- $ insert "mapM" "mapM"
-    -- $ insert "sequence" "sequence"
+    -- Foldable
+    $ insert "foldMap" "foldMap"
+    $ insert "foldr" "foldr"
+    $ insert "foldr1" "foldr1"
+    $ insert "elem" "elem"
+    -- Traversable
+    $ insert "traverse" "traverse"
+    $ insert "sequenceA" "sequenceA"
+    $ insert "mapM" "mapM"
+    $ insert "sequence" "sequence"
     -- Functor
     $ insert "fmap" "fmap"
-    -- -- Monad
-    -- $ insert "(>>=)" "(>>=)"
-    -- -- Applicative
-    -- $ insert "pure" "pure"
-    -- $ insert "(<*>)" "(<*>)"
-    -- -- Alternative
-    -- $ insert "empty" "empty"
-    -- -- Monoid
-    -- $ insert "mempty" "mempty"
-    -- -- Semigroup
-    -- $ insert "(<>)" "(<>)"
-    -- -- Show
-    -- $ insert "show" "show"
+    -- Monad
+    $ insert "(>>=)" "(>>=)"
+    -- Applicative
+    $ insert "pure" "pure"
+    $ insert "(<*>)" "(<*>)"
+    -- Alternative
+    $ insert "empty" "empty"
+    -- Monoid
+    $ insert "mempty" "mempty"
+    -- Semigroup
+    $ insert "(<>)" "(<>)"
+    -- Show
+    $ insert "show" "show"
     -- -- Bifunctor
     -- $ insert "bimap" "bimap"
     -- $ insert "first" "first"
