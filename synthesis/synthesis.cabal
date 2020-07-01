@@ -27,9 +27,6 @@ common config
       Paths_synthesis
   build-depends:      base >= 4.7 && < 5
                     , hasktorch
-                    -- , ghc-typelits-extra >= 0.3.1
-                    -- , ghc-typelits-knownnat >= 0.7
-                    -- , ghc-typelits-natnormalise >= 0.7
                     , ghc-typelits-extra
                     , ghc-typelits-knownnat
                     , ghc-typelits-natnormalise
@@ -61,13 +58,14 @@ common config
                     , text
                     , unordered-containers
                     , yaml
-                    , hasktorch
+                    , deepseq
 
 library
   import: config
   hs-source-dirs:
       library
   exposed-modules:
+      Control.Spork
       Synthesis.Ast
       Synthesis.Blocks
       Synthesis.Configs

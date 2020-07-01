@@ -22,7 +22,6 @@ import System.Log.Logger
 imports :: [ModuleImport]
 imports =
   [ ModuleImport "Prelude"             NotQualified                   NoImportList
-  , ModuleImport "Control.Exception"   NotQualified                   $ ImportList ["SomeException", "try", "evaluate"]
   , ModuleImport "Data.Bifunctor"      NotQualified                   $ ImportList ["first", "second"]
   -- , ModuleImport "Data.Set"            NotQualified                   $ ImportList ["Set"]
   -- , ModuleImport "Data.Set"            (QualifiedAs $ Just "Set")     $ ImportList ["insert"]
@@ -30,6 +29,7 @@ imports =
   -- , ModuleImport "Data.HashMap.Lazy"   (QualifiedAs $ Just "HashMap") $ ImportList ["fromList"]
   , ModuleImport "Control.Applicative" NotQualified                   $ ImportList ["empty"]
   , ModuleImport "Data.Hashable"       NotQualified                   $ ImportList ["Hashable"]
+  , ModuleImport "Control.Spork"       NotQualified                   $ ImportList ["spork"]
   ]
 
 -- | test an interpreter monad, printing errors, returning values
@@ -81,25 +81,20 @@ errorString e = show e
 showError :: GhcError -> String
 showError (GhcError e) = e
 
--- | interpret a stringified IO command, either performing an additional typecheck (slower), or just crashing on error for a bogus Either
+-- | interpret a command returning a string, either performing an additional typecheck (slower), or just crashing on error for a bogus Either
 -- TODO: can I generalize Right from String to `a` and not have GHC complain?
-interpretIO :: Bool -> String -> Interpreter (Either String String)
-interpretIO crash_on_error cmd =
-  if crash_on_error then do
-    io <- interpret cmd (as :: IO String)
-    Right <$> lift io
+interpretStr :: Bool -> String -> Interpreter (Either String String)
+interpretStr crash_on_error cmd =
+  if crash_on_error then
+    Right <$> interpret cmd (as :: String)
   else do
     res <- typeChecksWithDetails cmd
     either <- sequence . bimap
                   (show . fmap showError)
-                  ( \_s -> do
-                    io <- interpret cmd (as :: IO String)
-                    lift io
-                  )
+                  (\_ -> interpret cmd (as :: String))
                 $ res
     case either of
-        Left str -> do
-            debug str
+        Left str -> debug str
         _ -> pure ()
     return either
 
@@ -108,23 +103,12 @@ interpretIO crash_on_error cmd =
 -- | the reason this function needs to be run through the interpreter is I only have the function/inputs as AST,
 -- | meaning I also only know the types at run-time (which is when my programs are constructed).
 fnIoPairs :: Bool -> Int -> Expr -> (Tp, Tp) -> Expr -> Interpreter [(Expr, Either String Expr)]
-fnIoPairs crash_on_error n fn_ast (in_tp, out_tp) ins = do
+fnIoPairs crash_on_error n fn_ast (in_tp, _out_tp) ins = do
   let unCurry = genUncurry n
-  -- let cmd = "do; outs :: [Either SomeException " ++ out_tp ++ "] <- sequence $ try . evaluate . UNCURRY (" ++ fn_str ++ ") <$> (" ++ ins ++ " :: [" ++ pp in_tp ++ "]); return . show $ first show <$> outs"
-  let cmd =
-        pp $
-          Do l
-            [ Generator l
-                ( PatTypeSig l
-                    (pvar "outs")
-                    $ tyList
-                    $ tyApp (tyApp (tyCon "Either") (tyCon "SomeException")) out_tp
-                )
-                (infixApp (var "sequence") dollar $ infixApp (infixApp (var "try") dot (infixApp (var "evaluate") dot $ app (paren unCurry) $ paren fn_ast)) (symbol "<$>") $ expTypeSig ins $ tyList in_tp),
-              Qualifier l $ infixApp (infixApp (var "return") dot $ var "show") dollar $ infixApp (app (var "first") $ var "show") (symbol "<$>") $ var "outs"
-            ]
+  -- let cmd = "show $ spork . UNCURRY (" ++ fn_str ++ ") <$> (" ++ ins ++ " :: [" ++ pp in_tp ++ "])"
+  let cmd = pp $ infixApp (infixApp (var "show") dollar (infixApp (var "spork") dot $ app (paren unCurry) $ paren fn_ast)) (symbol "<$>") $ expTypeSig ins $ tyList in_tp
   debug cmd
-  zip (unList ins) . fmap unEitherString . unList . parseExpr . fromRight "[]" <$> interpretIO crash_on_error cmd
+  zip (unList ins) . fmap unEitherString . unList . parseExpr . fromRight "[]" <$> interpretStr crash_on_error cmd
 
 -- | get the type of an expression
 exprType :: Expr -> Interpreter Tp
