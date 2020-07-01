@@ -169,13 +169,13 @@ main = do
         bothCharMap
         ruleCharMap
 
-    putStrLn "\n\nenumerating function i/o examples:"
-    forM_ kept_fns $ \ast -> do
-        let fn_type :: Tp = fn_types_ ! ast
-        putStrLn "================================================"
-        putStrLn $ "\n" ++ pp_ (expTypeSig (letRes ast) fn_type)
-        let in_type_instance_outputs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = fn_type_ios_ ! ast
-        putStrLn $ pp_ in_type_instance_outputs
+    -- putStrLn "\n\nenumerating function i/o examples:"
+    -- forM_ kept_fns $ \ast -> do
+    --     let fn_type :: Tp = fn_types_ ! ast
+    --     putStrLn "================================================"
+    --     putStrLn $ "\n" ++ pp_ (expTypeSig (letRes ast) fn_type)
+    --     let in_type_instance_outputs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = fn_type_ios_ ! ast
+    --     putStrLn $ pp_ in_type_instance_outputs
 
     let set_list = untuple3 datasets
     forM_ (zip ["train", "validation", "test"] set_list) $ \(k, dataset) -> do
