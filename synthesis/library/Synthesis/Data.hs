@@ -17,7 +17,7 @@ import Language.Haskell.Exts.SrcLoc (SrcSpanInfo)
 
 -- | SrcSpanInfo, stuff I don't care about that `haskell-src-exts` forces upon
 -- | me by making it a mandatory (type/actual) parameter to all node types...
-type L = SrcSpanInfo
+type L = () -- SrcSpanInfo
 
 -- | Type node
 type Tp = Type L

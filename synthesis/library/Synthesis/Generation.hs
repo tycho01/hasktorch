@@ -25,6 +25,7 @@ import Data.Bifunctor (first)
 import qualified Data.Set as Set
 import Language.Haskell.Exts.Parser (ParseResult, parse)
 import Language.Haskell.Exts.Syntax (Type (..))
+import Language.Haskell.Exts.SrcLoc (SrcSpanInfo)
 import Language.Haskell.Interpreter
   ( Interpreter,
     lift,
@@ -103,9 +104,9 @@ fitExpr expr = do
       -- for currying, not for lambdas: use type to filter out non-function programs
       -- say $ "checking if fn type: " ++ pp expr
       -- tp <- exprType expr
-      res :: ParseResult Tp <- fmap parse <$> typeOf $ pp expr
+      res :: ParseResult (Type SrcSpanInfo) <- fmap parse <$> typeOf $ pp expr
       let ok = case unParseResult res of
-            Right tp -> isFn tp && typeSane tp
+            Right tp_ -> let tp = const l <$> tp_ in isFn tp && typeSane tp
             Left _e -> False
       -- error $ "failed to parse type " ++ s ++ ": " ++ e
       -- say $ "ok: " ++ show ok

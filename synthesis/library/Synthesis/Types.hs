@@ -22,6 +22,7 @@ import Language.Haskell.Exts.Parser
     ParseResult (..),
     defaultParseMode,
     parseWithMode,
+    parse,
   )
 import Language.Haskell.Exts.Pretty (Pretty)
 import Language.Haskell.Exts.SrcLoc
@@ -55,9 +56,10 @@ import Synthesis.Utility
 
 -- | dummy source span info, because I don't care
 l :: L
-l = SrcSpanInfo {srcInfoSpan = spn, srcInfoPoints = []}
-  where
-    spn = SrcSpan "<unknown>.hs" 1 1 1 1
+l = ()
+-- l = SrcSpanInfo {srcInfoSpan = spn, srcInfoPoints = []}
+--   where
+--     spn = SrcSpan "<unknown>.hs" 1 1 1 1
 
 -- | create a typed expression without value, intended for checking types
 undef :: Tp -> Expr
@@ -340,14 +342,14 @@ holeType = \case
 
 -- | parse an expression from a string
 parseExpr :: String -> Expr
-parseExpr s = case unParseResult (parseWithMode parseMode s :: ParseResult Expr) of
-  Right t -> t
+parseExpr s = case unParseResult (parseWithMode parseMode s :: ParseResult (Exp SrcSpanInfo)) of
+  Right t -> const l <$> t
   Left e -> error $ "failed to parse expr " ++ s ++ ": " ++ e
 
 -- | parse a type from a string
 parseType :: String -> Tp
-parseType s = case unParseResult (parseWithMode parseMode s :: ParseResult Tp) of
-  Right t -> t
+parseType s = case unParseResult (parse s :: ParseResult (Type SrcSpanInfo)) of
+  Right t -> const l <$> t
   Left e -> error $ "failed to parse type " ++ s ++ ": " ++ e
 
 -- | check if a type is a function type
