@@ -26,7 +26,7 @@ imports =
   -- , ModuleImport "Data.Set"            NotQualified                   $ ImportList ["Set"]
   -- , ModuleImport "Data.Set"            (QualifiedAs $ Just "Set")     $ ImportList ["insert"]
   , ModuleImport "Data.HashMap.Lazy"   NotQualified                   $ ImportList ["HashMap", "insert", "fromList"]
-  -- , ModuleImport "Data.HashMap.Lazy"   (QualifiedAs $ Just "HashMap") $ ImportList ["fromList"]
+  , ModuleImport "Data.HashMap.Lazy"   (QualifiedAs $ Just "HashMap") $ ImportList ["fromList"]
   , ModuleImport "Control.Applicative" NotQualified                   $ ImportList ["empty"]
   , ModuleImport "Data.Hashable"       NotQualified                   $ ImportList ["Hashable"]
   , ModuleImport "Control.Spork"       NotQualified                   $ ImportList ["spork"]
