@@ -40,7 +40,7 @@ interpretUnsafe fn = join $
 -- | run an interpreter monad with imports
 interpretSafe :: Interpreter a -> IO (Either InterpreterError a)
 interpretSafe fn = runInterpreter $ do
-  set [languageExtensions := [PartialTypeSignatures, ScopedTypeVariables, RankNTypes]]
+  set [languageExtensions := [ RankNTypes ]]
   setImportsF imports
     >>= const fn
 
@@ -48,33 +48,36 @@ interpretSafe fn = runInterpreter $ do
 logger :: String
 logger = "my_logger"
 
+-- | print in the IO monad
+say_, debug_, info_, notice_, warning_, err_, critical_, alert_, emergency_ :: String -> IO ()
+say_ = warning_
+debug_     = debugM     logger
+info_      = infoM      logger
+notice_    = noticeM    logger
+warning_   = warningM   logger
+err_       = errorM     logger
+critical_  = criticalM  logger
+alert_     = alertM     logger
+emergency_ = emergencyM logger
+
 -- | print in the Interpreter monad
 say, debug, info, notice, warning, err, critical, alert, emergency :: String -> Interpreter ()
 say = warning
-say_ = warning_
 -- | log: debug
-debug_     = debugM     logger
 debug      = liftIO . debug_
 -- | log: info
-info_      = infoM      logger
 info       = liftIO . info_
 -- | log: notice
-notice_    = noticeM    logger
 notice     = liftIO . notice_
 -- | log: warning
-warning_   = warningM   logger
 warning    = liftIO . warning_
 -- | log: error
-err_       = errorM     logger
 err        = liftIO . err_
 -- | log: critical
-critical_  = criticalM  logger
 critical   = liftIO . critical_
 -- | log: alert
-alert_     = alertM     logger
 alert      = liftIO . alert_
 -- | log: emergency
-emergency_ = emergencyM logger
 emergency  = liftIO . emergency_
 
 -- | run-time Language.Haskell.Interpreter compilation error
@@ -89,7 +92,6 @@ showError :: GhcError -> String
 showError (GhcError e) = e
 
 -- | interpret a command returning a string, either performing an additional typecheck (slower), or just crashing on error for a bogus Either
--- TODO: can I generalize Right from String to `a` and not have GHC complain?
 interpretStr :: Bool -> String -> Interpreter (Either String String)
 interpretStr crash_on_error cmd =
   if crash_on_error then
