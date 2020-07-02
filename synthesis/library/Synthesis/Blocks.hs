@@ -39,11 +39,11 @@ blockAstsCategoryTheory =
     $ insert "just" "Just"
     $ insert "maybe" "maybe"
     -- List
-    $ insert "(:)" "(:)"
+    $ insert "prepend" "(:)"
     $ insert "null" "null"
     $ insert "length" "length"
     -- (,)
-    $ insert "(,)" "(,)"
+    $ insert "tpl" "(,)"
     $ insert "zip" "zip"
     $ insert "unzip" "unzip"
     -- -- Set
@@ -68,16 +68,16 @@ blockAstsCategoryTheory =
     -- Functor
     $ insert "fmap" "fmap"
     -- Monad
-    $ insert "(>>=)" "(>>=)"
+    $ insert "bind" "(>>=)"
     -- Applicative
     $ insert "pure" "pure"
-    $ insert "(<*>)" "(<*>)"
+    $ insert "app" "(<*>)"
     -- Alternative
     $ insert "empty" "empty"
     -- Monoid
     $ insert "mempty" "mempty"
     -- Semigroup
-    $ insert "(<>)" "(<>)"
+    $ insert "conc" "(<>)"
     -- Show
     $ insert "show" "show"
     -- -- Bifunctor
@@ -92,7 +92,7 @@ blockAstsCategoryTheory =
     -- misc
     $ insert "const" "const"
     -- $ insert "" ""
-    $ singleton "(.)" "(.)"
+    $ singleton "compose" "(.)"
 
 -- https://raw.githubusercontent.com/shasfin/ml4fp2016/master/baseline/zil/src/builtin.ml
 -- https://raw.githubusercontent.com/shasfin/ml4fp2016/master/baseline/zil/src/b_library.tm
@@ -114,11 +114,11 @@ blockAstsTamandu =
     -- $ insert "max" "max" -- Int: for fractions use (/)
     -- $ insert "eq" "(==)"
     -- $ insert "neq" "(/=)" -- Tamandu restricts this to Int
-    -- $ insert "con" "(:)" -- Tamandu restricts this to Int
+    -- $ insert "prepend" "(:)" -- Tamandu restricts this to Int
     -- $ insert "head" "head"
     -- $ insert "tail" "tail"
     -- $ insert "isNil" "null"
-    -- $ insert "map" "map" -- list-specific, unlike fmap
+    -- $ insert "tpl" "map" -- list-specific, unlike fmap
     -- $ insert "foldr" "foldr"
     -- $ insert "foldl" "foldl"
     -- $ insert "filter" "filter"
@@ -167,7 +167,7 @@ blockAstsTamandu =
 --     $ insert "concat" "concat"
 --     $ insert "enumFromTo" "enumFromTo"
 --     $ insert "enumTo" "\\i -> [1..i]"
---     $ insert "isNil" "null" -- test!
+--     $ insert composeNil" "null" -- test!
 --     $ insert "length" "length"
 --     $ insert "maximum" "maximum"
 --     $ insert "member" "elem"
