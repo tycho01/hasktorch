@@ -28,7 +28,6 @@ blockAsts = blockAstsCategoryTheory
 -- -- blockAsts = insert "not" "\\b -> let _b = (b :: Bool) in not b" $
 -- -- alternative to ScopedTypeVariables: https://stackoverflow.com/q/14540704/1502035
 --                 insert "not" "not" $
---                 -- insert "(.)" "(.)" $ -- TODO: combinators error, cannot generate input samples of type function
 --                 singleton "id" "id"  -- TODO: only allow curried version of this function -- applying makes it redundant
 
 blockAstsCategoryTheory :: HashMap String Expr
