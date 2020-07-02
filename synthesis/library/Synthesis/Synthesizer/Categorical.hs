@@ -9,7 +9,7 @@ import qualified Torch.TensorFactories as D
 import qualified Torch.Functional as F
 import qualified Synthesis.Synthesizer.Constraints as Constraints
 import Synthesis.Synthesizer.Distribution
-import Synthesis.Synthesizer.Utility (f_sumDim, f_squeezeDim, f_multinomial_tlb)
+import Synthesis.Synthesizer.Utility (f_squeezeDim)
 
 -- | Creates a categorical distribution parameterized by either :attr:`probs` or
 -- | :attr:`logits` (but not both).
@@ -48,13 +48,13 @@ instance Distribution Categorical where
     variance d = F.divScalar (0.0 :: Float) (D.ones (extended_shape d []) D.float_opts)  -- all NaN
     sample d sample_shape = do
         let probs_2d = D.reshape [-1, (num_events d)] $ probs d
-        samples_2d <- F.transpose2D <$> f_multinomial_tlb probs_2d (product sample_shape) True
+        samples_2d <- F.transpose2D <$> D.multinomialIO probs_2d (product sample_shape) True
         return $ D.reshape (extended_shape d sample_shape) samples_2d
     log_prob d value = let
         value' = I.unsqueeze (F.toDType D.Int64 value) (-1 :: Int)
         value'' = D.select value' (-1) 0
         in f_squeezeDim (-1) $ I.gather (logits d) (-1 :: Int) value'' False
-    entropy d = F.mulScalar (-1.0 :: Float) (f_sumDim (-1) p_log_p)
+    entropy d = F.mulScalar (-1.0 :: Float) (F.sumDim (F.Dim $ -1) F.RemoveDim (D.dtype p_log_p) p_log_p)
             where p_log_p = logits d `F.mul` probs d
     enumerate_support d do_expand = 
         (if do_expand then \t -> F.expand t False ([-1] <> batch_shape d) else id) values

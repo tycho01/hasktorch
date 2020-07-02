@@ -9,7 +9,6 @@ import qualified Torch.Tensor as D
 import qualified Torch.TensorFactories as D
 import qualified Torch.Functional as F
 import Torch.Scalar
-import Synthesis.Synthesizer.Utility (f_sumDim)
 
 type Constraint = D.Tensor -> D.Tensor
 
@@ -65,7 +64,7 @@ simplex :: Constraint
 simplex tensor = F.allDim (F.Dim $ -1) False (greaterThanEq 0.0 tensor) `logical_and` (lessThan 1e-6 $ F.abs $ summed `F.sub` D.onesLike summed)
         where
             logical_and = F.mul
-            summed = f_sumDim (-1) tensor
+            summed = F.sumDim (F.Dim $ -1) F.RemoveDim (D.dtype tensor) tensor
 
 -- TODO: lowerTriangular
 -- TODO: lowerCholesky
