@@ -79,7 +79,7 @@ import           Synthesis.Synthesizer.R3NN
 import           Synthesis.Synthesizer.Synthesizer
 import           Synthesis.Synthesizer.Params
 
--- TODO: can't put this in Utility right now as it'd create a circular dependency with Categorical... still need to resolve.
+-- TODO: can't put this in Utility right now as it'd create a circular dependency with Categorical until F.squeezeDim... still need to resolve.
 -- | use a Categorical distribution to sample indices from a probability tensor
 sampleIdxs :: D.Tensor -> IO [Int]
 sampleIdxs t = do
@@ -312,7 +312,6 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
         -- TODO: dedupe samples before eval to save evals?
         -- TODO: consider A* / branch-and-bound / beam search instead
         sample_matches :: [Bool] <- replicateM bestOf $ do
-            -- TODO: use these ExpTypeSig type annotations
             -- TODO: split io_feats and taskType based on param type instance combo 
             (program, used, _filled) :: (Expr, Set String, Int) <- let
                     --  :: (Int, Expr) -> IO (Int, Expr)
