@@ -219,7 +219,7 @@ maxHolesOpt = option auto
 
 numEpochsOpt = option auto
     ( long "numEpochs"
-    <> value (1000 :: Int)
+    <> value (1001 :: Int)
     <> showDefault
     <> help "the maximum number of epochs to train for" )
 
