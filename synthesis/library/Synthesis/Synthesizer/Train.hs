@@ -310,7 +310,9 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
     (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \task_fn (gen_, eval_stats) -> do
 
         let taskType :: Tp = fnTypes ! task_fn
+        debug $ "taskType: " <> pp taskType
         let type_ins :: HashMap (Tp, Tp) [Expr] = task_type_ins ! task_fn
+        debug $ "type_ins: " <> pp_ type_ins
         let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = fnTypeIOs ! task_fn
         let target_outputs :: [Either String Expr] = task_outputs ! task_fn
 
