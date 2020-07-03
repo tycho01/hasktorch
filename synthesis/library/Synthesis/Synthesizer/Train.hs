@@ -336,7 +336,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
             if hasHoles program then pure False else do
                 let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                 let program' :: Expr = if null defs then program else letIn defs program
-                sane :: Bool <- fitExpr program
+                sane :: Bool <- fitExpr program'
                 if not sane then pure False else do
 
                     -- say $ "type_ins: " <> pp_ type_ins
