@@ -345,7 +345,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
                                     n :: Int = length $ unTuple' $ ins !! 0
                                     -- crash_on_error=False is slower but lets me check if it compiles.
                                     -- fitExpr already does a type-check tho, so don't repeat that here.
-                                    in fnIoPairs True n program' tp_instantiation $ list ins
+                                    in fnIoPairs False n program' tp_instantiation $ list ins
                             in sequence $ compileInput `mapWithKey` type_ins
                     -- say $ "prediction_type_ios: " <> pp_ prediction_type_ios
                     let prediction_io_pairs :: [(Expr, Either String Expr)] =
