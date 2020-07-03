@@ -221,7 +221,7 @@ numEpochsOpt = option auto
     ( long "numEpochs"
     <> value (1001 :: Int)
     <> showDefault
-    <> help "the maximum number of epochs to train for" )
+    <> help "the maximum number of epochs to train for. since we eval from epoch 1 to end on an eval this should be a multiple of evalFreq, plus one." )
 
 bestOfOpt = option auto
     ( long "bestOf"
