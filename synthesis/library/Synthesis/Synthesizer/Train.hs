@@ -109,6 +109,7 @@ argmaxExpansion hole_expansion_probs = (hole_idx, rule_idx) where
 -- | fill a non-terminal leaf node in a PPT given hole/rule expansion probabilities
 predictHole :: forall num_holes rules device . [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
 predictHole variants ppt used hole_expansion_probs = do
+    debug_ "predictHole"
     [hole_idx, rule_idx] :: [Int] <- sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
     -- order of rules: comes from `rule_emb`, which is just randomly assigned,
     -- so we can just arbitrarily associate this with any deterministic order e.g. that of `variants`
@@ -125,6 +126,7 @@ predictHole variants ppt used hole_expansion_probs = do
 -- | fill a random non-terminal leaf node as per `task_fn`
 superviseHole :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Int64) => HashMap String Expr -> Int -> Expr -> Expr -> IO Expr
 superviseHole variantMap num_holes task_fn ppt = do
+    debug_ "superviseHole"
     -- randomly pick a hole -- probably a good way to uniformly cover all scenarios...?
     -- technically holes closer to the root may go thru more rounds tho, creating more opportunities to randomly get picked
     hole_idx' :: Tensor device 'D.Int64 '[] <- randint 0 num_holes
@@ -138,6 +140,7 @@ superviseHole variantMap num_holes task_fn ppt = do
 -- | supervise with task program to calculate the loss of the predicted hole/rule expansion probabilities for this PPT
 fillHoleTrain :: forall num_holes rules device . (KnownDevice device, RandDTypeIsValid device 'D.Int64) => HashMap String Expr -> HashMap String Int -> Expr -> Expr -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Tensor device 'D.Float '[num_holes])
 fillHoleTrain variantMap ruleIdxs task_fn ppt hole_expansion_probs = do
+    debug_ "fillHoleTrain"
     let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
     let [num_holes, _rules] :: [Int] = shape' hole_expansion_probs
     ppt' :: Expr <- superviseHole @device variantMap num_holes task_fn ppt
@@ -149,6 +152,7 @@ fillHoleTrain variantMap ruleIdxs task_fn ppt hole_expansion_probs = do
 -- | calculate the loss by comparing the predicted expansions to the intended programs
 calcLoss :: forall rules ruleFeats device shape synthesizer num_holes . (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, Synthesizer device shape rules ruleFeats synthesizer) => HashMap String Expr -> Expr -> Tp -> HashMap String Int -> synthesizer -> Tensor device 'D.Float shape -> HashMap String Expr -> HashMap String Int -> HashMap String Int -> Int -> Bool -> [(String, Expr)] -> Tensor device 'D.Float '[rules, ruleFeats] -> Interpreter (Tensor device 'D.Float '[])
 calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb = do
+    debug "calcLoss"
     let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
     (_program, golds, predictions, _filled) :: (Expr, [D.Tensor], [D.Tensor], Int) <- let
             fill = \(ppt, golds, predictions, filled) -> do
@@ -196,6 +200,7 @@ foldrM_ x xs f = foldrM f x xs
 -- | train a NSPS model and return results
 train :: forall device rules shape ruleFeats synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
+    debug "train"
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset
 
@@ -237,6 +242,7 @@ train synthesizerConfig taskFnDataset init_model = do
             let model' :: synthesizer = A.replaceParameters model newParam
             return (toDynamic loss : train_losses, model', optim', gen'')
 
+        debug "finished epoch training"
         -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
         let loss_train :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ train_losses
 
@@ -295,6 +301,7 @@ evaluate :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer)
          => StdGen -> TaskFnDataset -> PreppedDSL -> Int -> Bool -> synthesizer -> [Expr] -> Interpreter (Tensor device 'D.Float '[], Tensor device 'D.Float '[], StdGen)
 evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
+    debug "evaluate"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 

@@ -124,6 +124,7 @@ fnOutputs crash_on_error instantiation_inputs fn_ast tp_instantiations =
   case tp_instantiations of
     [] -> return empty
     _ -> do
+      debug "fnOutputs"
       let tp_pairs :: [(Tp, Tp)] = first tplIfMultiple <$> tp_instantiations
       let in_par_instantiations :: [[Tp]] = fst <$> tp_instantiations
       -- a list of samples for parameters for types
