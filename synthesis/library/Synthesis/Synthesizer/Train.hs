@@ -220,6 +220,7 @@ train synthesizerConfig taskFnDataset init_model = do
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0)
 
     (_, model, _, _, eval_results, _, _) <- foldLoop init_state numEpochs $ \ state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc) epoch -> if earlyStop then pure state else do
+        debug $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         start <- liftIO $ getCPUTime
         -- TRAIN LOOP
@@ -251,6 +252,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
         -- EVAL
         (earlyStop, eval_results', gen''') <- whenOrM (False, eval_results, gen'') (mod epoch evalFreq == 0) $ do
+            debug "evaluating"
 
             (acc_valid, loss_valid, gen_) <- evaluate @device @rules @shape @ruleFeats gen'' taskFnDataset prepped_dsl bestOf maskBad model' validation_set
 
