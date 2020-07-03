@@ -251,7 +251,7 @@ train synthesizerConfig taskFnDataset init_model = do
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
 
         -- EVAL
-        (earlyStop, eval_results', gen''') <- whenOrM (False, eval_results, gen'') (mod epoch evalFreq == 0) $ do
+        (earlyStop, eval_results', gen''') <- whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
             debug "evaluating"
 
             (acc_valid, loss_valid, gen_) <- evaluate @device @rules @shape @ruleFeats gen'' taskFnDataset prepped_dsl bestOf maskBad model' validation_set
