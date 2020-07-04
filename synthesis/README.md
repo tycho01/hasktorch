@@ -51,5 +51,5 @@ cd plotting/
 pip install -r requirements.txt
 cd ../
 python plotting/plot.py
-# makes plots for ./results/*.csv
+# makes plots for ./run-results/*.csv
 ```

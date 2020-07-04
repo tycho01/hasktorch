@@ -9,7 +9,7 @@ generationConfig = GenerationConfig
     <$> strOption
         ( long "taskPath"
         <> short 'f'
-        <> value "./results/datasets.yml"
+        <> value "./run-results/datasets.yml"
         <> showDefault
         <> help "the file path at which to store generated datasets" )
     <*> switch
@@ -200,7 +200,7 @@ parseViewDatasetConfig = execParser opts
 taskPathOpt = strOption
     ( long "taskPath"
     <> short 'f'
-    <> value "./results/datasets.yml"
+    <> value "./run-results/datasets.yml"
     <> showDefault
     <> help "the file path from which to load generated datasets" )
 
@@ -276,7 +276,7 @@ convergenceThresholdOpt = option auto
 resultFolderOpt = strOption
     ( long "resultFolder"
     <> short 'f'
-    <> value "results"
+    <> value "run-results"
     <> showDefault
     <> help "the folder in which to store result files" )
 
