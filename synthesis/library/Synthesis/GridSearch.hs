@@ -18,7 +18,7 @@ module Synthesis.GridSearch (module Synthesis.GridSearch) where
 
 import           System.Log.Logger
 import           System.ProgressBar
-import           System.Random (StdGen, mkStdGen)
+import           System.Random (StdGen, mkStdGen, setStdGen)
 import           Control.Applicative
 import           Control.Exception (finally)
 import           Control.Monad (mapM, join)
@@ -101,6 +101,7 @@ gridSearch = do
     say_ . show $ generationCfg
     pb <- newProgressBar pgStyle 1 (Progress 0 (length hparCombs) ("grid-search" :: Text))
     let stdGen :: StdGen = mkStdGen seed
+    setStdGen stdGen
     let hparCombs' :: [(HparComb, IO (EvalResult, IO ()))] =
             fmap (second (`finally` incProgress pb 1)) $ join . join $ (!! length exprBlocks) $
             -- featMult

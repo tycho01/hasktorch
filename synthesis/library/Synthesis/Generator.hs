@@ -22,7 +22,7 @@ import Data.HashMap.Lazy
 import Data.List (partition, maximum)
 import qualified Data.Set as Set
 import Data.Yaml
-import System.Random (StdGen, mkStdGen)
+import System.Random (StdGen, mkStdGen, setStdGen)
 import Language.Haskell.Interpreter (Interpreter)
 import Synthesis.Blocks
 import Synthesis.Generation
@@ -44,6 +44,7 @@ main = do
     let GenerationConfig {..} = cfg
     updateGlobalLogger logger . setLevel $ logPriority verbosity
     let gen :: StdGen = mkStdGen seed
+    setStdGen gen
     let split = (training, validation, test)
     say_ "\ntypesByArity:"
     notice_ $ pp_ typesByArity
@@ -65,7 +66,7 @@ main = do
     say_ "\ntask_types:"
     notice_ $ pp_ task_types
     -- generated types we will use for instantiating type variables
-    fill_types :: HashMap Int [Tp] <- genTypes typesByArity nestLimit maxInstances
+    fill_types :: HashMap Int [Tp] <- genTypes seed typesByArity nestLimit maxInstances
     say_ "\nfill_types:"
     notice_ $ pp_ fill_types
     let fn_input_types :: HashMap Expr [Tp] = fnInputTypes <$> fn_types

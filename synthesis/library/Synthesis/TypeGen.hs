@@ -6,6 +6,7 @@
 -- | functions related to type generation
 module Synthesis.TypeGen (module Synthesis.TypeGen) where
 
+import System.Random (StdGen, mkStdGen, newStdGen)
 import Control.Monad (join, replicateM)
 import Data.HashMap.Lazy
   ( (!),
@@ -34,8 +35,8 @@ import Synthesis.Types
 import Synthesis.Utility
 
 -- | randomly generate a type
-randomType :: HashMap Int [String] -> Bool -> Bool -> Int -> HashMap String [Tp] -> Int -> IO Tp
-randomType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount = do
+randomType :: HashMap Int [String] -> Bool -> Bool -> Int -> HashMap String [Tp] -> Int -> StdGen -> IO Tp
+randomType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount gen = do
     -- type variables
     -- TODO: allow generating new type vars
     let tyVarName :: String = "t" ++ show tyVarCount -- TODO: make this random?
@@ -43,33 +44,36 @@ randomType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount = do
     let tpVars :: [IO Tp] = return . tyVar <$> keys typeVars
     let abstracts :: [IO Tp] = if allowAbstract then [tpVar] else []
     -- functions
-    let gen_fn :: IO Tp = randomFnType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount
+    let gen_fn :: IO Tp = randomFnType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount gen
     let fns :: [IO Tp] = [gen_fn | allowFns]
     -- base types
-    let applied :: HashMap Int [IO Tp] = mapWithKey (\ i strs -> fillChildren i <$> strs) tpsByArity
+    let applied :: HashMap Int [IO Tp] = mapWithKey (\ i strs -> fillChildren gen i <$> strs) tpsByArity
     let base :: [IO Tp] = concat $ elems $ filterWithKey (\ k _v -> k == 0 || nestLimit > 0) applied
     -- total
     let options :: [IO Tp] = base ++ tpVars ++ abstracts ++ fns
-    join $ pick options
+    tp :: Tp <- snd $ pickG' gen options
+    return tp
     where
       f = randomType tpsByArity allowAbstract allowFns (nestLimit - 1)
-      fillChildren :: Int -> String -> IO Tp = \ arity str -> do
-        let x = tyCon str
-        nest arity (\a -> do
-          b <- f typeVars tyVarCount
-          return $ tyApp a b
-          ) x
+      fillChildren :: StdGen -> Int -> String -> IO Tp = \ g arity str -> do
+        (g', tp) <- nest arity (\(gen_, a) -> do
+          b <- f typeVars tyVarCount gen
+          gen' <- newStdGen
+          return $ (gen', tyApp a b)
+          ) (g, tyCon str)
+        return tp
 
 -- | randomly generate a function type
 -- | deprecated, not in actual use (`randomType` is only used with `allowFns` as `True` in another deprecated function)
 -- TODO: ensure each type var is used at least twice
-randomFnType :: HashMap Int [String] -> Bool -> Bool -> Int -> HashMap String [Tp] -> Int -> IO Tp
-randomFnType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount = do
+randomFnType :: HashMap Int [String] -> Bool -> Bool -> Int -> HashMap String [Tp] -> Int -> StdGen -> IO Tp
+randomFnType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount gen = do
   let f = randomType tpsByArity allowAbstract allowFns nestLimit
-  tpIn :: Tp <- f typeVars tyVarCount
+  gen' <- newStdGen
+  tpIn :: Tp <- f typeVars tyVarCount gen
   let typeVarsIn :: HashMap String [Tp] = snd <$> findTypeVars tpIn
   let typeVars_ = mergeTyVars typeVars typeVarsIn
-  tpOut :: Tp <- f typeVars_ tyVarCount
+  tpOut :: Tp <- f typeVars_ tyVarCount gen'
   let fn :: Tp = tyFun tpIn tpOut
   return fn
 
@@ -148,9 +152,12 @@ fillTypeVars tp substitutions =
         _ -> tp
 
 -- | generate a number of monomorphic types to be used in type variable substitution
-genTypes :: HashMap Int [String] -> Int -> Int -> IO (HashMap Int [Tp])
-genTypes tpsByArity nestLimit maxInstances = do
-  tps :: [Tp] <- nubPp . flatten <$> Many . fmap (One . pure) <$> replicateM maxInstances makeTp
+genTypes :: Int -> HashMap Int [String] -> Int -> Int -> IO (HashMap Int [Tp])
+genTypes seed tpsByArity nestLimit maxInstances = do
+  tps :: [Tp] <- nubPp . flatten <$> Many . fmap (One . pure) <$>
+        -- replicateM maxInstances makeTp
+        (makeTp . mkStdGen . (seed +)) `mapM` [1 .. maxInstances] 
   return . insert 0 tps . delete 0 $ fmap tyCon <$> tpsByArity
   where
-    makeTp :: IO Tp = randomType tpsByArity False False nestLimit empty 0
+    makeTp :: StdGen -> IO Tp =
+        randomType tpsByArity False False nestLimit empty 0

@@ -17,7 +17,7 @@ import Data.Maybe (fromJust, isJust)
 import qualified Data.Text.Prettyprint.Doc as PP
 import GHC.Exts (groupWith)
 import Language.Haskell.Exts.Pretty (Pretty, prettyPrint)
-import System.Random (RandomGen(..), mkStdGen, randomR, randomRIO)
+import System.Random (RandomGen(..), StdGen, mkStdGen, randomR, randomRIO)
 import System.Log.Logger
 
 -- | map over both elements of a bifunctor
@@ -57,6 +57,11 @@ pickG :: Int -> [a] -> a
 pickG seed xs = xs !! i where
     g = mkStdGen seed
     (i, _g') = randomR (0, length xs - 1) g
+
+-- | randomly pick an item from a list given a generator
+pickG' :: StdGen -> [a] -> (StdGen, a)
+pickG' g xs = (g', xs !! i) where
+    (i, g') = randomR (0, length xs - 1) g
 
 -- | group a list of k/v pairs by values, essentially inverting the original HashMap
 groupByVal :: (Hashable v, Ord v) => [(k, v)] -> HashMap v [k]

@@ -160,6 +160,7 @@ evolutionary = do
     say_ . show $ generationCfg
     let len = length hparCombs
     let g = mkStdGen seed
+    setStdGen g
     let hparCombs' :: [(HparComb, IO (EvalResult, IO ()))] = join . fmap join $ (!! length exprBlocks) $
             -- featMult
             if useTypes then

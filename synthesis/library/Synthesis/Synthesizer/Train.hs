@@ -17,7 +17,7 @@
 
 module Synthesis.Synthesizer.Train (module Synthesis.Synthesizer.Train) where
 
-import           System.Random                 (StdGen, mkStdGen)
+import           System.Random                 (StdGen, mkStdGen, setStdGen)
 import           System.Timeout                (timeout)
 import           System.Directory              (createDirectoryIfMissing)
 import           System.CPUTime
@@ -208,6 +208,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
     let [train_set, validation_set, test_set] :: [[Expr]] = untuple3 datasets
     let stdGen :: StdGen = mkStdGen seed
+    liftIO $ setStdGen stdGen
     let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
     let modelFolder = resultFolder <> "/" <> ppCfg synthesizerConfig
     liftIO $ createDirectoryIfMissing True modelFolder
