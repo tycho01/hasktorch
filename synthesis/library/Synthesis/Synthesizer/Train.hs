@@ -337,27 +337,25 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
             if hasHoles program then pure False else do
                 let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                 let program' :: Expr = if null defs then program else letIn defs program
-                sane :: Bool <- fitExpr program'
-                if not sane then pure False else do
 
-                    -- say $ "type_ins: " <> pp_ type_ins
-                    prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
-                            compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
-                                    n :: Int = length $ unTuple' $ ins !! 0
-                                    -- crash_on_error=False is slower but lets me check if it compiles.
-                                    -- fitExpr already does a type-check tho, so don't repeat that here.
-                                    in fnIoPairs False n program' tp_instantiation $ list ins
-                            in sequence $ compileInput `mapWithKey` type_ins
-                    -- say $ "prediction_type_ios: " <> pp_ prediction_type_ios
-                    let prediction_io_pairs :: [(Expr, Either String Expr)] =
-                            join . elems $ prediction_type_ios
-                    let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
-                            False -> False
-                            True -> let
-                                    prediction_outputs :: [Either String Expr] = snd <$> prediction_io_pairs
-                                    output_matches :: [Bool] = uncurry (==) . mapBoth pp_ <$> target_outputs `zip` prediction_outputs
-                                    in and output_matches
-                    return outputs_match
+                -- say $ "type_ins: " <> pp_ type_ins
+                prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
+                        compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
+                                n :: Int = length $ unTuple' $ ins !! 0
+                                -- crash_on_error=False is slower but lets me check if it compiles.
+                                -- fitExpr already does a type-check tho, so don't repeat that here.
+                                in fnIoPairs False n program' tp_instantiation $ list ins
+                        in sequence $ compileInput `mapWithKey` type_ins
+                -- say $ "prediction_type_ios: " <> pp_ prediction_type_ios
+                let prediction_io_pairs :: [(Expr, Either String Expr)] =
+                        join . elems $ prediction_type_ios
+                let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
+                        False -> False
+                        True -> let
+                                prediction_outputs :: [Either String Expr] = snd <$> prediction_io_pairs
+                                output_matches :: [Bool] = uncurry (==) . mapBoth pp_ <$> target_outputs `zip` prediction_outputs
+                                in and output_matches
+                return outputs_match
 
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
