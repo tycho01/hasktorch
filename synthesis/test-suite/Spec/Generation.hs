@@ -88,12 +88,12 @@ gen = let
     , TestLabel "fillHoles" $ TestCase $ do
         let blockAsts' = singleton "not_" $ var "not"
         let expr = expTypeSig holeExpr tp
-        lst <- interpretUnsafe $ fillHoles 0 blockAsts' Data.Set.empty [("not_", var "not_")] expr
+        lst <- interpretUnsafe $ fillHoles 1 blockAsts' Data.Set.empty [("not_", var "not_")] expr
         (gtrExpr <$> lst) `shouldContain` [var "not_"]
 
     , TestLabel "genFns" $ TestCase $ do
         let blockAsts' = singleton "not_" $ var "not"
-        lst <- interpretUnsafe $ genFns 0 [("not_", var "not_")] blockAsts'
+        lst <- interpretUnsafe $ genFns 1 [("not_", var "not_")] blockAsts'
         (gtrExpr <$> lst) `shouldContain` [var "not_"]
 
     , TestLabel "instantiateTypes" $ TestCase $ do
