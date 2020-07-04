@@ -148,10 +148,10 @@ main = do
 
     let longest_string :: Int = max longest_expr_string longest_tp_string
     let bothCharMap :: HashMap Char Int = mkCharMap $ elems fn_type_ios_
-    -- TODO: this Hint-based `exprType` approach fails here for exprs with type-ambiguous variables e.g. `show undefined`, even if type-annotated. typing this does work in GHCI so I should probably swap Hint out for the compiler API...
-    -- variantTypes :: [Tp] <- (exprType . letIn dsl . snd) `mapM` variants
-    -- variantTypes :: [Tp] <- interpretUnsafe $ (tryType . letIn dsl . snd) `mapM` variants
-    variantTypes :: [Tp] <- (tryType . letIn dsl . snd) `mapM` variants
+    -- Hint-based `exprType` approach fails here for exprs with type-ambiguous variables e.g. `show undefined`, even if type-annotated. typing this does work in GHCI so I should probably swap Hint out for the compiler API...
+    let unaliasedBlockTypes :: HashMap String Tp = asPairs (first (pp . (dsl !))) block_fn_types
+    let unaliasedVariants :: [(String, Expr)] = genBlockVariants unaliasedBlockTypes
+    variantTypes :: [Tp] <- (tryType . snd) `mapM` unaliasedVariants
     let ruleCharMap :: HashMap Char Int = indexChars $ pp <$> variantTypes
     let datasets :: ([Expr], [Expr], [Expr]) = randomSplit gen split kept_fns
 
