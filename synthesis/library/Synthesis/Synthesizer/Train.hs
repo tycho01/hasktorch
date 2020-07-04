@@ -113,14 +113,16 @@ predictHole variants ppt used hole_expansion_probs = do
     [hole_idx, rule_idx] :: [Int] <- sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
     -- order of rules: comes from `rule_emb`, which is just randomly assigned,
     -- so we can just arbitrarily associate this with any deterministic order e.g. that of `variants`
+    debug_ $ "rule_idx: " <> show rule_idx
     let (_rule_str, rule_expr) :: (String, Expr) = variants !! rule_idx
     let block_name :: String = pp . head . fnAppNodes $ rule_expr
+    debug_ $ "block_name: " <> show block_name
     let used' :: Set String = insert block_name used
     -- grab hole lenses by `findHolesExpr` and ensure `forwardPass` follows the same order to make these match.
     let (_hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
     let ppt' :: Expr = hole_setter ppt rule_expr
-    -- say_ . show $ (hole_idx, rule_idx, pp ppt')
+    debug_ . show $ (hole_idx, rule_idx, pp ppt')
     return (ppt', used')
 
 -- | fill a random non-terminal leaf node as per `task_fn`
@@ -333,20 +335,19 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
                             (ppt', used') <- liftIO $ predictHole variants ppt used predicted
                             return (ppt', used', filled + 1)
                     in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
-            -- say $ pp program
+            debug $ pp program
             if hasHoles program then pure False else do
                 let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                 let program' :: Expr = if null defs then program else letIn defs program
 
-                -- say $ "type_ins: " <> pp_ type_ins
+                debug $ "type_ins: " <> pp_ type_ins
                 prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
                         compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
                                 n :: Int = length $ unTuple' $ ins !! 0
                                 -- crash_on_error=False is slower but lets me check if it compiles.
-                                -- fitExpr already does a type-check tho, so don't repeat that here.
                                 in fnIoPairs False n program' tp_instantiation $ list ins
                         in sequence $ compileInput `mapWithKey` type_ins
-                -- say $ "prediction_type_ios: " <> pp_ prediction_type_ios
+                debug $ "prediction_type_ios: " <> pp_ prediction_type_ios
                 let prediction_io_pairs :: [(Expr, Either String Expr)] =
                         join . elems $ prediction_type_ios
                 let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
