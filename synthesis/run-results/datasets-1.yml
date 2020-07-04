@@ -10955,30 +10955,30 @@ variantTypes:
 - type: '[b] -> [(a, b)]'
 - type: '[(a, b)]'
 - type: '  Show a => a -> String'
-- type: '*'
+- type: 'String'
 - type: '  Enum a => a -> a'
 - type: '  Enum a => a'
 - type: '  (Traversable t, Applicative f) => (a -> f b) -> t a -> f (t b)'
-- type: '*'
-- type: '*'
+- type: '  (Traversable t, Applicative f) => t a -> f (t b)'
+- type: '  (Traversable t, Applicative f) => f (t b)'
 - type: a -> [a] -> [a]
 - type: '[a] -> [a]'
 - type: '[a]'
 - type: '[(a, b)] -> ([a], [b])'
 - type: ([a], [b])
 - type: '  (Foldable t, Eq a) => a -> t a -> Bool'
-- type: '*'
-- type: '*'
+- type: '  (Foldable t, Eq a) => t a -> Bool'
+- type: 'Bool'
 - type: '  Num p => p'
 - type: a -> Maybe a
 - type: Maybe a
 - type: '  Applicative f => a -> f a'
-- type: '*'
+- type: '  Applicative f => f a'
 - type: '  Monoid a => a'
 - type: '  Enum a => Int -> a'
-- type: '*'
+- type: '  Enum a => a'
 - type: '  Foldable t => t a -> Int'
-- type: '*'
+- type: 'Int'
 - type: '  Monad m => m a -> (a -> m b) -> m b'
 - type: '  Monad m => (a -> m b) -> m b'
 - type: '  Monad m => m b'
@@ -10987,31 +10987,31 @@ variantTypes:
 - type: (a, b)
 - type: '  GHC.Base.Alternative f => f a'
 - type: '  Foldable t => (a -> a -> a) -> t a -> a'
-- type: '*'
-- type: '*'
+- type: '  Foldable t => t a -> a'
+- type: 'a'
 - type: '  (Traversable t, Monad m) => t (m a) -> m (t a)'
 - type: '  (Traversable t, Monad m) => m (t a)'
 - type: '  (Traversable t, Applicative f) => t (f a) -> f (t a)'
 - type: '  (Traversable t, Applicative f) => f (t a)'
 - type: '  Enum a => a -> Int'
-- type: '*'
+- type: 'Int'
 - type: '  (Traversable t, Monad m) => (a -> m b) -> t a -> m (t b)'
-- type: '*'
-- type: '*'
+- type: '  (Traversable t, Monad m) => t a -> m (t b)'
+- type: '  (Traversable t, Monad m) => m (t b)'
 - type: a -> b -> a
 - type: b -> a
 - type: a
 - type: '  (Foldable t, Monoid m) => (a -> m) -> t a -> m'
-- type: '*'
-- type: '*'
+- type: '  (Foldable t, Monoid m) => t a -> m'
+- type: 'Monoid m => m'
 - type: '  Functor f => (a -> b) -> f a -> f b'
-- type: '*'
-- type: '*'
+- type: '  Functor f => f a -> f b'
+- type: '  Functor f => f b'
 - type: '  Semigroup a => a -> a -> a'
 - type: '  Semigroup a => a -> a'
 - type: '  Semigroup a => a'
 - type: '  Foldable t => t a -> Bool'
-- type: '*'
+- type: 'Bool'
 - type: b -> (a -> b) -> Maybe a -> b
 - type: (a -> b) -> Maybe a -> b
 - type: Maybe a -> b
@@ -11020,17 +11020,17 @@ variantTypes:
 - type: '  Applicative f => f a -> f b'
 - type: '  Applicative f => f b'
 - type: '  Foldable t => (a -> b -> b) -> b -> t a -> b'
-- type: '*'
-- type: '*'
-- type: '*'
+- type: '  Foldable t => b -> t a -> b'
+- type: '  Foldable t => t a -> b'
+- type: 'b'
 - type: (b -> c) -> (a -> b) -> a -> c
 - type: (a -> b) -> a -> c
 - type: a -> c
 - type: c
 - type: '  (Eq k, Hashable k) => k -> v -> HashMap k v -> HashMap k v'
 - type: '  (Eq k, Hashable k) => v -> HashMap k v -> HashMap k v'
-- type: '*'
-- type: '*'
+- type: '  (Eq k, Hashable k) => HashMap k v -> HashMap k v'
+- type: '  (Eq k, Hashable k) => HashMap k v'
 ruleCharMap:
   ',': 5
   \: 23
