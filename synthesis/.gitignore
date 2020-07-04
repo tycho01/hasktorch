@@ -5,7 +5,7 @@
 *.pt
 *.png
 *.chk
-!**/result*
+!run-results/datasets-*.yml
 
 # Created by https://www.gitignore.io/api/haskell
 # Edit at https://www.gitignore.io/?templates=haskell

@@ -6,7 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set_palette('pastel')
-folder = os.path.join(os.getcwd(), 'results')
+folder = os.path.join(os.getcwd(), 'run-results')
 csvs = glob.glob(os.path.join(folder, '*.csv'))
 result = lambda file: os.path.join(folder, file)
 def save_ax(ax, name):
