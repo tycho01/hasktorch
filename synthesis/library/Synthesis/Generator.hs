@@ -19,6 +19,7 @@ import Data.HashMap.Lazy
     union,
     size,
   )
+import qualified Data.HashMap.Lazy as HM
 import Data.List (partition, maximum)
 import qualified Data.Set as Set
 import Data.Yaml
@@ -134,7 +135,7 @@ main = do
     say_ "\nkept_fns:"
     notice_ $ pp_ kept_fns
     let fn_types_ = pickKeys kept_fns fn_types
-    let fn_type_ios_ = pickKeys kept_fns fn_type_ios
+    let fn_type_ios_ = HM.filter (not . null) <$> pickKeys kept_fns fn_type_ios
 
     let tp_pairs :: [(Tp, Tp)] = join . elems $ keys <$> fn_type_ios
     let longest_tp_string :: Int =
@@ -163,7 +164,6 @@ main = do
         typesByArity
         fn_types_
         fn_type_ios_
-        rest_instantiation_inputs
         datasets
         variants
         variantTypes

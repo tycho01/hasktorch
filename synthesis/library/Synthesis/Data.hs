@@ -34,7 +34,6 @@ data TaskFnDataset = TaskFnDataset
     , generatedTypes :: HashMap Int [String]  -- i.e. typesByArity
     , fnTypes :: HashMap Expr Tp
     , fnTypeIOs :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)])
-    , restInstantiationInputs :: HashMap Tp [Expr]
     , datasets :: ([Expr], [Expr], [Expr])
     , exprBlocks :: [(String, Expr)]
     , variantTypes :: [Tp]
