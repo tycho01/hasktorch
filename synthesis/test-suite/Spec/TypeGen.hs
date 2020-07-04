@@ -68,6 +68,7 @@ typeGen = parallel $ let
         int_ = tyCon "Int"
         str = tyCon "String"
         types_by_arity = insert 1 ["[]"] (singleton 0 ["Bool", "Int"])
+        gen = mkStdGen seedDef
     in do
 
     it "findTypeVars" $ do
@@ -83,18 +84,18 @@ typeGen = parallel $ let
     it "randomType" $ do
         GenerationConfig{..} <- liftIO parseGenerationConfig
         let nestLimit' :: Int = 0
-        tp <- randomType types_by_arity False False nestLimit' empty 0
+        tp <- randomType types_by_arity False False nestLimit' empty 0 gen
         [tyCon "Bool", tyCon "Int", tyCon "Char"] `shouldContain` [tp]
 
     it "randomFnType" $ do
         GenerationConfig{..} <- liftIO parseGenerationConfig
-        tp <- randomFnType types_by_arity False False nestLimit empty 0
+        tp <- randomFnType types_by_arity False False nestLimit empty 0 gen
         -- [tyFun bl bl, tyFun bl int_, tyFun int_ bl, tyFun int_ int_] `shouldContain` [tp]
         True `shouldBe` True
 
     it "genTypes" $ do
-        hm <- genTypes types_by_arity 0 10
-        hm ! 0 `shouldContain` [bl]
+        hm <- genTypes seedDef types_by_arity 0 10
+        null (hm ! 0) `shouldBe` False
 
     it "fillTypeVars" $ do
         let a = tyVar "a"
