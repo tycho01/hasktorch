@@ -183,7 +183,7 @@ initR3nn variants batch_size dropoutRate charMap = R3NNSpec @device @m @symbols 
 -- | Recursive Reverse-Recursive Neural Network (R3NN) (Parisotto et al.)
 runR3nn
     :: forall symbols m maxStringLength h rules batch_size num_holes device maxChar featMult
-    . ( KnownNat symbols, KnownNat m, KnownNat maxStringLength, KnownNat h, KnownNat rules, KnownNat batch_size, KnownNat maxChar, KnownNat featMult, KnownDevice device, MatMulDTypeIsValid device 'D.Float )
+    . ( KnownNat symbols, KnownNat m, KnownNat maxStringLength, KnownNat h, KnownNat rules, KnownNat batch_size, KnownNat maxChar, KnownNat featMult, KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float )
     => R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
     -> HashMap String Int
     -> Expr
@@ -235,7 +235,7 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
                 :. rule_tp_emb
                 :. HNil
                 )
-        else matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
+        else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
     -- delay softmax for log-sum-exp trick (crossEntropy)
 
 variantInt :: Expr -> (String, Int)
