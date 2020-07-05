@@ -8,7 +8,7 @@ import Data.Bifoldable (biList)
 import Data.List (replicate, intercalate, maximumBy, minimumBy)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (Bifunctor, bimap, first)
-import Data.HashMap.Lazy ((!), HashMap, fromList, toList)
+import Data.HashMap.Lazy ((!), HashMap, fromList, toList, member)
 import qualified Data.HashMap.Lazy as HM
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -206,6 +206,11 @@ traverseSnd (a, m) = do
     b <- m
     return (a, b)
 
--- map a HashMap as pairs
+-- | map a HashMap as pairs
 asPairs :: (Eq k2, Hashable k2) => ((k1, v1) -> (k2, v2)) -> HashMap k1 v1 -> HashMap k2 v2
 asPairs f = fromList . fmap f . toList
+
+-- | like (!) but with a sensible error message
+safeIndexHM :: (Eq k, Hashable k, Show k) => HashMap k v -> k -> v
+safeIndexHM hm k = if member k hm then hm ! k
+                                  else error $ "key " <> show k <> " not found!"
