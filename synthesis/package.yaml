@@ -99,5 +99,4 @@ tests:
     - synthesis
     - tasty
     - tasty-hspec
-    - HUnit
     - tasty-hunit
