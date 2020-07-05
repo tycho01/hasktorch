@@ -72,7 +72,8 @@ type MaxChar = 18
 type H = 30
 type EncoderBatch' = 1
 type R3nnBatch' = 1
-type FeatMult = 2
+type FeatMultWithTypes = 2
+type FeatMultWithoutTypes = 1
 
 numHoles     :: Int = natValI @NumHoles
 rules        :: Int = natValI @Rules
