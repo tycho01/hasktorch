@@ -121,7 +121,7 @@ getM cfg taskFnDataset = let
                 r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h maxChar featMult =
                     initR3nn variants r3nnBatch dropoutRate charMap
                 rule_encoder_spec :: TypeEncoderSpec device maxStringLength maxChar m =
-                    TypeEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
+                    TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropoutRate
                 spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch maxChar h featMult =
                     NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
             _ -> error "synthesizer not recognized")
