@@ -6,8 +6,6 @@
 {-# LANGUAGE TypeOperators #-}
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
-import           Test.HUnit.Base              (Test (..))
-import           Test.HUnit.Text              (runTestTT)
 import           Test.Tasty.Hspec
 import           Test.Tasty.HUnit             ((@?=))
 
@@ -74,12 +72,9 @@ import           Spec.Synthesizer.Optimization
 
 main ∷ IO ()
 main = do
-    -- unlike Tasty, HUnit's default printer is illegible,
-    -- but helps ensure the Interpreter is run only once...
-    void $ runTestTT $ TestList [hint, gen, synth]
-
-    -- Tasty HSpec
     util_ <- testSpec "Utility" util
+    hint_ <- testSpec "Hint" hint
+    gen_ <- testSpec "Generation" gen
     types_ <- testSpec "Types" types
     typeGen_ <- testSpec "TypeGen" typeGen
     find_ <- testSpec "FindHoles" find
@@ -87,5 +82,6 @@ main = do
     synth_util_ <- testSpec "Synthesizer: Utility" synth_util
     nsps_ <- testSpec "NSPS" nsps
     optim_ <- testSpec "optim" optim
-    let tree :: TestTree = testGroup "synthesis" [util_, types_, typeGen_, find_, ast_, synth_util_, nsps_, optim_]
+    synth_ <- testSpec "synth" synth
+    let tree :: TestTree = testGroup "synthesis" [util_, types_, typeGen_, find_, ast_, hint_, gen_, synth_util_, nsps_, optim_, synth_]
     defaultMain tree

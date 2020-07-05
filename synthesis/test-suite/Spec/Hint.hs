@@ -8,8 +8,6 @@
 module Spec.Hint (module Spec.Hint) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
-import           Test.HUnit.Base              (Test (..))
-import           Test.HUnit.Text              (runTestTT)
 import           Test.Tasty.Hspec
 import           Test.Tasty.HUnit             ((@?=))
 
@@ -62,33 +60,38 @@ import qualified Synthesis.Synthesizer.Distribution as Distribution
 import qualified Synthesis.Synthesizer.Categorical  as Categorical
 import           Synthesis.Synthesizer.Params
 
-hint ∷ Test
-hint = let
+-- hint ∷ Test
+-- hint = let
+hint ∷ Spec
+hint = parallel $ let
         bl = tyCon "Bool"
         int_ = tyCon "Int"
         infTp :: String = "div (const const) div"
-    in TestList
+    -- in TestList
 
-    [ TestLabel "interpretSafe" $ TestCase $ do
+    -- [ TestLabel "interpretSafe" $ TestCase $ do
+    in do
+
+    it "interpretSafe" $ do
         x <- interpretSafe $ interpret "\"foo\"" (as :: String)
         fromRight "" x @?= "foo"
 
-    , TestLabel "say" $ TestCase $ do
+    it "say" $ do
         x <- interpretUnsafe $ return ()
         x @?= ()
 
-    , TestLabel "errorString" $ TestCase $ do
+    it "errorString" $ do
         s <- interpretSafe (interpret "foo" (as :: String)) <&> \case
             Left err_ -> errorString err_
             _ -> ""
         not (null s) @?= True
 
-    , TestLabel "interpretStr" $ TestCase $ do
+    it "interpretStr" $ do
         GenerationConfig { crashOnError = crashOnError } :: GenerationConfig <- parseGenerationConfig
         x <- interpretUnsafe (fromRight "" <$> interpretStr crashOnError "\"foo\"")
         x @?= "foo"
 
-    , TestLabel "fnIoPairs" $ TestCase $ do
+    it "fnIoPairs" $ do
         let crashOnError = False
         -- n=1
         x <- interpretUnsafe $ fnIoPairs crashOnError 1 (var "not") (tplIfMultiple [bl], bl) $ parseExpr "[True, False]"
@@ -103,13 +106,13 @@ hint = let
         errored <- isNothing <.> timeout 10000 . interpretUnsafe . fnIoPairs crashOnError 1 (parseExpr infTp) (tplIfMultiple [bl], bl) $ list []
         errored `shouldBe` True
 
-    , TestLabel "exprType" $ TestCase $ do
+    it "exprType" $ do
         x <- interpretUnsafe $ exprType $ parseExpr "True"
         pp x `shouldBe` "Bool"
         errored <- isNothing <.> timeout 10000 . interpretUnsafe . exprType $ parseExpr "div (const const) div"
         errored `shouldBe` True
 
-    , TestLabel "handling infinite types: typeChecks" $ TestCase $ do
+    it "handling infinite types: typeChecks" $ do
 
         -- typeChecks
         errored <- not <.> interpretUnsafe . typeChecks $ infTp
@@ -120,7 +123,7 @@ hint = let
         let errored = not $ isRight either
         errored `shouldBe` True
 
-    , TestLabel "handling infinite types: typeOf" $ TestCase $ do
+    it "handling infinite types: typeOf" $ do
 
         -- type check + typeOf
         let timeout_micros :: Int = 100000
@@ -130,12 +133,10 @@ hint = let
             _ -> pure True
         errored `shouldBe` True
 
-    , TestLabel "handling infinite types: fnIoPairs" $ TestCase $ do
+    it "handling infinite types: fnIoPairs" $ do
 
         -- fnIoPairs + type check
         let n = 1
         let crash_on_error = False
         errored <- null <.> interpretUnsafe . fnIoPairs crash_on_error n (parseExpr infTp) (tplIfMultiple [bl], bl) $ list []
         errored `shouldBe` True
-
-    ]

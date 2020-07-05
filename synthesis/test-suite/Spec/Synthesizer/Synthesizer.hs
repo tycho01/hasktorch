@@ -8,8 +8,6 @@
 module Spec.Synthesizer.Synthesizer (module Spec.Synthesizer.Synthesizer) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
-import           Test.HUnit.Base              (Test (..))
-import           Test.HUnit.Text              (runTestTT)
 import           Test.Tasty.Hspec
 import           Test.Tasty.HUnit             ((@?=))
 
@@ -71,8 +69,8 @@ import           Spec.Synthesizer.Types
 
 type Device = Cpu
 
-synth ∷ Test
-synth = let
+synth ∷ Spec
+synth = parallel $ let
         int_ = tyCon "Int"
         str = tyCon "String"
         dropOut :: Double = 0.0
@@ -83,9 +81,9 @@ synth = let
         -- expr_blocks :: [(String, Expr)] <- interpretUnsafe $ dslVariants dsl
         expr_blocks :: [(String, Expr)] = second parseExpr <$> [("nil", "nil"), ("true", "true"), ("not", "not"), ("not", "not (undefined :: Bool)")]
         lr = D.asTensor (0.01 :: Float)
-    in TestList
+    in do
 
-    [ TestLabel "calcLoss" $ TestCase $ do
+    it "calcLoss" $ do
         let variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> expr_blocks
         let variant_sizes :: HashMap String Int = fromList $ variantInt . snd <$> variants
         let variantMap :: HashMap String Expr = fromList variants
@@ -126,5 +124,3 @@ synth = let
         let model' :: NSPS Device M Symbols Rules MaxStringLength EncoderBatch' R3nnBatch' MaxChar H FeatMultWithTypes = A.replaceParameters model newParam
         loss' :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules dsl task_fn taskType symbolIdxs model' sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants rule_tp_emb
         toBool (loss' <. loss) `shouldBe` True
-
-    ]

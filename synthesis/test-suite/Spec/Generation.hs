@@ -8,8 +8,6 @@
 module Spec.Generation (module Spec.Generation) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
-import           Test.HUnit.Base              (Test (..))
-import           Test.HUnit.Text              (runTestTT)
 import           Test.Tasty.Hspec
 import           Test.Tasty.HUnit             ((@?=))
 
@@ -62,15 +60,15 @@ import qualified Synthesis.Synthesizer.Distribution as Distribution
 import qualified Synthesis.Synthesizer.Categorical  as Categorical
 import           Synthesis.Synthesizer.Params
 
-gen ∷ Test
-gen = let
+gen ∷ Spec
+gen = parallel $ let
         bl = tyCon "Bool"
         int_ = tyCon "Int"
         tp = tyFun bl bl
         types_by_arity = insert 1 ["[]"] (singleton 0 ["Bool", "Int"])
-    in TestList
+    in do
 
-    [ TestLabel "fnOutputs" $ TestCase $ do
+    it "fnOutputs" $ do
         GenerationConfig { crashOnError = crashOnError } :: GenerationConfig <- parseGenerationConfig
         -- not
         hm1 <- interpretUnsafe $ fnOutputs crashOnError (singleton bl [con "True", con "False"]) (var "not") [([bl], bl)]
@@ -79,24 +77,24 @@ gen = let
         hm2 <- interpretUnsafe $ fnOutputs crashOnError (singleton int_ (int <$> [1,2,3])) (parseExpr "(+)") [([int_,int_], int_)]
         pp_ hm2 `shouldBe` pp_ ((singleton (tyTuple [int_, int_], int_) [(parseExpr "(1,1)", Right (parseExpr "2")), (parseExpr "(1,2)", Right (parseExpr "3")), (parseExpr "(1,3)", Right (parseExpr "4")), (parseExpr "(2,1)", Right (parseExpr "3")), (parseExpr "(2,2)", Right (parseExpr "4")), (parseExpr "(2,3)", Right (parseExpr "5")), (parseExpr "(3,1)", Right (parseExpr "4")), (parseExpr "(3,2)", Right (parseExpr "5")), (parseExpr "(3,3)", Right (parseExpr "6"))]) :: HashMap (Tp, Tp) [(Expr, Either String Expr)])
 
-    , TestLabel "fillHole" $ TestCase $ do
+    it "fillHole" $ do
         let blockAsts' = singleton "not_" $ var "not"
         let expr = letIn blockAsts' $ expTypeSig holeExpr tp
         lst <- interpretUnsafe (fillHole blockAsts' Data.Set.empty [("not_", var "not_")] expr) <&> snd
         (gtrExpr . fstOf3 <$> lst) `shouldContain` [var "not_"]
 
-    , TestLabel "fillHoles" $ TestCase $ do
+    it "fillHoles" $ do
         let blockAsts' = singleton "not_" $ var "not"
         let expr = expTypeSig holeExpr tp
         lst <- interpretUnsafe $ fillHoles 1 blockAsts' Data.Set.empty [("not_", var "not_")] expr
         (gtrExpr <$> lst) `shouldContain` [var "not_"]
 
-    , TestLabel "genFns" $ TestCase $ do
+    it "genFns" $ do
         let blockAsts' = singleton "not_" $ var "not"
         lst <- interpretUnsafe $ genFns 1 [("not_", var "not_")] blockAsts'
         (gtrExpr <$> lst) `shouldContain` [var "not_"]
 
-    , TestLabel "instantiateTypes" $ TestCase $ do
+    it "instantiateTypes" $ do
         let lst_ = tyCon "[]"
         -- a => Set a
         let set_ s = tyApp (tyCon "Set") $ tyCon s
@@ -117,7 +115,7 @@ gen = let
         l5 <- interpretUnsafe $ instantiateTypes types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) (tyForall Nothing (Just $ cxTuple [typeA "Foldable" t]) $ tyFun (tyApp t a) bl)
         (pp <$> l5) `shouldBe` (pp <$> [tyFun (tyApp lst_ bl) bl, tyFun (tyApp lst_ int_) bl])
 
-    , TestLabel "instantiateTypeVars" $ TestCase $ do
+    it "instantiateTypeVars" $ do
         let lst_ = tyCon "[]"
         -- without type constraint
         l1 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, [])
@@ -135,7 +133,7 @@ gen = let
         l5 <- interpretUnsafe $ instantiateTypeVars types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) $ insert "a" (0, []) $ singleton "t" (1, [tyCon "Foldable"])
         pp_ l5 `shouldBe` pp_ [insert "a" bl (singleton "t" lst_), insert "a" int_ (singleton "t" lst_)]
 
-    , TestLabel "matchesType" $ TestCase $ do
+    it "matchesType" $ do
         let a = tyVar "a"
         q <- interpretUnsafe $ matchesType int_ a
         q `shouldBe` True
@@ -150,7 +148,7 @@ gen = let
         y <- interpretUnsafe $ matchesType a $ tyVar "b"
         y `shouldBe` True
 
-    , TestLabel "matchesConstraints" $ TestCase $ do
+    it "matchesConstraints" $ do
         -- Bool <-> Foldable
         y <- interpretUnsafe $ matchesConstraints 0 bl [tyCon "Foldable"]
         y `shouldBe` False
@@ -161,5 +159,3 @@ gen = let
         let lst = tyCon "[]"
         z <- interpretUnsafe $ matchesConstraints 1 lst [tyCon "Foldable"]
         z `shouldBe` True
-
-    ]

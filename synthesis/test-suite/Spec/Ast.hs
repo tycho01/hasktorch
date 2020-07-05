@@ -8,8 +8,6 @@
 module Spec.Ast (module Spec.Ast) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
-import           Test.HUnit.Base              (Test (..))
-import           Test.HUnit.Text              (runTestTT)
 import           Test.Tasty.Hspec
 import           Test.Tasty.HUnit             ((@?=))
 

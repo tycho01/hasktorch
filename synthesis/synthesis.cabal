@@ -145,7 +145,6 @@ test-suite synthesis-test-suite
   main-is: Main.hs
   build-depends:
       synthesis
-    , HUnit
     , tasty
     , tasty-hspec
     , tasty-hunit
