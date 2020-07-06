@@ -151,10 +151,7 @@ instantiateTypes types_by_arity tps tp = fmap (fillTypeVars tp) <$> instantiateT
 instantiateTypeVars :: HashMap Int [String] -> HashMap Int [Tp] -> HashMap String (Int, Int, [Tp]) -> Interpreter [HashMap String Tp]
 instantiateTypeVars types_by_arity instTpsByArity variableConstraints = do
   let tpArity :: HashMap Tp Int = fromList $ concat $ fmap (\(i, strs) -> (,i) . tyCon <$> strs) $ toList types_by_arity
---   let arityByInst :: HashMap Tp Int = fromList . join . fmap (\(i, tps) -> (,i) <$> tps) . toList $ instTpsByArity
-  warning $ "tpArity: " <> pp_ tpArity
---   warning $ "arityByInst: " <> pp_ arityByInst
-  let keyDepths  :: HashMap String Int = sndOf3 <$> variableConstraints
+  -- debug $ "tpArity: " <> pp_ tpArity
   let keyArities :: HashMap String Int = fstOf3 <$> variableConstraints
   let arities :: [Int] = elems keyArities
   let ks :: [String] = keys variableConstraints
