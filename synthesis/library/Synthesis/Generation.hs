@@ -17,6 +17,7 @@ import Data.HashMap.Lazy
     lookupDefault,
     toList,
     singleton,
+    member,
   )
 import Data.List (minimumBy, partition, nubBy)
 import Data.Ord (Ordering (..))
@@ -42,7 +43,7 @@ import Synthesis.Types
 import Synthesis.TypeGen
 import Synthesis.Data
 import Synthesis.Utility
-import Util (nTimes, fstOf3, thdOf3)
+import Util (nTimes, fstOf3, sndOf3, thdOf3)
 
 -- | just directly generate any functions in batch, and see what types end up coming out.
 -- | in this approach, further nodes can impose new constraints on the type variables introduced in earlier nodes.
@@ -147,16 +148,24 @@ instantiateTypes :: HashMap Int [String] -> HashMap Int [Tp] -> Tp -> Interprete
 instantiateTypes types_by_arity tps tp = fmap (fillTypeVars tp) <$> instantiateTypeVars types_by_arity tps (findTypeVars tp)
 
 -- | instantiate type variables
-instantiateTypeVars :: HashMap Int [String] -> HashMap Int [Tp] -> HashMap String (Int, [Tp]) -> Interpreter [HashMap String Tp]
+instantiateTypeVars :: HashMap Int [String] -> HashMap Int [Tp] -> HashMap String (Int, Int, [Tp]) -> Interpreter [HashMap String Tp]
 instantiateTypeVars types_by_arity instTpsByArity variableConstraints = do
   let tpArity :: HashMap Tp Int = fromList $ concat $ fmap (\(i, strs) -> (,i) . tyCon <$> strs) $ toList types_by_arity
-  let keyArities :: HashMap String Int = fst <$> variableConstraints
+--   let arityByInst :: HashMap Tp Int = fromList . join . fmap (\(i, tps) -> (,i) <$> tps) . toList $ instTpsByArity
+  warning $ "tpArity: " <> pp_ tpArity
+--   warning $ "arityByInst: " <> pp_ arityByInst
+  let keyDepths  :: HashMap String Int = sndOf3 <$> variableConstraints
+  let keyArities :: HashMap String Int = fstOf3 <$> variableConstraints
   let arities :: [Int] = elems keyArities
   let ks :: [String] = keys variableConstraints
   let combs :: [[Tp]] = (\tps -> sequence $ replicate (length ks) tps) $ concat $ elems $ instTpsByArity
   let combs_ :: [[Tp]] = filter (\tps -> ((\k -> lookupDefault 0 k tpArity) <$> tps) == arities) combs
   let maps :: [HashMap String Tp] = fromList . zip ks <$> combs_
-  let keysOk :: HashMap String Tp -> Interpreter Bool = allM (\(k, v) -> let (arity, tps) = variableConstraints ! k in matchesConstraints arity v tps) . toList
+  -- fully arbitrary constraint to limit deep instantiated types in deep type variables,
+  -- which helps constraint maximum string length, speeding up any encoding computations
+  -- as maximum string length ends up used as one of the tensor dimensions.
+  let depthConstraint :: Int -> Tp -> Bool = \ depth tp -> let is_simple = member tp tpArity in depth == 0 || is_simple
+  let keysOk :: HashMap String Tp -> Interpreter Bool = allM (\(k, v) -> let (arity, depth, tps) = variableConstraints ! k in if (depthConstraint depth v) then matchesConstraints arity v tps else pure False) . toList
   res <- filterM keysOk maps
   return res
 

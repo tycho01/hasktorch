@@ -30,6 +30,7 @@ import Language.Haskell.Exts.Syntax
     TyVarBind (..),
     Type (..),
   )
+import Util (thdOf3)
 import Synthesis.Data hiding (nestLimit, maxInstances)
 import Synthesis.Types
 import Synthesis.Utility
@@ -71,7 +72,7 @@ randomFnType tpsByArity allowAbstract allowFns nestLimit typeVars tyVarCount gen
   let f = randomType tpsByArity allowAbstract allowFns nestLimit
   gen' <- newStdGen
   tpIn :: Tp <- f typeVars tyVarCount gen
-  let typeVarsIn :: HashMap String [Tp] = snd <$> findTypeVars tpIn
+  let typeVarsIn :: HashMap String [Tp] = thdOf3 <$> findTypeVars tpIn
   let typeVars_ = mergeTyVars typeVars typeVarsIn
   tpOut :: Tp <- f typeVars_ tyVarCount gen'
   let fn :: Tp = tyFun tpIn tpOut
@@ -83,29 +84,29 @@ mergeTyVars :: HashMap String [Tp] -> HashMap String [Tp] -> HashMap String [Tp]
 mergeTyVars = unionWith $ \a b -> nubPp $ a ++ b
 
 -- | helper function for `findTypeVars` and `findTypeVars_`
-reconcileTypeVars :: (Int, [Tp]) -> (Int, [Tp]) -> (Int, [Tp])
-reconcileTypeVars (arity1, constraints1) (_arity2, constraints2) = (arity1, constraints1 ++ constraints2)
+reconcileTypeVars :: (Int, Int, [Tp]) -> (Int, Int, [Tp]) -> (Int, Int, [Tp])
+reconcileTypeVars (arity1, depth1, constraints1) (_arity2, depth2, constraints2) = (arity1, max depth1 depth2, constraints1 ++ constraints2)
 
 -- | find the type variables and their constraints
-findTypeVars :: Tp -> HashMap String (Int, [Tp])
-findTypeVars = fromListWith reconcileTypeVars . findTypeVars_ 0
+findTypeVars :: Tp -> HashMap String (Int, Int, [Tp])
+findTypeVars = fromListWith reconcileTypeVars . findTypeVars_ 0 0
 
 -- | recursive `findTypeVars_` helper
-findTypeVars_ :: Int -> Tp -> [(String, (Int, [Tp]))]
-findTypeVars_ arity tp =
-  let f = findTypeVars_ arity
+findTypeVars_ :: Int -> Int -> Tp -> [(String, (Int, Int, [Tp]))]
+findTypeVars_ arity depth tp =
+  let f = findTypeVars_ arity $ depth + 1
    in case tp of
-        TyForall _l maybeTyVarBinds maybeContext typ -> bindings ++ context ++ f typ
+        TyForall _l maybeTyVarBinds maybeContext typ -> bindings ++ context ++ findTypeVars_ arity depth typ
           where
-            bindings :: [(String, (Int, [Tp]))] = toList $ fromListWith reconcileTypeVars $ (\(KindedVar _l name kind) -> (pp name, (arity, [kind]))) <$> fromMaybe [] maybeTyVarBinds
-            context :: [(String, (Int, [Tp]))] = fromContext $ fromMaybe (CxEmpty l) maybeContext
-            fromContext :: Context L -> [(String, (Int, [Tp]))] = \case
+            bindings :: [(String, (Int, Int, [Tp]))] = toList $ fromListWith reconcileTypeVars $ (\(KindedVar _l name kind) -> (pp name, (arity, depth, [kind]))) <$> fromMaybe [] maybeTyVarBinds
+            context :: [(String, (Int, Int, [Tp]))] = fromContext $ fromMaybe (CxEmpty l) maybeContext
+            fromContext :: Context L -> [(String, (Int, Int, [Tp]))] = \case
               CxTuple _l assts -> concat $ unAsst <$> assts
               CxSingle _l asst -> unAsst asst
               CxEmpty _l -> []
-            unAsst :: Asst L -> [(String, (Int, [Tp]))] = \case
+            unAsst :: Asst L -> [(String, (Int, Int, [Tp]))] = \case
               TypeA _l tp' -> case tp' of
-                TyApp _l a b -> [(pp b, (arity, [a]))]
+                TyApp _l a b -> [(pp b, (arity, depth, [a]))]
                 _ -> f typ
               IParam _l _iPName a -> f a
               ParenA _l asst -> unAsst asst
@@ -115,9 +116,9 @@ findTypeVars_ arity tp =
         TyUnboxedSum _l tps -> concat $ f <$> tps
         TyList _l a -> f a
         TyParArray _l a -> f a
-        TyApp _l a b -> findTypeVars_ (arity + 1) a ++ f b
-        TyVar _l _name -> [(pp tp, (arity, []))]
-        TyParen _l a -> f a
+        TyApp _l a b -> findTypeVars_ (arity + 1) (depth + 1) a ++ f b
+        TyVar _l _name -> [(pp tp, (arity, depth, []))]
+        TyParen _l a -> findTypeVars_ arity depth a
         TyKind _l a kind -> f a ++ f kind
         TyPromoted _l promoted -> case promoted of
           PromotedList _l _bl tps -> concat $ f <$> tps
