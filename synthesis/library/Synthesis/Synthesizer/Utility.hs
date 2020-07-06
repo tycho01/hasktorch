@@ -350,9 +350,9 @@ assertEq :: (Show a, Eq a) => a -> a -> a
 assertEq = assertEqBy id
 
 -- | apply a softmax over all dimensions
+-- | presumes input is already in e
 softmaxAll :: D.Tensor -> D.Tensor
-softmaxAll t = F.divScalar ((D.asValue $ F.sumAll e) :: Float) e
-    where e = F.exp t
+softmaxAll t = F.divScalar ((D.asValue $ F.sumAll t) :: Float) t
 
 -- | loop n times, retaining state
 foldLoop :: forall a b m . (Num a, Enum a, Monad m) => b -> a -> (b -> a -> m b) -> m b
@@ -556,6 +556,6 @@ sampleIdxs t = do
     -- info_ $ "t: \n" <> show t
     let ps :: D.Tensor = flip I.unsqueeze 0 . F.flattenAll $ t
     info_ $ "ps: \n" <> show ps
-    [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
+    [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromLogits ps) [1]
     info_ $ "idx: " <> show idx
     return $ unravelIdx t idx
