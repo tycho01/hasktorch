@@ -117,19 +117,19 @@ gen = parallel $ let
     it "instantiateTypeVars" $ do
         let lst_ = tyCon "[]"
         -- without type constraint
-        l1 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, [])
+        l1 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, 0, [])
         l1 `shouldBe` [singleton "a" bl, singleton "a" int_]
         -- with type constraint
-        l2 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, [tyCon "Num"])
+        l2 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, 0, [tyCon "Num"])
         l2 `shouldBe` [singleton "a" int_]
         -- Ord a => [a] -> [a]
-        l3 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, [tyCon "Ord"])
+        l3 <- interpretUnsafe $ instantiateTypeVars types_by_arity (singleton 0 [bl, int_]) $ singleton "a" (0, 0, [tyCon "Ord"])
         l3 `shouldBe` [singleton "a" bl, singleton "a" int_]
         -- Foldable t => t Bool -> Bool
-        l4 <- interpretUnsafe $ instantiateTypeVars types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) $ singleton "t" (1, [tyCon "Foldable"])
+        l4 <- interpretUnsafe $ instantiateTypeVars types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) $ singleton "t" (1, 2, [tyCon "Foldable"])
         l4 `shouldBe` [singleton "t" lst_]
         -- Foldable t => t a -> Bool
-        l5 <- interpretUnsafe $ instantiateTypeVars types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) $ insert "a" (0, []) $ singleton "t" (1, [tyCon "Foldable"])
+        l5 <- interpretUnsafe $ instantiateTypeVars types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) $ insert "a" (0, 2, []) $ singleton "t" (1, 2, [tyCon "Foldable"])
         pp_ l5 `shouldBe` pp_ [insert "a" bl (singleton "t" lst_), insert "a" int_ (singleton "t" lst_)]
 
     it "matchesType" $ do
