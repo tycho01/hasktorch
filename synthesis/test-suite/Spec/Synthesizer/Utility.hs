@@ -35,6 +35,8 @@ import qualified Torch.DType                   as D
 import qualified Torch.Functional.Internal     as I
 import qualified Torch.Functional              as F
 import qualified Torch.NN                      as A
+import qualified Torch.Distributions.Distribution as Distribution
+import qualified Torch.Distributions.Categorical as Categorical
 import           Torch.Typed.Aux
 import           Torch.Typed.Tensor
 import           Torch.Typed.Factories
