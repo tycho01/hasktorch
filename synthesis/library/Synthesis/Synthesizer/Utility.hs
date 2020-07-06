@@ -547,3 +547,10 @@ showTrace a = trace (show a) a
 -- | print info about an item with a description
 showTraceOf :: Show a => String -> a -> a
 showTraceOf str a = trace (str <> ": " <> show a) a
+
+-- | use a Categorical distribution to sample indices from a probability tensor
+sampleIdxs :: D.Tensor -> IO [Int]
+sampleIdxs t = do
+    let ps :: D.Tensor = flip I.unsqueeze 0 . F.flattenAll $ t
+    [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
+    return $ unravelIdx t idx
