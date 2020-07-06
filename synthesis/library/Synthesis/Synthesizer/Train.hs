@@ -79,14 +79,6 @@ import           Synthesis.Synthesizer.R3NN
 import           Synthesis.Synthesizer.Synthesizer
 import           Synthesis.Synthesizer.Params
 
--- TODO: can't put this in Utility right now as it'd create a circular dependency with Categorical until F.squeezeDim... still need to resolve.
--- | use a Categorical distribution to sample indices from a probability tensor
-sampleIdxs :: D.Tensor -> IO [Int]
-sampleIdxs t = do
-    let ps :: D.Tensor = flip I.unsqueeze 0 . F.flattenAll $ t
-    [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
-    return $ unravelIdx t idx
-
 -- | deterministically pick the most likely expansion to fill a hole in a PPT
 -- | deprecated, not in use
 -- TODO: replace this whole block with argmaxAll (argmax_t) returning non-flat index (like np.unravel_index)...
