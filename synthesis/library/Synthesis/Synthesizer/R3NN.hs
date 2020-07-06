@@ -207,7 +207,7 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
     conditioned' :: Tensor device 'D.Float '[symbols, m] = 
             -- asUntyped to type-check m*2/2
             asUntyped (\t -> I.squeezeDim t 0) .
-            fstOf3 . lstmWithDropout @'SequenceFirst condition_model . unsqueeze @0 $ conditioned
+            fstOf3 . lstmForwardWithDropout @'SequenceFirst condition_model . unsqueeze @0 $ conditioned
     root_emb :: Tensor device 'D.Float '[1, m] = forwardPass @m r3nn symbolIdxs conditioned' ppt
     node_embs :: Tensor device 'D.Float '[num_holes, m] = 
             UnsafeMkTensor $ F.cat (F.Dim 0) $ toDynamic <$> reversePass @m r3nn root_emb ppt
