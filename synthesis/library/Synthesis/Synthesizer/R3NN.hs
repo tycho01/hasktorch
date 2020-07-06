@@ -32,6 +32,7 @@ import qualified Torch.Typed.Parameter
 import Torch.Typed.Factories
 import Torch.Autograd
 import Torch.Typed.NN
+import Torch.Typed.NN.Recurrent.Aux
 import Torch.Typed.NN.Recurrent.LSTM
 import Torch.HList
 import qualified Torch.NN                      as A

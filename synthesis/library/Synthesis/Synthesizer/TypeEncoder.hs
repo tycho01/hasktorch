@@ -40,6 +40,7 @@ import qualified Torch.Tensor                  as D
 import qualified Torch.Device                  as D
 import qualified Torch.DType                   as D
 import           Torch.Typed.NN
+import           Torch.Typed.NN.Recurrent.Aux
 import           Torch.Typed.NN.Recurrent.LSTM
 
 import Synthesis.Orphanage ()
