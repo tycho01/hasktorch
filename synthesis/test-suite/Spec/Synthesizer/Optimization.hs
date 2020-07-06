@@ -61,8 +61,7 @@ import           Synthesis.Synthesizer.Encoder
 import           Synthesis.Synthesizer.R3NN
 import           Synthesis.Synthesizer.NSPS
 import           Synthesis.Synthesizer.Train
-import qualified Synthesis.Synthesizer.Distribution as Distribution
-import qualified Synthesis.Synthesizer.Categorical  as Categorical
+
 import           Synthesis.Synthesizer.Params
 import           Synthesis.GridSearch
 import           Spec.Synthesizer.Types
