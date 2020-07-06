@@ -227,8 +227,6 @@ train synthesizerConfig taskFnDataset init_model = do
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         start <- liftIO $ getCPUTime
         -- TRAIN LOOP
-        let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
-                rule_encode @device @shape @rules @ruleFeats model_ variantTypes
         (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
             notice $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = fnTypes ! task_fn
@@ -236,6 +234,8 @@ train synthesizerConfig taskFnDataset init_model = do
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     fnTypeIOs ! task_fn
             notice $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+            let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
+                    rule_encode @device @shape @rules @ruleFeats model variantTypes
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
             let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
