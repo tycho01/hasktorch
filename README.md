@@ -6,7 +6,7 @@ It is an independent open source community project which leverages the core C++ 
 This project is in active development, so expect changes to the library API as it evolves.
 We would like to invite new users to join our Hasktorch slack space for questions and discussions.
 
-Contributious/PR are encouraged (see Contributing).
+Contributions/PR are encouraged (see Contributing).
 
 Currently we are prepping development and migration for a major 2nd release, Hasktorch 0.2.
 The 1st release, Hasktorch 0.1, that you can find on hackage is outdated and should not be used at this point.
@@ -101,9 +101,46 @@ launch the Nix shell instead with:
 $ nix-shell --arg cudaSupport true --argstr cudaMajorVersion 10
 ```
 
-If you have run `cabal` in a CPU-only Hasktorch shell before,
-you need to clean the `dist-newstyle` folder first, `cabal clean`.
-Otherwise, you will not be able to move tensors to CUDA.
+#### Known Nix Shell Issues
+
+##### Tensors Cannot Be Moved to CUDA
+
+In rare cases, you may see errors like
+
+```
+cannot move tensor to "CUDA:0"
+```
+
+although you have CUDA capable hardware in your machine and
+have started the Nix shell with CUDA support.
+
+If that happens, check if you have `/run/opengl-driver/lib`
+in your `LD_LIBRARY_PATH` in the Nix shell.
+If not, run
+
+```
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/run/opengl-driver/lib
+```
+
+to add it.
+
+##### Weird Behaviour When Switching from CPU-Only to CUDA-Enabled Nix Shell
+
+If you have run `cabal` in a CPU-only Hasktorch Nix shell before,
+you may need to:
+
+* Clean the `dist-newstyle` folder using `cabal clean`.
+* Delete the `.ghc.environment*` file in the Hasktorch root folder.
+
+Otherwise, at best, you will not be able to move tensors to CUDA,
+and, at worst, you will see weird linker errors like
+
+```
+gcc: error: hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.8.3/libtorch-ffi-1.5.0.0/build/Torch/Internal/Unmanaged/Autograd.dyn_o: No such file or directory
+`cc' failed in phase `Linker'. (Exit code: 1)
+```
+
+##### CUDA 9
 
 In rare cases, you may want to use `--argstr cudaMajorVersion 9`.
 This will pull in version 9 of the CUDA toolkit instead.
@@ -146,7 +183,7 @@ $ nix-shell \
   --command "export DEVICE=\"cuda:0\"; cabal run static-mnist-mlp"
 ```
 
-### Set up your development environement
+### Set up your development environment
 
 If you want to develop the project with great Haskell IDE integration,
 you should consider using [ghcide](https://github.com/digital-asset/ghcide).
@@ -163,19 +200,26 @@ You will then want to install an integration for your preferred editor. `ghcide`
 * [Vim](https://github.com/digital-asset/ghcide#using-with-vimneovim),
 * and [others](https://github.com/digital-asset/ghcide).
 
-In order to get started with VS Code, start it from within a Nix shell:
+### Getting started with VS Code
+
+This section walks you through the steps of setting up the `ghcide` integration with VS Code.
+It assumes that VS Code is already installed system-wide.
+
+First, open a Nix shell and start VS Code:
 
 ```sh
 $ nix-shell --command "code ."
 ```
 
-This assumes VS Code is already installed system-wide.
+This will work on both macOS and Linux since it is limited to the CPU-only Torch backend.
+On Linux, a CUDA-enabled experience is also possible.
+Just append `--arg cudaSupport true` and `--argstr cudaMajorVersion 10` to the above `nix-shell` command.
 
-A CUDA-enabled `ghcide` experience is also possible,
-just append `--arg cudaSupport true` and `--argstr cudaMajorVersion 10` to the `nix-shell` command.
-
-All that is needed now is the VS Code [Haskell Language Server plugin](https://marketplace.visualstudio.com/items?itemName=alanz.vscode-hie-server).
+Once VS Code is up an running,
+the [Haskell Language Server plugin](https://marketplace.visualstudio.com/items?itemName=alanz.vscode-hie-server)
+needs to be installed.
 Follow the link to the market place, and install the plugin in VS Code.
+
 Lastly, in the settings for the plugin, set the `Hie Variant` to `ghcide`.
 Changing this setting may require a restart of VS Code.
 Afterwards, you should be good to go.
