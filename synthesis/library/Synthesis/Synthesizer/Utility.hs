@@ -68,6 +68,8 @@ import qualified Torch.Functional              as F
 import qualified Torch.Internal.Class                    as ATen
 import qualified Torch.Internal.Managed.Native           as ATen
 import qualified Torch.Internal.Unmanaged.Type.Context   as ATen
+import qualified Torch.Distributions.Distribution as Distribution
+import qualified Torch.Distributions.Categorical as Categorical
 
 import Synthesis.Data
 import Synthesis.Orphanage ()
