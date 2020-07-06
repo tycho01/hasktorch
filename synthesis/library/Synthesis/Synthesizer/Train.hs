@@ -223,17 +223,17 @@ train synthesizerConfig taskFnDataset init_model = do
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0)
 
     (_, model, _, _, eval_results, _, _) <- foldLoop init_state numEpochs $ \ state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc) epoch -> if earlyStop then pure state else do
-        debug $ "epoch: " <> show epoch
+        notice $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         start <- liftIO $ getCPUTime
         -- TRAIN LOOP
         (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
-            notice $ "task_fn: \n" <> pp task_fn
+            info $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = fnTypes ! task_fn
-            notice $ "taskType: " <> pp taskType
+            info $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     fnTypeIOs ! task_fn
-            notice $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+            info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
             let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                     rule_encode @device @shape @rules @ruleFeats model variantTypes
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
