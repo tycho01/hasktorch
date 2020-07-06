@@ -78,9 +78,6 @@ library
       Synthesis.Orphanage
       Synthesis.Synthesis
       Synthesis.Synthesize
-      Synthesis.Synthesizer.Categorical
-      Synthesis.Synthesizer.Constraints
-      Synthesis.Synthesizer.Distribution
       Synthesis.Synthesizer.Encoder
       Synthesis.Synthesizer.Exports
       Synthesis.Synthesizer.NSPS
