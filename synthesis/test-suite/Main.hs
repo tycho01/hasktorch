@@ -65,7 +65,6 @@ import           Spec.TypeGen
 import           Spec.Types
 import           Spec.Utility
 import           Spec.Synthesizer.NSPS
-import           Spec.Synthesizer.Synthesizer
 import           Spec.Synthesizer.Utility
 import           Spec.Synthesizer.Optimization
 
@@ -81,6 +80,5 @@ main = do
     synth_util_ <- testSpec "Synthesizer: Utility" synth_util
     nsps_ <- testSpec "NSPS" nsps
     optim_ <- testSpec "optim" optim
-    synth_ <- testSpec "synth" synth
-    let tree :: TestTree = testGroup "synthesis" [util_, types_, typeGen_, find_, ast_, hint_, gen_, synth_util_, nsps_, optim_, synth_]
+    let tree :: TestTree = testGroup "synthesis" [util_, types_, typeGen_, find_, ast_, hint_, gen_, synth_util_, nsps_, optim_]
     defaultMain tree

@@ -61,9 +61,8 @@ import           Synthesis.Synthesizer.TypeEncoder
 import           Synthesis.Synthesizer.R3NN
 import           Synthesis.Synthesizer.NSPS
 import           Synthesis.Synthesizer.Train
-
 import           Synthesis.Synthesizer.Params
-
+import           Synthesis.Synthesizer.Synthesizer
 import           Spec.Synthesizer.Types
 
 type Device = Cpu
@@ -224,3 +223,45 @@ nsps = parallel $ let
         (task_fn', gold) :: (Expr, Tensor Device 'D.Float '[NumHoles]) <- fillHoleTrain variantMap ruleIdxs task_fn ppt hole_expansion_probs
         pp task_fn' `shouldBe` pp task_fn
         D.shape (toDynamic gold) `shouldBe` [numHoles]
+
+    it "calcLoss" $ do
+        let variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> expr_blocks
+        let variant_sizes :: HashMap String Int = fromList $ variantInt . snd <$> variants
+        let variantMap :: HashMap String Expr = fromList variants
+        let task_fn :: Expr = letIn (pickKeysSafe ["true"] dsl) $ parseExpr "not (not true)"
+        taskType :: Tp <- interpretUnsafe $ exprType task_fn
+        let symbolIdxs :: HashMap String Int = indexList $ "undefined" : keys dsl
+        let tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = singleton (int_, str) [(parseExpr "0", Right (parseExpr "\"0\"")), (parseExpr "1", Right (parseExpr "\"1\"")), (parseExpr "2", Right (parseExpr "\"2\""))]
+        let io_pairs :: [(Expr, Either String Expr)] = join . elems $ tp_io_pairs
+        let charMap :: HashMap Char Int = mkCharMap [tp_io_pairs]
+        let encoder_spec :: LstmEncoderSpec Device MaxStringLength EncoderBatch' MaxChar H FeatMultWithTypes =
+                LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropOut
+        let dsl' = filterWithKey (\k v -> k /= pp v) dsl
+        variantTypes :: [Tp] <- interpretUnsafe $ (exprType . letIn dsl' . snd) `mapM` variants
+        let ruleCharMap :: HashMap Char Int = indexChars $ pp <$> variantTypes
+        let r3nn_spec :: R3NNSpec Device M Symbols Rules MaxStringLength R3nnBatch' H MaxChar FeatMultWithTypes =
+                initR3nn variants r3nnBatch' dropOut ruleCharMap
+        let type_encoder_spec :: TypeEncoderSpec Device MaxStringLength MaxChar M =
+                TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropOut
+        model :: NSPS Device M Symbols Rules MaxStringLength EncoderBatch' R3nnBatch' MaxChar H FeatMultWithTypes
+                <- A.sample $ NSPSSpec encoder_spec type_encoder_spec r3nn_spec
+        
+        let gen :: StdGen = mkStdGen seedDef
+        let (_gen, sampled_feats) :: (StdGen, Tensor Device 'D.Float '[R3nnBatch', MaxStringLength * (2 * FeatMultWithTypes * Dirs * H)])
+                = encode @Device @'[R3nnBatch', MaxStringLength * (2 * FeatMultWithTypes * Dirs * H)] @Rules model gen tp_io_pairs
+
+        let ruleIdxs :: HashMap String Int = indexList $ fst <$> variants
+        let synth_max_holes = 3
+
+        let maskBad = False
+        let rule_tp_emb :: Tensor Device 'D.Float '[Rules, MaxStringLength * M] =
+                rule_encode @Device @'[R3nnBatch', MaxStringLength * (2 * FeatMultWithTypes * Dirs * H)] @Rules @(MaxStringLength * M) model variantTypes
+
+        loss :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules dsl task_fn taskType symbolIdxs model sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants rule_tp_emb
+        toFloat loss > 0.0 `shouldBe` True
+
+        let optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
+        (newParam, optim') <- D.runStep model optim (toDynamic loss) lr
+        let model' :: NSPS Device M Symbols Rules MaxStringLength EncoderBatch' R3nnBatch' MaxChar H FeatMultWithTypes = A.replaceParameters model newParam
+        loss' :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules dsl task_fn taskType symbolIdxs model' sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants rule_tp_emb
+        toBool (loss' <. loss) `shouldBe` True

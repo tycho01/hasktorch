@@ -152,7 +152,6 @@ test-suite synthesis-test-suite
       Spec.Hint
       Spec.Synthesizer.NSPS
       Spec.Synthesizer.Optimization
-      Spec.Synthesizer.Synthesizer
       Spec.Synthesizer.Types
       Spec.Synthesizer.Utility
       Spec.TypeGen
