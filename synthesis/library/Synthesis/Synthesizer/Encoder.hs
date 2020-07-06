@@ -103,7 +103,7 @@ lstmBatch
     -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, maxChar]
     -> Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]
 lstmBatch LstmEncoder{..} in_vec out_vec = feat_vec where
-    lstm' = \model -> fstOf3 . lstmWithDropout @'BatchFirst model
+    lstm' = \model -> fstOf3 . lstmForwardWithDropout @'BatchFirst model
     emb_in  :: Tensor device 'D.Float '[batch_size, featMult * maxStringLength, h * Dirs] = lstm'  inModel  in_vec
     emb_out :: Tensor device 'D.Float '[batch_size, featMult * maxStringLength, h * Dirs] = lstm' outModel out_vec
     -- | For each pair, it then concatenates the topmost hidden representation at every time step to produce a 4HT-dimensional feature vector per I/O pair
