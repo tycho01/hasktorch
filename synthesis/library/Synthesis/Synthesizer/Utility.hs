@@ -548,9 +548,6 @@ showTraceOf str a = trace (str <> ": " <> show a) a
 -- | use a Categorical distribution to sample indices from a probability tensor
 sampleIdxs :: D.Tensor -> IO [Int]
 sampleIdxs t = do
-    -- info_ $ "t: \n" <> show t
     let ps :: D.Tensor = flip I.unsqueeze 0 . F.flattenAll $ t
-    info_ $ "ps: \n" <> show ps
     [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
-    info_ $ "idx: " <> show idx
     return $ unravelIdx t idx
