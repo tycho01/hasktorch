@@ -66,6 +66,7 @@ data GenerationConfig = GenerationConfig
     , validation :: Double
     , test :: Double
     , maxDataset :: Int
+    , maxParams :: Int
     , verbosity :: String
     } deriving (Eq, Show, Generic)
 

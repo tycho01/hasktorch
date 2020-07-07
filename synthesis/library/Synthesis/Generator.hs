@@ -114,7 +114,7 @@ main = do
     let both_instantiation_inputs :: HashMap Tp [Expr] = rest_instantiation_inputs `union` instantiated_fn_options
     say_ "\nboth_instantiation_inputs:"
     notice_ $ pp_ both_instantiation_inputs
-    fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- interpretUnsafe . sequence $ mapWithKey (fnOutputs crashOnError both_instantiation_inputs) fn_type_instantiations
+    fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- interpretUnsafe . sequence $ mapWithKey (fnOutputs crashOnError maxParams both_instantiation_inputs) fn_type_instantiations
     say_ "\nfn_type_ios:"
     notice_ $ pp_ fn_type_ios
     -- combine i/o lists across type instances
