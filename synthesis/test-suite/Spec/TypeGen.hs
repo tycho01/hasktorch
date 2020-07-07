@@ -91,7 +91,7 @@ typeGen = parallel $ let
         True `shouldBe` True
 
     it "genTypes" $ do
-        hm <- genTypes seedDef types_by_arity 0 10
+        hm <- genTypes types_by_arity 0 10
         null (hm ! 0) `shouldBe` False
 
     it "fillTypeVars" $ do
