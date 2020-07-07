@@ -116,12 +116,13 @@ fitExpr expr = do
 -- | given sample inputs by type and type instantiations for a function, get its in/out pairs (by type)
 fnOutputs
   :: Bool
+  -> Int
   -> HashMap Tp [Expr]
   -> Expr
   -> [([Tp], Tp)]
   -- | for each type instantiation, for each param, the input type as string
   -> Interpreter (HashMap (Tp, Tp) [(Expr, Either String Expr)])
-fnOutputs crash_on_error instantiation_inputs fn_ast tp_instantiations =
+fnOutputs crash_on_error maxParams instantiation_inputs fn_ast tp_instantiations =
   case tp_instantiations of
     [] -> return empty
     _ -> do
@@ -138,8 +139,9 @@ fnOutputs crash_on_error instantiation_inputs fn_ast tp_instantiations =
         [] -> return empty
         _ -> do
           let n = length . head . head $ param_combs
-          let ins :: [Expr] = list . fmap tuple <$> param_combs
-          fmap (fromList . zip tp_pairs) $ mapM (uncurry $ fnIoPairs crash_on_error n fn_ast) $ zip tp_pairs ins
+          if n > maxParams then return empty else do
+            let ins :: [Expr] = list . fmap tuple <$> param_combs
+            fmap (fromList . zip tp_pairs) $ mapM (uncurry $ fnIoPairs crash_on_error n fn_ast) $ zip tp_pairs ins
 
 -- TODO: c.f. https://hackage.haskell.org/package/ghc-8.6.5/docs/TcHsSyn.html#v:zonkTcTypeToType
 

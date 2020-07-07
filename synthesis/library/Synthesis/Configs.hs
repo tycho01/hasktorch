@@ -23,6 +23,7 @@ generationConfig = GenerationConfig
     <*> validationOpt
     <*> testOpt
     <*> maxDatasetOpt
+    <*> maxParamsOpt
     <*> verbosityOpt
 
 parseGenerationConfig :: IO GenerationConfig
@@ -239,6 +240,13 @@ maxDatasetOpt = option auto
     <> value maxDatasetDef
     <> showDefault
     <> help "the maximum number of programs we will consider for use in our dataset (before further filtering)" )
+
+maxParamsDef :: Int = 3
+maxParamsOpt = option auto
+    ( long "maxParams"
+    <> value maxParamsDef
+    <> showDefault
+    <> help "the maximum number of parameters we will permit a task function to have. not restricting this may result in a stack overflow from e.g. the number of potential argument permutations for functions taking as many as e.g. 6 parameters." )
 
 taskPathOpt = strOption
     ( long "taskPath"
