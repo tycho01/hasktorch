@@ -153,11 +153,10 @@ fillTypeVars tp substitutions =
         _ -> tp
 
 -- | generate a number of monomorphic types to be used in type variable substitution
-genTypes :: Int -> HashMap Int [String] -> Int -> Int -> IO (HashMap Int [Tp])
-genTypes seed tpsByArity nestLimit maxInstances = do
-  tps :: [Tp] <- nubPp . flatten <$> Many . fmap (One . pure) <$>
-        -- replicateM maxInstances makeTp
-        (makeTp . mkStdGen . (seed +)) `mapM` [1 .. maxInstances] 
+genTypes :: HashMap Int [String] -> Int -> Int -> IO (HashMap Int [Tp])
+genTypes tpsByArity nestLimit maxInstances = do
+  tps :: [Tp] <- (nubPp . flatten . Many . fmap (One . pure)) <.>
+        join $ sequence . fmap makeTp <$> replicateM maxInstances newStdGen 
   return . insert 0 tps . delete 0 $ fmap tyCon <$> tpsByArity
   where
     makeTp :: StdGen -> IO Tp =
