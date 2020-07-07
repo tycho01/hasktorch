@@ -1,6 +1,5 @@
 generatedTypes:
   '0':
-  - Bool
   - Int
   - Char
   '1':
@@ -9,8 +8,7 @@ generatedTypes:
   '2':
   - (,)
   - Either
-  - HashMap
-longestExprString: 289
+longestExprString: 58
 exprBlocks:
 - - zip
   - expr: zip
@@ -18,25 +16,6 @@ exprBlocks:
   - expr: 'zip (undefined :: [a])'
 - - zip
   - expr: 'zip (undefined :: [a]) (undefined :: [b])'
-- - show
-  - expr: show
-- - show
-  - expr: 'show (undefined :: Show a => a)'
-- - succ
-  - expr: succ
-- - succ
-  - expr: 'succ (undefined :: Enum a => a)'
-- - traverse
-  - expr: traverse
-- - traverse
-  - expr: |-
-      traverse
-        (undefined :: (Traversable t, Applicative f) => (a -> f b))
-- - traverse
-  - expr: |-
-      traverse
-        (undefined :: (Traversable t, Applicative f) => (a -> f b))
-        (undefined :: (Traversable t, Applicative f) => t a)
 - - unzip
   - expr: unzip
 - - unzip
@@ -61,10 +40,6 @@ exprBlocks:
   - expr: just
 - - just
   - expr: 'just (undefined :: a)'
-- - pure
-  - expr: pure
-- - pure
-  - expr: 'pure (undefined :: Applicative f => a)'
 - - mempty
   - expr: mempty
 - - toEnum
@@ -75,14 +50,6 @@ exprBlocks:
   - expr: length
 - - length
   - expr: 'length (undefined :: Foldable t => t a)'
-- - bind
-  - expr: bind
-- - bind
-  - expr: 'bind (undefined :: Monad m => m a)'
-- - bind
-  - expr: |-
-      bind (undefined :: Monad m => m a)
-        (undefined :: Monad m => (a -> m b))
 - - compose
   - expr: compose
 - - compose
@@ -93,16 +60,6 @@ exprBlocks:
   - expr: |-
       compose (undefined :: (b -> c)) (undefined :: (a -> b))
         (undefined :: a)
-- - empty
-  - expr: empty
-- - foldr1
-  - expr: foldr1
-- - foldr1
-  - expr: 'foldr1 (undefined :: Foldable t => (a -> a -> a))'
-- - foldr1
-  - expr: |-
-      foldr1 (undefined :: Foldable t => (a -> a -> a))
-        (undefined :: Foldable t => t a)
 - - sequence
   - expr: sequence
 - - sequence
@@ -115,20 +72,6 @@ exprBlocks:
   - expr: fromEnum
 - - fromEnum
   - expr: 'fromEnum (undefined :: Enum a => a)'
-- - mapM
-  - expr: mapM
-- - mapM
-  - expr: 'mapM (undefined :: (Traversable t, Monad m) => (a -> m b))'
-- - mapM
-  - expr: |-
-      mapM (undefined :: (Traversable t, Monad m) => (a -> m b))
-        (undefined :: (Traversable t, Monad m) => t a)
-- - const
-  - expr: const
-- - const
-  - expr: 'const (undefined :: a)'
-- - const
-  - expr: 'const (undefined :: a) (undefined :: b)'
 - - zero
   - expr: zero
 - - prepend
@@ -153,18 +96,6 @@ exprBlocks:
   - expr: |-
       fmap (undefined :: Functor f => (a -> b))
         (undefined :: Functor f => f a)
-- - app
-  - expr: app
-- - app
-  - expr: 'app (undefined :: Applicative f => f (a -> b))'
-- - app
-  - expr: |-
-      app (undefined :: Applicative f => f (a -> b))
-        (undefined :: Applicative f => f a)
-- - 'null'
-  - expr: 'null'
-- - 'null'
-  - expr: 'null (undefined :: Foldable t => t a)'
 - - maybe
   - expr: maybe
 - - maybe
@@ -175,3648 +106,621 @@ exprBlocks:
   - expr: |-
       maybe (undefined :: b) (undefined :: (a -> b))
         (undefined :: Maybe a)
-- - foldr
-  - expr: foldr
-- - foldr
-  - expr: 'foldr (undefined :: Foldable t => (a -> b -> b))'
-- - foldr
-  - expr: |-
-      foldr (undefined :: Foldable t => (a -> b -> b))
-        (undefined :: Foldable t => b)
-- - foldr
-  - expr: |-
-      foldr (undefined :: Foldable t => (a -> b -> b))
-        (undefined :: Foldable t => b)
-        (undefined :: Foldable t => t a)
 - - tpl
   - expr: tpl
 - - tpl
   - expr: 'tpl (undefined :: a)'
 - - tpl
   - expr: 'tpl (undefined :: a) (undefined :: b)'
-- - insert
-  - expr: insert
-- - insert
-  - expr: 'insert (undefined :: (Eq k, Hashable k) => k)'
-- - insert
-  - expr: |-
-      insert (undefined :: (Eq k, Hashable k) => k)
-        (undefined :: (Eq k, Hashable k) => v)
-- - insert
-  - expr: |-
-      insert (undefined :: (Eq k, Hashable k) => k)
-        (undefined :: (Eq k, Hashable k) => v)
-        (undefined :: (Eq k, Hashable k) => HashMap k v)
-longestString: 289
+longestString: 58
 fnTypeIOs:
 - - expr: toEnum
   - - - - type: Int
-        - type: Int
-      - - - expr: ((-2))
+        - type: Char
+      - - - expr: ((-17))
+          - Left: '"Prelude.chr: bad argument: (-17)"'
+        - - expr: ((-10))
+          - Left: '"Prelude.chr: bad argument: (-10)"'
+        - - expr: ((-19))
+          - Left: '"Prelude.chr: bad argument: (-19)"'
+        - - expr: ((19))
           - Right:
-              expr: (-2)
-        - - expr: ((4))
+              expr: '''\DC3'''
+        - - expr: ((15))
+          - Right:
+              expr: '''\SI'''
+        - - expr: ((-16))
+          - Left: '"Prelude.chr: bad argument: (-16)"'
+        - - expr: ((-5))
+          - Left: '"Prelude.chr: bad argument: (-5)"'
+        - - expr: ((-11))
+          - Left: '"Prelude.chr: bad argument: (-11)"'
+        - - expr: ((-9))
+          - Left: '"Prelude.chr: bad argument: (-9)"'
+        - - expr: ((-12))
+          - Left: '"Prelude.chr: bad argument: (-12)"'
+- - expr: sequenceA
+  - - - - type: '[] ([] Char)'
+        - type: '[] ([] Char)'
+      - - - expr: ([['7', '1', '9', '3'], ['7']])
+          - Right:
+              expr: '["77", "17", "97", "37"]'
+        - - expr: ([['7', '1', '9', '3']])
+          - Right:
+              expr: '["7", "1", "9", "3"]'
+        - - expr: ([])
+          - Right:
+              expr: '[""]'
+    - - - type: '[] (Maybe Char)'
+        - type: Maybe ([] Char)
+      - - - expr: ([Just '7', Just '1', Just '9', Just '3'])
+          - Right:
+              expr: (Just "7193")
+        - - expr: ([Just '7'])
+          - Right:
+              expr: (Just "7")
+        - - expr: ([])
+          - Right:
+              expr: (Just "")
+        - - expr: ([Just '7', Just '1'])
+          - Right:
+              expr: (Just "71")
+    - - - type: Maybe (Maybe Char)
+        - type: Maybe (Maybe Char)
+      - - - expr: (Just (Just '7'))
+          - Right:
+              expr: (Just (Just '7'))
+        - - expr: (Just (Just '1'))
+          - Right:
+              expr: (Just (Just '1'))
+        - - expr: (Just (Just '9'))
+          - Right:
+              expr: (Just (Just '9'))
+        - - expr: (Just (Just '3'))
+          - Right:
+              expr: (Just (Just '3'))
+        - - expr: (Just (Just '6'))
+          - Right:
+              expr: (Just (Just '6'))
+        - - expr: (Just (Just '0'))
+          - Right:
+              expr: (Just (Just '0'))
+    - - - type: Maybe ([] Char)
+        - type: '[] (Maybe Char)'
+      - - - expr: (Just ['7', '1', '9', '3'])
+          - Right:
+              expr: '[Just ''7'', Just ''1'', Just ''9'', Just ''3'']'
+        - - expr: (Just ['7'])
+          - Right:
+              expr: '[Just ''7'']'
+        - - expr: (Just [])
+          - Right:
+              expr: '[]'
+        - - expr: (Just ['7', '1'])
+          - Right:
+              expr: '[Just ''7'', Just ''1'']'
+- - expr: length
+  - - - - type: Maybe Char
+        - type: Int
+      - - - expr: (Just '7')
+          - Right:
+              expr: '1'
+        - - expr: (Just '1')
+          - Right:
+              expr: '1'
+        - - expr: (Just '9')
+          - Right:
+              expr: '1'
+        - - expr: (Just '3')
+          - Right:
+              expr: '1'
+        - - expr: (Just '6')
+          - Right:
+              expr: '1'
+        - - expr: (Just '0')
+          - Right:
+              expr: '1'
+    - - - type: '[] Char'
+        - type: Int
+      - - - expr: (['7', '1', '9', '3'])
           - Right:
               expr: '4'
-        - - expr: ((14))
-          - Right:
-              expr: '14'
-        - - expr: ((12))
-          - Right:
-              expr: '12'
-        - - expr: ((13))
-          - Right:
-              expr: '13'
-        - - expr: ((16))
-          - Right:
-              expr: '16'
-        - - expr: ((6))
-          - Right:
-              expr: '6'
-        - - expr: ((3))
-          - Right:
-              expr: '3'
-        - - expr: ((-17))
-          - Right:
-              expr: (-17)
-        - - expr: ((17))
-          - Right:
-              expr: '17'
-- - expr: sequenceA
-  - - - - type: '[] ([] Int)'
-        - type: '[] ([] Int)'
-      - - - expr: ([[(-2), (4), (14), (12), (13)], [(-2), (4), (14), (12)], [(-2)]])
-          - Right:
-              expr: |-
-                [[-2, -2, -2], [-2, 4, -2], [-2, 14, -2], [-2, 12, -2],
-                 [4, -2, -2], [4, 4, -2], [4, 14, -2], [4, 12, -2], [14, -2, -2],
-                 [14, 4, -2], [14, 14, -2], [14, 12, -2], [12, -2, -2], [12, 4, -2],
-                 [12, 14, -2], [12, 12, -2], [13, -2, -2], [13, 4, -2],
-                 [13, 14, -2], [13, 12, -2]]
-        - - expr: ([[(-2), (4), (14), (12), (13)], [(-2), (4), (14), (12)]])
-          - Right:
-              expr: |-
-                [[-2, -2], [-2, 4], [-2, 14], [-2, 12], [4, -2], [4, 4], [4, 14],
-                 [4, 12], [14, -2], [14, 4], [14, 14], [14, 12], [12, -2], [12, 4],
-                 [12, 14], [12, 12], [13, -2], [13, 4], [13, 14], [13, 12]]
-        - - expr: ([[(-2), (4), (14), (12), (13)]])
-          - Right:
-              expr: '[[-2], [4], [14], [12], [13]]'
-    - - - type: '[] (Maybe Int)'
-        - type: Maybe ([] Int)
-      - - - expr: ([Just (-2), Just (4), Nothing, Just (13)])
-          - Right:
-              expr: Nothing
-        - - expr: ([Just (-2), Just (4), Nothing])
-          - Right:
-              expr: Nothing
-        - - expr: ([Just (-2)])
-          - Right:
-              expr: (Just [-2])
-        - - expr: ([Just (-2), Just (4)])
-          - Right:
-              expr: (Just [-2, 4])
-    - - - type: Maybe (Maybe Int)
-        - type: Maybe (Maybe Int)
-      - - - expr: (Just (Just (-2)))
-          - Right:
-              expr: (Just (Just (-2)))
-        - - expr: (Just (Just (4)))
-          - Right:
-              expr: (Just (Just 4))
-        - - expr: (Nothing)
-          - Right:
-              expr: (Just Nothing)
-        - - expr: (Just (Just (16)))
-          - Right:
-              expr: (Just (Just 16))
-        - - expr: (Just (Just (6)))
-          - Right:
-              expr: (Just (Just 6))
-        - - expr: (Just (Just (3)))
-          - Right:
-              expr: (Just (Just 3))
-    - - - type: Maybe ([] Int)
-        - type: '[] (Maybe Int)'
-      - - - expr: (Just [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[Just (-2), Just 4, Just 14, Just 12, Just 13]'
-        - - expr: (Just [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[Just (-2), Just 4, Just 14, Just 12]'
-        - - expr: (Nothing)
-          - Right:
-              expr: '[Nothing]'
-        - - expr: (Just [(-2), (4)])
-          - Right:
-              expr: '[Just (-2), Just 4]'
-- - expr: length
-  - - - - type: Maybe Int
-        - type: Int
-      - - - expr: (Just (-2))
+        - - expr: (['7'])
           - Right:
               expr: '1'
-        - - expr: (Just (4))
-          - Right:
-              expr: '1'
-        - - expr: (Nothing)
+        - - expr: ([])
           - Right:
               expr: '0'
-        - - expr: (Just (13))
-          - Right:
-              expr: '1'
-        - - expr: (Just (16))
-          - Right:
-              expr: '1'
-        - - expr: (Just (6))
-          - Right:
-              expr: '1'
-        - - expr: (Just (3))
-          - Right:
-              expr: '1'
-    - - - type: '[] Int'
-        - type: Int
-      - - - expr: ([(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '5'
-        - - expr: ([(-2), (4), (14), (12)])
-          - Right:
-              expr: '4'
-        - - expr: ([(-2)])
-          - Right:
-              expr: '1'
-        - - expr: ([(-2), (4), (14)])
-          - Right:
-              expr: '3'
-        - - expr: ([(-2), (4)])
+        - - expr: (['7', '1'])
           - Right:
               expr: '2'
 - - expr: zip
-  - - - - type: ([Int], [Int])
-        - type: '[(Int, Int)]'
-      - - - expr: ([(-2), (4), (14), (12), (13)], [(-2), (4), (14), (12), (13)])
+  - - - - type: ([Char], [Char])
+        - type: '[(Char, Char)]'
+      - - - expr: (['7', '1', '9', '3'], ['7', '1', '9', '3'])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14), (12, 12), (13, 13)]'
-        - - expr: ([(-2), (4), (14), (12), (13)], [(-2), (4), (14), (12)])
+              expr: '[(''7'', ''7''), (''1'', ''1''), (''9'', ''9''), (''3'', ''3'')]'
+        - - expr: (['7', '1', '9', '3'], ['7'])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14), (12, 12)]'
-        - - expr: ([(-2), (4), (14), (12), (13)], [(-2)])
+              expr: '[(''7'', ''7'')]'
+        - - expr: (['7', '1', '9', '3'], [])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2), (4), (14), (12), (13)], [(-2), (4), (14)])
+              expr: '[]'
+        - - expr: (['7', '1', '9', '3'], ['7', '1'])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14)]'
-        - - expr: ([(-2), (4), (14), (12), (13)], [(-2), (4)])
+              expr: '[(''7'', ''7''), (''1'', ''1'')]'
+        - - expr: (['7'], ['7', '1', '9', '3'])
           - Right:
-              expr: '[(-2, -2), (4, 4)]'
-        - - expr: ([(-2), (4), (14), (12)], [(-2), (4), (14), (12), (13)])
+              expr: '[(''7'', ''7'')]'
+        - - expr: (['7'], ['7'])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14), (12, 12)]'
-        - - expr: ([(-2), (4), (14), (12)], [(-2), (4), (14), (12)])
+              expr: '[(''7'', ''7'')]'
+        - - expr: (['7'], [])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14), (12, 12)]'
-        - - expr: ([(-2), (4), (14), (12)], [(-2)])
+              expr: '[]'
+        - - expr: (['7'], ['7', '1'])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2), (4), (14), (12)], [(-2), (4), (14)])
+              expr: '[(''7'', ''7'')]'
+        - - expr: ([], ['7', '1', '9', '3'])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14)]'
-        - - expr: ([(-2), (4), (14), (12)], [(-2), (4)])
+              expr: '[]'
+        - - expr: ([], ['7'])
           - Right:
-              expr: '[(-2, -2), (4, 4)]'
-        - - expr: ([(-2)], [(-2), (4), (14), (12), (13)])
+              expr: '[]'
+        - - expr: ([], [])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2)], [(-2), (4), (14), (12)])
+              expr: '[]'
+        - - expr: ([], ['7', '1'])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2)], [(-2)])
+              expr: '[]'
+        - - expr: (['7', '1'], ['7', '1', '9', '3'])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2)], [(-2), (4), (14)])
+              expr: '[(''7'', ''7''), (''1'', ''1'')]'
+        - - expr: (['7', '1'], ['7'])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2)], [(-2), (4)])
+              expr: '[(''7'', ''7'')]'
+        - - expr: (['7', '1'], [])
           - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2), (4), (14)], [(-2), (4), (14), (12), (13)])
+              expr: '[]'
+        - - expr: (['7', '1'], ['7', '1'])
           - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14)]'
-        - - expr: ([(-2), (4), (14)], [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14)]'
-        - - expr: ([(-2), (4), (14)], [(-2)])
-          - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2), (4), (14)], [(-2), (4), (14)])
-          - Right:
-              expr: '[(-2, -2), (4, 4), (14, 14)]'
-        - - expr: ([(-2), (4), (14)], [(-2), (4)])
-          - Right:
-              expr: '[(-2, -2), (4, 4)]'
-        - - expr: ([(-2), (4)], [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[(-2, -2), (4, 4)]'
-        - - expr: ([(-2), (4)], [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[(-2, -2), (4, 4)]'
-        - - expr: ([(-2), (4)], [(-2)])
-          - Right:
-              expr: '[(-2, -2)]'
-        - - expr: ([(-2), (4)], [(-2), (4), (14)])
-          - Right:
-              expr: '[(-2, -2), (4, 4)]'
-        - - expr: ([(-2), (4)], [(-2), (4)])
-          - Right:
-              expr: '[(-2, -2), (4, 4)]'
+              expr: '[(''7'', ''7''), (''1'', ''1'')]'
 - - expr: unzip
-  - - - - type: '[(Int, Int)]'
-        - type: ([Int], [Int])
-      - - - expr: |-
-              ([((-2), (-2)), ((4), (4)), ((14), (14)), ((12), (12)),
-                ((13), (13))])
+  - - - - type: '[(Char, Char)]'
+        - type: ([Char], [Char])
+      - - - expr: ([('7', '7'), ('1', '1'), ('9', '9'), ('3', '3')])
           - Right:
-              expr: ([-2, 4, 14, 12, 13], [-2, 4, 14, 12, 13])
-        - - expr: ([((-2), (-2)), ((4), (4)), ((14), (14)), ((12), (12))])
+              expr: ("7193", "7193")
+        - - expr: ([('7', '7')])
           - Right:
-              expr: ([-2, 4, 14, 12], [-2, 4, 14, 12])
-        - - expr: ([((-2), (-2))])
+              expr: ("7", "7")
+        - - expr: ([])
           - Right:
-              expr: ([-2], [-2])
-        - - expr: ([((-2), (-2)), ((4), (4)), ((14), (14))])
+              expr: ("", "")
+        - - expr: ([('7', '7'), ('1', '1')])
           - Right:
-              expr: ([-2, 4, 14], [-2, 4, 14])
-        - - expr: ([((-2), (-2)), ((4), (4))])
-          - Right:
-              expr: ([-2, 4], [-2, 4])
-- - expr: succ
-  - - - - type: Int
-        - type: Int
-      - - - expr: ((-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((4))
-          - Right:
-              expr: '5'
-        - - expr: ((14))
-          - Right:
-              expr: '15'
-        - - expr: ((12))
-          - Right:
-              expr: '13'
-        - - expr: ((13))
-          - Right:
-              expr: '14'
-        - - expr: ((16))
-          - Right:
-              expr: '17'
-        - - expr: ((6))
-          - Right:
-              expr: '7'
-        - - expr: ((3))
-          - Right:
-              expr: '4'
-        - - expr: ((-17))
-          - Right:
-              expr: (-16)
-        - - expr: ((17))
-          - Right:
-              expr: '18'
-- - expr: 'null'
-  - - - - type: Maybe Int
-        - type: Bool
-      - - - expr: (Just (-2))
-          - Right:
-              expr: 'False'
-        - - expr: (Just (4))
-          - Right:
-              expr: 'False'
-        - - expr: (Nothing)
-          - Right:
-              expr: 'True'
-        - - expr: (Just (13))
-          - Right:
-              expr: 'False'
-        - - expr: (Just (16))
-          - Right:
-              expr: 'False'
-        - - expr: (Just (6))
-          - Right:
-              expr: 'False'
-        - - expr: (Just (3))
-          - Right:
-              expr: 'False'
-    - - - type: '[] Int'
-        - type: Bool
-      - - - expr: ([(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'False'
-        - - expr: ([(-2), (4), (14), (12)])
-          - Right:
-              expr: 'False'
-        - - expr: ([(-2)])
-          - Right:
-              expr: 'False'
-        - - expr: ([(-2), (4), (14)])
-          - Right:
-              expr: 'False'
-        - - expr: ([(-2), (4)])
-          - Right:
-              expr: 'False'
-- - expr: let bind = (>>=) in bind
-  - - - - type: (Maybe Int, (Int -> Maybe Int))
-        - type: Maybe Int
-      - - - expr: (Just (-2), let just = Just in just)
-          - Right:
-              expr: (Just (-2))
-        - - expr: (Just (-2), pure)
-          - Right:
-              expr: (Just (-2))
-        - - expr: (Just (4), let just = Just in just)
-          - Right:
-              expr: (Just 4)
-        - - expr: (Just (4), pure)
-          - Right:
-              expr: (Just 4)
-        - - expr: (Nothing, let just = Just in just)
-          - Right:
-              expr: Nothing
-        - - expr: (Nothing, pure)
-          - Right:
-              expr: Nothing
-        - - expr: (Just (13), let just = Just in just)
-          - Right:
-              expr: (Just 13)
-        - - expr: (Just (13), pure)
-          - Right:
-              expr: (Just 13)
-        - - expr: (Just (16), let just = Just in just)
-          - Right:
-              expr: (Just 16)
-        - - expr: (Just (16), pure)
-          - Right:
-              expr: (Just 16)
-        - - expr: (Just (6), let just = Just in just)
-          - Right:
-              expr: (Just 6)
-        - - expr: (Just (6), pure)
-          - Right:
-              expr: (Just 6)
-        - - expr: (Just (3), let just = Just in just)
-          - Right:
-              expr: (Just 3)
-        - - expr: (Just (3), pure)
-          - Right:
-              expr: (Just 3)
-    - - - type: ([] Int, (Int -> [] Int))
-        - type: '[] Int'
-      - - - expr: ([(-2), (4), (14), (12), (13)], pure)
-          - Right:
-              expr: '[-2, 4, 14, 12, 13]'
-        - - expr: ([(-2), (4), (14), (12)], pure)
-          - Right:
-              expr: '[-2, 4, 14, 12]'
-        - - expr: ([(-2)], pure)
-          - Right:
-              expr: '[-2]'
-        - - expr: ([(-2), (4), (14)], pure)
-          - Right:
-              expr: '[-2, 4, 14]'
-        - - expr: ([(-2), (4)], pure)
-          - Right:
-              expr: '[-2, 4]'
-- - expr: const
-  - - - - type: (Int, Int)
-        - type: Int
-      - - - expr: ((-2), (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (4))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (14))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (12))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (13))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (16))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (6))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (3))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (-17))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), (17))
-          - Right:
-              expr: (-2)
-        - - expr: ((4), (-2))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (4))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (14))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (12))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (13))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (16))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (6))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (3))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (-17))
-          - Right:
-              expr: '4'
-        - - expr: ((4), (17))
-          - Right:
-              expr: '4'
-        - - expr: ((14), (-2))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (4))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (14))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (12))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (13))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (16))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (6))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (3))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (-17))
-          - Right:
-              expr: '14'
-        - - expr: ((14), (17))
-          - Right:
-              expr: '14'
-        - - expr: ((12), (-2))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (4))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (14))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (12))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (13))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (16))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (6))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (3))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (-17))
-          - Right:
-              expr: '12'
-        - - expr: ((12), (17))
-          - Right:
-              expr: '12'
-        - - expr: ((13), (-2))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (4))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (14))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (12))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (13))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (16))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (6))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (3))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (-17))
-          - Right:
-              expr: '13'
-        - - expr: ((13), (17))
-          - Right:
-              expr: '13'
-        - - expr: ((16), (-2))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (4))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (14))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (12))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (13))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (16))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (6))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (3))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (-17))
-          - Right:
-              expr: '16'
-        - - expr: ((16), (17))
-          - Right:
-              expr: '16'
-        - - expr: ((6), (-2))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (4))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (14))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (12))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (13))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (16))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (6))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (3))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (-17))
-          - Right:
-              expr: '6'
-        - - expr: ((6), (17))
-          - Right:
-              expr: '6'
-        - - expr: ((3), (-2))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (4))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (14))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (12))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (13))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (16))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (6))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (3))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (-17))
-          - Right:
-              expr: '3'
-        - - expr: ((3), (17))
-          - Right:
-              expr: '3'
-        - - expr: ((-17), (-2))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (4))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (14))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (12))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (13))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (16))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (6))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (3))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (-17))
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), (17))
-          - Right:
-              expr: (-17)
-        - - expr: ((17), (-2))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (4))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (14))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (12))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (13))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (16))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (6))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (3))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (-17))
-          - Right:
-              expr: '17'
-        - - expr: ((17), (17))
-          - Right:
-              expr: '17'
+              expr: ("71", "71")
 - - expr: let prepend = (:) in prepend
-  - - - - type: (Int, [Int])
-        - type: '[Int]'
-      - - - expr: ((-2), [(-2), (4), (14), (12), (13)])
+  - - - - type: (Char, [Char])
+        - type: '[Char]'
+      - - - expr: ('7', ['7', '1', '9', '3'])
           - Right:
-              expr: '[-2, -2, 4, 14, 12, 13]'
-        - - expr: ((-2), [(-2), (4), (14), (12)])
+              expr: '"77193"'
+        - - expr: ('7', ['7'])
           - Right:
-              expr: '[-2, -2, 4, 14, 12]'
-        - - expr: ((-2), [(-2)])
+              expr: '"77"'
+        - - expr: ('7', [])
           - Right:
-              expr: '[-2, -2]'
-        - - expr: ((-2), [(-2), (4), (14)])
+              expr: '"7"'
+        - - expr: ('7', ['7', '1'])
           - Right:
-              expr: '[-2, -2, 4, 14]'
-        - - expr: ((-2), [(-2), (4)])
+              expr: '"771"'
+        - - expr: ('1', ['7', '1', '9', '3'])
           - Right:
-              expr: '[-2, -2, 4]'
-        - - expr: ((4), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[4, -2, 4, 14, 12, 13]'
-        - - expr: ((4), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[4, -2, 4, 14, 12]'
-        - - expr: ((4), [(-2)])
-          - Right:
-              expr: '[4, -2]'
-        - - expr: ((4), [(-2), (4), (14)])
-          - Right:
-              expr: '[4, -2, 4, 14]'
-        - - expr: ((4), [(-2), (4)])
-          - Right:
-              expr: '[4, -2, 4]'
-        - - expr: ((14), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[14, -2, 4, 14, 12, 13]'
-        - - expr: ((14), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[14, -2, 4, 14, 12]'
-        - - expr: ((14), [(-2)])
-          - Right:
-              expr: '[14, -2]'
-        - - expr: ((14), [(-2), (4), (14)])
-          - Right:
-              expr: '[14, -2, 4, 14]'
-        - - expr: ((14), [(-2), (4)])
-          - Right:
-              expr: '[14, -2, 4]'
-        - - expr: ((12), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[12, -2, 4, 14, 12, 13]'
-        - - expr: ((12), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[12, -2, 4, 14, 12]'
-        - - expr: ((12), [(-2)])
-          - Right:
-              expr: '[12, -2]'
-        - - expr: ((12), [(-2), (4), (14)])
-          - Right:
-              expr: '[12, -2, 4, 14]'
-        - - expr: ((12), [(-2), (4)])
-          - Right:
-              expr: '[12, -2, 4]'
-        - - expr: ((13), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[13, -2, 4, 14, 12, 13]'
-        - - expr: ((13), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[13, -2, 4, 14, 12]'
-        - - expr: ((13), [(-2)])
-          - Right:
-              expr: '[13, -2]'
-        - - expr: ((13), [(-2), (4), (14)])
-          - Right:
-              expr: '[13, -2, 4, 14]'
-        - - expr: ((13), [(-2), (4)])
-          - Right:
-              expr: '[13, -2, 4]'
-        - - expr: ((16), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[16, -2, 4, 14, 12, 13]'
-        - - expr: ((16), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[16, -2, 4, 14, 12]'
-        - - expr: ((16), [(-2)])
-          - Right:
-              expr: '[16, -2]'
-        - - expr: ((16), [(-2), (4), (14)])
-          - Right:
-              expr: '[16, -2, 4, 14]'
-        - - expr: ((16), [(-2), (4)])
-          - Right:
-              expr: '[16, -2, 4]'
-        - - expr: ((6), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[6, -2, 4, 14, 12, 13]'
-        - - expr: ((6), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[6, -2, 4, 14, 12]'
-        - - expr: ((6), [(-2)])
-          - Right:
-              expr: '[6, -2]'
-        - - expr: ((6), [(-2), (4), (14)])
-          - Right:
-              expr: '[6, -2, 4, 14]'
-        - - expr: ((6), [(-2), (4)])
-          - Right:
-              expr: '[6, -2, 4]'
-        - - expr: ((3), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[3, -2, 4, 14, 12, 13]'
-        - - expr: ((3), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[3, -2, 4, 14, 12]'
-        - - expr: ((3), [(-2)])
-          - Right:
-              expr: '[3, -2]'
-        - - expr: ((3), [(-2), (4), (14)])
-          - Right:
-              expr: '[3, -2, 4, 14]'
-        - - expr: ((3), [(-2), (4)])
-          - Right:
-              expr: '[3, -2, 4]'
-        - - expr: ((-17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[-17, -2, 4, 14, 12, 13]'
-        - - expr: ((-17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[-17, -2, 4, 14, 12]'
-        - - expr: ((-17), [(-2)])
-          - Right:
-              expr: '[-17, -2]'
-        - - expr: ((-17), [(-2), (4), (14)])
-          - Right:
-              expr: '[-17, -2, 4, 14]'
-        - - expr: ((-17), [(-2), (4)])
-          - Right:
-              expr: '[-17, -2, 4]'
-        - - expr: ((17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[17, -2, 4, 14, 12, 13]'
-        - - expr: ((17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[17, -2, 4, 14, 12]'
-        - - expr: ((17), [(-2)])
-          - Right:
-              expr: '[17, -2]'
-        - - expr: ((17), [(-2), (4), (14)])
-          - Right:
-              expr: '[17, -2, 4, 14]'
-        - - expr: ((17), [(-2), (4)])
-          - Right:
-              expr: '[17, -2, 4]'
-- - expr: pure
-  - - - - type: Int
-        - type: '[] Int'
-      - - - expr: ((-2))
-          - Right:
-              expr: '[-2]'
-        - - expr: ((4))
-          - Right:
-              expr: '[4]'
-        - - expr: ((14))
-          - Right:
-              expr: '[14]'
-        - - expr: ((12))
-          - Right:
-              expr: '[12]'
-        - - expr: ((13))
-          - Right:
-              expr: '[13]'
-        - - expr: ((16))
-          - Right:
-              expr: '[16]'
-        - - expr: ((6))
-          - Right:
-              expr: '[6]'
-        - - expr: ((3))
-          - Right:
-              expr: '[3]'
-        - - expr: ((-17))
-          - Right:
-              expr: '[-17]'
-        - - expr: ((17))
-          - Right:
-              expr: '[17]'
-    - - - type: Int
-        - type: Maybe Int
-      - - - expr: ((-2))
-          - Right:
-              expr: (Just (-2))
-        - - expr: ((4))
-          - Right:
-              expr: (Just 4)
-        - - expr: ((14))
-          - Right:
-              expr: (Just 14)
-        - - expr: ((12))
-          - Right:
-              expr: (Just 12)
-        - - expr: ((13))
-          - Right:
-              expr: (Just 13)
-        - - expr: ((16))
-          - Right:
-              expr: (Just 16)
-        - - expr: ((6))
-          - Right:
-              expr: (Just 6)
-        - - expr: ((3))
-          - Right:
-              expr: (Just 3)
-        - - expr: ((-17))
-          - Right:
-              expr: (Just (-17))
-        - - expr: ((17))
-          - Right:
-              expr: (Just 17)
-- - expr: show
-  - - - - type: Int
-        - type: String
-      - - - expr: ((-2))
-          - Right:
-              expr: '"-2"'
-        - - expr: ((4))
-          - Right:
-              expr: '"4"'
-        - - expr: ((14))
-          - Right:
-              expr: '"14"'
-        - - expr: ((12))
-          - Right:
-              expr: '"12"'
-        - - expr: ((13))
-          - Right:
-              expr: '"13"'
-        - - expr: ((16))
-          - Right:
-              expr: '"16"'
-        - - expr: ((6))
-          - Right:
-              expr: '"6"'
-        - - expr: ((3))
-          - Right:
-              expr: '"3"'
-        - - expr: ((-17))
-          - Right:
-              expr: '"-17"'
-        - - expr: ((17))
+              expr: '"17193"'
+        - - expr: ('1', ['7'])
           - Right:
               expr: '"17"'
+        - - expr: ('1', [])
+          - Right:
+              expr: '"1"'
+        - - expr: ('1', ['7', '1'])
+          - Right:
+              expr: '"171"'
+        - - expr: ('9', ['7', '1', '9', '3'])
+          - Right:
+              expr: '"97193"'
+        - - expr: ('9', ['7'])
+          - Right:
+              expr: '"97"'
+        - - expr: ('9', [])
+          - Right:
+              expr: '"9"'
+        - - expr: ('9', ['7', '1'])
+          - Right:
+              expr: '"971"'
+        - - expr: ('3', ['7', '1', '9', '3'])
+          - Right:
+              expr: '"37193"'
+        - - expr: ('3', ['7'])
+          - Right:
+              expr: '"37"'
+        - - expr: ('3', [])
+          - Right:
+              expr: '"3"'
+        - - expr: ('3', ['7', '1'])
+          - Right:
+              expr: '"371"'
+        - - expr: ('6', ['7', '1', '9', '3'])
+          - Right:
+              expr: '"67193"'
+        - - expr: ('6', ['7'])
+          - Right:
+              expr: '"67"'
+        - - expr: ('6', [])
+          - Right:
+              expr: '"6"'
+        - - expr: ('6', ['7', '1'])
+          - Right:
+              expr: '"671"'
+        - - expr: ('0', ['7', '1', '9', '3'])
+          - Right:
+              expr: '"07193"'
+        - - expr: ('0', ['7'])
+          - Right:
+              expr: '"07"'
+        - - expr: ('0', [])
+          - Right:
+              expr: '"0"'
+        - - expr: ('0', ['7', '1'])
+          - Right:
+              expr: '"071"'
 - - expr: let tpl = (,) in tpl
-  - - - - type: (Int, Int)
-        - type: (Int, Int)
-      - - - expr: ((-2), (-2))
+  - - - - type: (Char, Char)
+        - type: (Char, Char)
+      - - - expr: ('7', '7')
           - Right:
-              expr: (-2, -2)
-        - - expr: ((-2), (4))
+              expr: ('7', '7')
+        - - expr: ('7', '1')
           - Right:
-              expr: (-2, 4)
-        - - expr: ((-2), (14))
+              expr: ('7', '1')
+        - - expr: ('7', '9')
           - Right:
-              expr: (-2, 14)
-        - - expr: ((-2), (12))
+              expr: ('7', '9')
+        - - expr: ('7', '3')
           - Right:
-              expr: (-2, 12)
-        - - expr: ((-2), (13))
+              expr: ('7', '3')
+        - - expr: ('7', '6')
           - Right:
-              expr: (-2, 13)
-        - - expr: ((-2), (16))
+              expr: ('7', '6')
+        - - expr: ('7', '0')
           - Right:
-              expr: (-2, 16)
-        - - expr: ((-2), (6))
+              expr: ('7', '0')
+        - - expr: ('1', '7')
           - Right:
-              expr: (-2, 6)
-        - - expr: ((-2), (3))
+              expr: ('1', '7')
+        - - expr: ('1', '1')
           - Right:
-              expr: (-2, 3)
-        - - expr: ((-2), (-17))
+              expr: ('1', '1')
+        - - expr: ('1', '9')
           - Right:
-              expr: (-2, -17)
-        - - expr: ((-2), (17))
+              expr: ('1', '9')
+        - - expr: ('1', '3')
           - Right:
-              expr: (-2, 17)
-        - - expr: ((4), (-2))
+              expr: ('1', '3')
+        - - expr: ('1', '6')
           - Right:
-              expr: (4, -2)
-        - - expr: ((4), (4))
+              expr: ('1', '6')
+        - - expr: ('1', '0')
           - Right:
-              expr: (4, 4)
-        - - expr: ((4), (14))
+              expr: ('1', '0')
+        - - expr: ('9', '7')
           - Right:
-              expr: (4, 14)
-        - - expr: ((4), (12))
+              expr: ('9', '7')
+        - - expr: ('9', '1')
           - Right:
-              expr: (4, 12)
-        - - expr: ((4), (13))
+              expr: ('9', '1')
+        - - expr: ('9', '9')
           - Right:
-              expr: (4, 13)
-        - - expr: ((4), (16))
+              expr: ('9', '9')
+        - - expr: ('9', '3')
           - Right:
-              expr: (4, 16)
-        - - expr: ((4), (6))
+              expr: ('9', '3')
+        - - expr: ('9', '6')
           - Right:
-              expr: (4, 6)
-        - - expr: ((4), (3))
+              expr: ('9', '6')
+        - - expr: ('9', '0')
           - Right:
-              expr: (4, 3)
-        - - expr: ((4), (-17))
+              expr: ('9', '0')
+        - - expr: ('3', '7')
           - Right:
-              expr: (4, -17)
-        - - expr: ((4), (17))
+              expr: ('3', '7')
+        - - expr: ('3', '1')
           - Right:
-              expr: (4, 17)
-        - - expr: ((14), (-2))
+              expr: ('3', '1')
+        - - expr: ('3', '9')
           - Right:
-              expr: (14, -2)
-        - - expr: ((14), (4))
+              expr: ('3', '9')
+        - - expr: ('3', '3')
           - Right:
-              expr: (14, 4)
-        - - expr: ((14), (14))
+              expr: ('3', '3')
+        - - expr: ('3', '6')
           - Right:
-              expr: (14, 14)
-        - - expr: ((14), (12))
+              expr: ('3', '6')
+        - - expr: ('3', '0')
           - Right:
-              expr: (14, 12)
-        - - expr: ((14), (13))
+              expr: ('3', '0')
+        - - expr: ('6', '7')
           - Right:
-              expr: (14, 13)
-        - - expr: ((14), (16))
+              expr: ('6', '7')
+        - - expr: ('6', '1')
           - Right:
-              expr: (14, 16)
-        - - expr: ((14), (6))
+              expr: ('6', '1')
+        - - expr: ('6', '9')
           - Right:
-              expr: (14, 6)
-        - - expr: ((14), (3))
+              expr: ('6', '9')
+        - - expr: ('6', '3')
           - Right:
-              expr: (14, 3)
-        - - expr: ((14), (-17))
+              expr: ('6', '3')
+        - - expr: ('6', '6')
           - Right:
-              expr: (14, -17)
-        - - expr: ((14), (17))
+              expr: ('6', '6')
+        - - expr: ('6', '0')
           - Right:
-              expr: (14, 17)
-        - - expr: ((12), (-2))
+              expr: ('6', '0')
+        - - expr: ('0', '7')
           - Right:
-              expr: (12, -2)
-        - - expr: ((12), (4))
+              expr: ('0', '7')
+        - - expr: ('0', '1')
           - Right:
-              expr: (12, 4)
-        - - expr: ((12), (14))
+              expr: ('0', '1')
+        - - expr: ('0', '9')
           - Right:
-              expr: (12, 14)
-        - - expr: ((12), (12))
+              expr: ('0', '9')
+        - - expr: ('0', '3')
           - Right:
-              expr: (12, 12)
-        - - expr: ((12), (13))
+              expr: ('0', '3')
+        - - expr: ('0', '6')
           - Right:
-              expr: (12, 13)
-        - - expr: ((12), (16))
+              expr: ('0', '6')
+        - - expr: ('0', '0')
           - Right:
-              expr: (12, 16)
-        - - expr: ((12), (6))
-          - Right:
-              expr: (12, 6)
-        - - expr: ((12), (3))
-          - Right:
-              expr: (12, 3)
-        - - expr: ((12), (-17))
-          - Right:
-              expr: (12, -17)
-        - - expr: ((12), (17))
-          - Right:
-              expr: (12, 17)
-        - - expr: ((13), (-2))
-          - Right:
-              expr: (13, -2)
-        - - expr: ((13), (4))
-          - Right:
-              expr: (13, 4)
-        - - expr: ((13), (14))
-          - Right:
-              expr: (13, 14)
-        - - expr: ((13), (12))
-          - Right:
-              expr: (13, 12)
-        - - expr: ((13), (13))
-          - Right:
-              expr: (13, 13)
-        - - expr: ((13), (16))
-          - Right:
-              expr: (13, 16)
-        - - expr: ((13), (6))
-          - Right:
-              expr: (13, 6)
-        - - expr: ((13), (3))
-          - Right:
-              expr: (13, 3)
-        - - expr: ((13), (-17))
-          - Right:
-              expr: (13, -17)
-        - - expr: ((13), (17))
-          - Right:
-              expr: (13, 17)
-        - - expr: ((16), (-2))
-          - Right:
-              expr: (16, -2)
-        - - expr: ((16), (4))
-          - Right:
-              expr: (16, 4)
-        - - expr: ((16), (14))
-          - Right:
-              expr: (16, 14)
-        - - expr: ((16), (12))
-          - Right:
-              expr: (16, 12)
-        - - expr: ((16), (13))
-          - Right:
-              expr: (16, 13)
-        - - expr: ((16), (16))
-          - Right:
-              expr: (16, 16)
-        - - expr: ((16), (6))
-          - Right:
-              expr: (16, 6)
-        - - expr: ((16), (3))
-          - Right:
-              expr: (16, 3)
-        - - expr: ((16), (-17))
-          - Right:
-              expr: (16, -17)
-        - - expr: ((16), (17))
-          - Right:
-              expr: (16, 17)
-        - - expr: ((6), (-2))
-          - Right:
-              expr: (6, -2)
-        - - expr: ((6), (4))
-          - Right:
-              expr: (6, 4)
-        - - expr: ((6), (14))
-          - Right:
-              expr: (6, 14)
-        - - expr: ((6), (12))
-          - Right:
-              expr: (6, 12)
-        - - expr: ((6), (13))
-          - Right:
-              expr: (6, 13)
-        - - expr: ((6), (16))
-          - Right:
-              expr: (6, 16)
-        - - expr: ((6), (6))
-          - Right:
-              expr: (6, 6)
-        - - expr: ((6), (3))
-          - Right:
-              expr: (6, 3)
-        - - expr: ((6), (-17))
-          - Right:
-              expr: (6, -17)
-        - - expr: ((6), (17))
-          - Right:
-              expr: (6, 17)
-        - - expr: ((3), (-2))
-          - Right:
-              expr: (3, -2)
-        - - expr: ((3), (4))
-          - Right:
-              expr: (3, 4)
-        - - expr: ((3), (14))
-          - Right:
-              expr: (3, 14)
-        - - expr: ((3), (12))
-          - Right:
-              expr: (3, 12)
-        - - expr: ((3), (13))
-          - Right:
-              expr: (3, 13)
-        - - expr: ((3), (16))
-          - Right:
-              expr: (3, 16)
-        - - expr: ((3), (6))
-          - Right:
-              expr: (3, 6)
-        - - expr: ((3), (3))
-          - Right:
-              expr: (3, 3)
-        - - expr: ((3), (-17))
-          - Right:
-              expr: (3, -17)
-        - - expr: ((3), (17))
-          - Right:
-              expr: (3, 17)
-        - - expr: ((-17), (-2))
-          - Right:
-              expr: (-17, -2)
-        - - expr: ((-17), (4))
-          - Right:
-              expr: (-17, 4)
-        - - expr: ((-17), (14))
-          - Right:
-              expr: (-17, 14)
-        - - expr: ((-17), (12))
-          - Right:
-              expr: (-17, 12)
-        - - expr: ((-17), (13))
-          - Right:
-              expr: (-17, 13)
-        - - expr: ((-17), (16))
-          - Right:
-              expr: (-17, 16)
-        - - expr: ((-17), (6))
-          - Right:
-              expr: (-17, 6)
-        - - expr: ((-17), (3))
-          - Right:
-              expr: (-17, 3)
-        - - expr: ((-17), (-17))
-          - Right:
-              expr: (-17, -17)
-        - - expr: ((-17), (17))
-          - Right:
-              expr: (-17, 17)
-        - - expr: ((17), (-2))
-          - Right:
-              expr: (17, -2)
-        - - expr: ((17), (4))
-          - Right:
-              expr: (17, 4)
-        - - expr: ((17), (14))
-          - Right:
-              expr: (17, 14)
-        - - expr: ((17), (12))
-          - Right:
-              expr: (17, 12)
-        - - expr: ((17), (13))
-          - Right:
-              expr: (17, 13)
-        - - expr: ((17), (16))
-          - Right:
-              expr: (17, 16)
-        - - expr: ((17), (6))
-          - Right:
-              expr: (17, 6)
-        - - expr: ((17), (3))
-          - Right:
-              expr: (17, 3)
-        - - expr: ((17), (-17))
-          - Right:
-              expr: (17, -17)
-        - - expr: ((17), (17))
-          - Right:
-              expr: (17, 17)
-- - expr: fmap
-  - - - - type: ((Int -> Int), [] Int)
-        - type: '[] Int'
-      - - - expr: (succ, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[-1, 5, 15, 13, 14]'
-        - - expr: (succ, [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[-1, 5, 15, 13]'
-        - - expr: (succ, [(-2)])
-          - Right:
-              expr: '[-1]'
-        - - expr: (succ, [(-2), (4), (14)])
-          - Right:
-              expr: '[-1, 5, 15]'
-        - - expr: (succ, [(-2), (4)])
-          - Right:
-              expr: '[-1, 5]'
-        - - expr: (toEnum, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[-2, 4, 14, 12, 13]'
-        - - expr: (toEnum, [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[-2, 4, 14, 12]'
-        - - expr: (toEnum, [(-2)])
-          - Right:
-              expr: '[-2]'
-        - - expr: (toEnum, [(-2), (4), (14)])
-          - Right:
-              expr: '[-2, 4, 14]'
-        - - expr: (toEnum, [(-2), (4)])
-          - Right:
-              expr: '[-2, 4]'
-        - - expr: (fromEnum, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[-2, 4, 14, 12, 13]'
-        - - expr: (fromEnum, [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[-2, 4, 14, 12]'
-        - - expr: (fromEnum, [(-2)])
-          - Right:
-              expr: '[-2]'
-        - - expr: (fromEnum, [(-2), (4), (14)])
-          - Right:
-              expr: '[-2, 4, 14]'
-        - - expr: (fromEnum, [(-2), (4)])
-          - Right:
-              expr: '[-2, 4]'
-    - - - type: ((Int -> Int), Maybe Int)
-        - type: Maybe Int
-      - - - expr: (succ, Just (-2))
-          - Right:
-              expr: (Just (-1))
-        - - expr: (succ, Just (4))
-          - Right:
-              expr: (Just 5)
-        - - expr: (succ, Nothing)
-          - Right:
-              expr: Nothing
-        - - expr: (succ, Just (13))
-          - Right:
-              expr: (Just 14)
-        - - expr: (succ, Just (16))
-          - Right:
-              expr: (Just 17)
-        - - expr: (succ, Just (6))
-          - Right:
-              expr: (Just 7)
-        - - expr: (succ, Just (3))
-          - Right:
-              expr: (Just 4)
-        - - expr: (toEnum, Just (-2))
-          - Right:
-              expr: (Just (-2))
-        - - expr: (toEnum, Just (4))
-          - Right:
-              expr: (Just 4)
-        - - expr: (toEnum, Nothing)
-          - Right:
-              expr: Nothing
-        - - expr: (toEnum, Just (13))
-          - Right:
-              expr: (Just 13)
-        - - expr: (toEnum, Just (16))
-          - Right:
-              expr: (Just 16)
-        - - expr: (toEnum, Just (6))
-          - Right:
-              expr: (Just 6)
-        - - expr: (toEnum, Just (3))
-          - Right:
-              expr: (Just 3)
-        - - expr: (fromEnum, Just (-2))
-          - Right:
-              expr: (Just (-2))
-        - - expr: (fromEnum, Just (4))
-          - Right:
-              expr: (Just 4)
-        - - expr: (fromEnum, Nothing)
-          - Right:
-              expr: Nothing
-        - - expr: (fromEnum, Just (13))
-          - Right:
-              expr: (Just 13)
-        - - expr: (fromEnum, Just (16))
-          - Right:
-              expr: (Just 16)
-        - - expr: (fromEnum, Just (6))
-          - Right:
-              expr: (Just 6)
-        - - expr: (fromEnum, Just (3))
-          - Right:
-              expr: (Just 3)
-- - expr: maybe
-  - - - - type: (Int, (Int -> Int), Maybe Int)
-        - type: Int
-      - - - expr: ((-2), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((-2), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((-2), succ, Nothing)
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((-2), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((-2), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((-2), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((-2), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((-2), toEnum, Nothing)
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((-2), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((-2), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((-2), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((-2), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((-2), fromEnum, Nothing)
-          - Right:
-              expr: (-2)
-        - - expr: ((-2), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((-2), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((-2), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((-2), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((4), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((4), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((4), succ, Nothing)
-          - Right:
-              expr: '4'
-        - - expr: ((4), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((4), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((4), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((4), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((4), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((4), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((4), toEnum, Nothing)
-          - Right:
-              expr: '4'
-        - - expr: ((4), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((4), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((4), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((4), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((4), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((4), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((4), fromEnum, Nothing)
-          - Right:
-              expr: '4'
-        - - expr: ((4), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((4), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((4), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((4), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((14), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((14), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((14), succ, Nothing)
-          - Right:
-              expr: '14'
-        - - expr: ((14), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((14), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((14), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((14), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((14), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((14), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((14), toEnum, Nothing)
-          - Right:
-              expr: '14'
-        - - expr: ((14), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((14), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((14), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((14), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((14), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((14), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((14), fromEnum, Nothing)
-          - Right:
-              expr: '14'
-        - - expr: ((14), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((14), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((14), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((14), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((12), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((12), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((12), succ, Nothing)
-          - Right:
-              expr: '12'
-        - - expr: ((12), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((12), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((12), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((12), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((12), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((12), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((12), toEnum, Nothing)
-          - Right:
-              expr: '12'
-        - - expr: ((12), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((12), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((12), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((12), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((12), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((12), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((12), fromEnum, Nothing)
-          - Right:
-              expr: '12'
-        - - expr: ((12), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((12), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((12), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((12), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((13), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((13), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((13), succ, Nothing)
-          - Right:
-              expr: '13'
-        - - expr: ((13), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((13), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((13), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((13), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((13), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((13), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((13), toEnum, Nothing)
-          - Right:
-              expr: '13'
-        - - expr: ((13), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((13), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((13), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((13), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((13), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((13), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((13), fromEnum, Nothing)
-          - Right:
-              expr: '13'
-        - - expr: ((13), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((13), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((13), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((13), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((16), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((16), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((16), succ, Nothing)
-          - Right:
-              expr: '16'
-        - - expr: ((16), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((16), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((16), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((16), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((16), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((16), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((16), toEnum, Nothing)
-          - Right:
-              expr: '16'
-        - - expr: ((16), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((16), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((16), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((16), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((16), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((16), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((16), fromEnum, Nothing)
-          - Right:
-              expr: '16'
-        - - expr: ((16), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((16), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((16), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((16), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((6), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((6), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((6), succ, Nothing)
-          - Right:
-              expr: '6'
-        - - expr: ((6), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((6), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((6), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((6), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((6), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((6), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((6), toEnum, Nothing)
-          - Right:
-              expr: '6'
-        - - expr: ((6), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((6), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((6), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((6), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((6), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((6), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((6), fromEnum, Nothing)
-          - Right:
-              expr: '6'
-        - - expr: ((6), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((6), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((6), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((6), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((3), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((3), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((3), succ, Nothing)
-          - Right:
-              expr: '3'
-        - - expr: ((3), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((3), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((3), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((3), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((3), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((3), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((3), toEnum, Nothing)
-          - Right:
-              expr: '3'
-        - - expr: ((3), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((3), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((3), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((3), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((3), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((3), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((3), fromEnum, Nothing)
-          - Right:
-              expr: '3'
-        - - expr: ((3), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((3), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((3), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((3), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((-17), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((-17), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((-17), succ, Nothing)
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((-17), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((-17), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((-17), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((-17), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((-17), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((-17), toEnum, Nothing)
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((-17), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((-17), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((-17), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((-17), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((-17), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((-17), fromEnum, Nothing)
-          - Right:
-              expr: (-17)
-        - - expr: ((-17), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((-17), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((-17), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((-17), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((17), succ, Just (-2))
-          - Right:
-              expr: (-1)
-        - - expr: ((17), succ, Just (4))
-          - Right:
-              expr: '5'
-        - - expr: ((17), succ, Nothing)
-          - Right:
-              expr: '17'
-        - - expr: ((17), succ, Just (13))
-          - Right:
-              expr: '14'
-        - - expr: ((17), succ, Just (16))
-          - Right:
-              expr: '17'
-        - - expr: ((17), succ, Just (6))
-          - Right:
-              expr: '7'
-        - - expr: ((17), succ, Just (3))
-          - Right:
-              expr: '4'
-        - - expr: ((17), toEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((17), toEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((17), toEnum, Nothing)
-          - Right:
-              expr: '17'
-        - - expr: ((17), toEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((17), toEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((17), toEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((17), toEnum, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: ((17), fromEnum, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: ((17), fromEnum, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: ((17), fromEnum, Nothing)
-          - Right:
-              expr: '17'
-        - - expr: ((17), fromEnum, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: ((17), fromEnum, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: ((17), fromEnum, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: ((17), fromEnum, Just (3))
-          - Right:
-              expr: '3'
-- - expr: foldr
-  - - - - type: ((Int -> Int -> Int), Int, [] Int)
-        - type: Int
-      - - - expr: (pure, (-2), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-2), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-2), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-2), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-2), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (4), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (4), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (4), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (4), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (4), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (14), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (14), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (14), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (14), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (14), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (12), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (12), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (12), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (12), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (12), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (13), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (13), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (13), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (13), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (13), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (16), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (16), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (16), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (16), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (16), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (6), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (6), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (6), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (6), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (6), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (3), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (3), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (3), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (3), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (3), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-17), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-17), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-17), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (17), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (17), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (17), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (4), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (4), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (4), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (4), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (4), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (14), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (14), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (14), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (14), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (14), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (12), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (12), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (12), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (12), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (12), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (13), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (13), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (13), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (13), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (13), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (16), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (16), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (16), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (16), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (16), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (6), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (6), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (6), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (6), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (6), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (3), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (3), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (3), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (3), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (3), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-17), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-17), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-17), [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (17), [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (17), [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, (17), [(-2), (4)])
-          - Right:
-              expr: (-2)
-    - - - type: ((Int -> Int -> Int), Int, Maybe Int)
-        - type: Int
-      - - - expr: (pure, (-2), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-2), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (-2), Nothing)
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-2), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (-2), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (-2), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (-2), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (4), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (4), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (4), Nothing)
-          - Right:
-              expr: '4'
-        - - expr: (pure, (4), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (4), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (4), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (4), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (14), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (14), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (14), Nothing)
-          - Right:
-              expr: '14'
-        - - expr: (pure, (14), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (14), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (14), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (14), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (12), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (12), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (12), Nothing)
-          - Right:
-              expr: '12'
-        - - expr: (pure, (12), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (12), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (12), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (12), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (13), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (13), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (13), Nothing)
-          - Right:
-              expr: '13'
-        - - expr: (pure, (13), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (13), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (13), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (13), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (16), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (16), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (16), Nothing)
-          - Right:
-              expr: '16'
-        - - expr: (pure, (16), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (16), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (16), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (16), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (6), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (6), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (6), Nothing)
-          - Right:
-              expr: '6'
-        - - expr: (pure, (6), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (6), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (6), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (6), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (3), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (3), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (3), Nothing)
-          - Right:
-              expr: '3'
-        - - expr: (pure, (3), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (3), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (3), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (3), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (-17), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (-17), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (-17), Nothing)
-          - Right:
-              expr: (-17)
-        - - expr: (pure, (-17), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (-17), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (-17), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (-17), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (pure, (17), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, (17), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, (17), Nothing)
-          - Right:
-              expr: '17'
-        - - expr: (pure, (17), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, (17), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, (17), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, (17), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (-2), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (-2), Nothing)
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-2), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (-2), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (-2), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (-2), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (4), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (4), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (4), Nothing)
-          - Right:
-              expr: '4'
-        - - expr: (const, (4), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (4), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (4), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (4), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (14), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (14), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (14), Nothing)
-          - Right:
-              expr: '14'
-        - - expr: (const, (14), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (14), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (14), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (14), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (12), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (12), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (12), Nothing)
-          - Right:
-              expr: '12'
-        - - expr: (const, (12), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (12), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (12), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (12), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (13), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (13), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (13), Nothing)
-          - Right:
-              expr: '13'
-        - - expr: (const, (13), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (13), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (13), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (13), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (16), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (16), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (16), Nothing)
-          - Right:
-              expr: '16'
-        - - expr: (const, (16), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (16), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (16), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (16), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (6), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (6), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (6), Nothing)
-          - Right:
-              expr: '6'
-        - - expr: (const, (6), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (6), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (6), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (6), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (3), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (3), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (3), Nothing)
-          - Right:
-              expr: '3'
-        - - expr: (const, (3), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (3), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (3), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (3), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (-17), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (-17), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (-17), Nothing)
-          - Right:
-              expr: (-17)
-        - - expr: (const, (-17), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (-17), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (-17), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (-17), Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, (17), Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, (17), Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, (17), Nothing)
-          - Right:
-              expr: '17'
-        - - expr: (const, (17), Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, (17), Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, (17), Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, (17), Just (3))
-          - Right:
-              expr: '3'
-- - expr: foldr1
-  - - - - type: ((Int -> Int -> Int), Maybe Int)
-        - type: Int
-      - - - expr: (pure, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (pure, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (pure, Nothing)
-          - Left: '"foldr1: empty structure"'
-        - - expr: (pure, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (pure, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (pure, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (pure, Just (3))
-          - Right:
-              expr: '3'
-        - - expr: (const, Just (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (const, Just (4))
-          - Right:
-              expr: '4'
-        - - expr: (const, Nothing)
-          - Left: '"foldr1: empty structure"'
-        - - expr: (const, Just (13))
-          - Right:
-              expr: '13'
-        - - expr: (const, Just (16))
-          - Right:
-              expr: '16'
-        - - expr: (const, Just (6))
-          - Right:
-              expr: '6'
-        - - expr: (const, Just (3))
-          - Right:
-              expr: '3'
-    - - - type: ((Int -> Int -> Int), [] Int)
-        - type: Int
-      - - - expr: (pure, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (pure, [(-2), (4)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, [(-2), (4), (14), (12)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, [(-2)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, [(-2), (4), (14)])
-          - Right:
-              expr: (-2)
-        - - expr: (const, [(-2), (4)])
-          - Right:
-              expr: (-2)
-- - expr: let compose = (.) in compose
-  - - - - type: ((Int -> Int), (Int -> Int), Int)
-        - type: Int
-      - - - expr: (succ, succ, (-2))
-          - Right:
-              expr: '0'
-        - - expr: (succ, succ, (4))
-          - Right:
-              expr: '6'
-        - - expr: (succ, succ, (14))
-          - Right:
-              expr: '16'
-        - - expr: (succ, succ, (12))
-          - Right:
-              expr: '14'
-        - - expr: (succ, succ, (13))
-          - Right:
-              expr: '15'
-        - - expr: (succ, succ, (16))
-          - Right:
-              expr: '18'
-        - - expr: (succ, succ, (6))
-          - Right:
-              expr: '8'
-        - - expr: (succ, succ, (3))
-          - Right:
-              expr: '5'
-        - - expr: (succ, succ, (-17))
-          - Right:
-              expr: (-15)
-        - - expr: (succ, succ, (17))
-          - Right:
-              expr: '19'
-        - - expr: (succ, toEnum, (-2))
-          - Right:
-              expr: (-1)
-        - - expr: (succ, toEnum, (4))
-          - Right:
-              expr: '5'
-        - - expr: (succ, toEnum, (14))
-          - Right:
-              expr: '15'
-        - - expr: (succ, toEnum, (12))
-          - Right:
-              expr: '13'
-        - - expr: (succ, toEnum, (13))
-          - Right:
-              expr: '14'
-        - - expr: (succ, toEnum, (16))
-          - Right:
-              expr: '17'
-        - - expr: (succ, toEnum, (6))
-          - Right:
-              expr: '7'
-        - - expr: (succ, toEnum, (3))
-          - Right:
-              expr: '4'
-        - - expr: (succ, toEnum, (-17))
-          - Right:
-              expr: (-16)
-        - - expr: (succ, toEnum, (17))
-          - Right:
-              expr: '18'
-        - - expr: (succ, fromEnum, (-2))
-          - Right:
-              expr: (-1)
-        - - expr: (succ, fromEnum, (4))
-          - Right:
-              expr: '5'
-        - - expr: (succ, fromEnum, (14))
-          - Right:
-              expr: '15'
-        - - expr: (succ, fromEnum, (12))
-          - Right:
-              expr: '13'
-        - - expr: (succ, fromEnum, (13))
-          - Right:
-              expr: '14'
-        - - expr: (succ, fromEnum, (16))
-          - Right:
-              expr: '17'
-        - - expr: (succ, fromEnum, (6))
-          - Right:
-              expr: '7'
-        - - expr: (succ, fromEnum, (3))
-          - Right:
-              expr: '4'
-        - - expr: (succ, fromEnum, (-17))
-          - Right:
-              expr: (-16)
-        - - expr: (succ, fromEnum, (17))
-          - Right:
-              expr: '18'
-        - - expr: (toEnum, succ, (-2))
-          - Right:
-              expr: (-1)
-        - - expr: (toEnum, succ, (4))
-          - Right:
-              expr: '5'
-        - - expr: (toEnum, succ, (14))
-          - Right:
-              expr: '15'
-        - - expr: (toEnum, succ, (12))
-          - Right:
-              expr: '13'
-        - - expr: (toEnum, succ, (13))
-          - Right:
-              expr: '14'
-        - - expr: (toEnum, succ, (16))
-          - Right:
-              expr: '17'
-        - - expr: (toEnum, succ, (6))
-          - Right:
-              expr: '7'
-        - - expr: (toEnum, succ, (3))
-          - Right:
-              expr: '4'
-        - - expr: (toEnum, succ, (-17))
-          - Right:
-              expr: (-16)
-        - - expr: (toEnum, succ, (17))
-          - Right:
-              expr: '18'
-        - - expr: (toEnum, toEnum, (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (toEnum, toEnum, (4))
-          - Right:
-              expr: '4'
-        - - expr: (toEnum, toEnum, (14))
-          - Right:
-              expr: '14'
-        - - expr: (toEnum, toEnum, (12))
-          - Right:
-              expr: '12'
-        - - expr: (toEnum, toEnum, (13))
-          - Right:
-              expr: '13'
-        - - expr: (toEnum, toEnum, (16))
-          - Right:
-              expr: '16'
-        - - expr: (toEnum, toEnum, (6))
-          - Right:
-              expr: '6'
-        - - expr: (toEnum, toEnum, (3))
-          - Right:
-              expr: '3'
-        - - expr: (toEnum, toEnum, (-17))
-          - Right:
-              expr: (-17)
-        - - expr: (toEnum, toEnum, (17))
-          - Right:
-              expr: '17'
-        - - expr: (toEnum, fromEnum, (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (toEnum, fromEnum, (4))
-          - Right:
-              expr: '4'
-        - - expr: (toEnum, fromEnum, (14))
-          - Right:
-              expr: '14'
-        - - expr: (toEnum, fromEnum, (12))
-          - Right:
-              expr: '12'
-        - - expr: (toEnum, fromEnum, (13))
-          - Right:
-              expr: '13'
-        - - expr: (toEnum, fromEnum, (16))
-          - Right:
-              expr: '16'
-        - - expr: (toEnum, fromEnum, (6))
-          - Right:
-              expr: '6'
-        - - expr: (toEnum, fromEnum, (3))
-          - Right:
-              expr: '3'
-        - - expr: (toEnum, fromEnum, (-17))
-          - Right:
-              expr: (-17)
-        - - expr: (toEnum, fromEnum, (17))
-          - Right:
-              expr: '17'
-        - - expr: (fromEnum, succ, (-2))
-          - Right:
-              expr: (-1)
-        - - expr: (fromEnum, succ, (4))
-          - Right:
-              expr: '5'
-        - - expr: (fromEnum, succ, (14))
-          - Right:
-              expr: '15'
-        - - expr: (fromEnum, succ, (12))
-          - Right:
-              expr: '13'
-        - - expr: (fromEnum, succ, (13))
-          - Right:
-              expr: '14'
-        - - expr: (fromEnum, succ, (16))
-          - Right:
-              expr: '17'
-        - - expr: (fromEnum, succ, (6))
-          - Right:
-              expr: '7'
-        - - expr: (fromEnum, succ, (3))
-          - Right:
-              expr: '4'
-        - - expr: (fromEnum, succ, (-17))
-          - Right:
-              expr: (-16)
-        - - expr: (fromEnum, succ, (17))
-          - Right:
-              expr: '18'
-        - - expr: (fromEnum, toEnum, (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (fromEnum, toEnum, (4))
-          - Right:
-              expr: '4'
-        - - expr: (fromEnum, toEnum, (14))
-          - Right:
-              expr: '14'
-        - - expr: (fromEnum, toEnum, (12))
-          - Right:
-              expr: '12'
-        - - expr: (fromEnum, toEnum, (13))
-          - Right:
-              expr: '13'
-        - - expr: (fromEnum, toEnum, (16))
-          - Right:
-              expr: '16'
-        - - expr: (fromEnum, toEnum, (6))
-          - Right:
-              expr: '6'
-        - - expr: (fromEnum, toEnum, (3))
-          - Right:
-              expr: '3'
-        - - expr: (fromEnum, toEnum, (-17))
-          - Right:
-              expr: (-17)
-        - - expr: (fromEnum, toEnum, (17))
-          - Right:
-              expr: '17'
-        - - expr: (fromEnum, fromEnum, (-2))
-          - Right:
-              expr: (-2)
-        - - expr: (fromEnum, fromEnum, (4))
-          - Right:
-              expr: '4'
-        - - expr: (fromEnum, fromEnum, (14))
-          - Right:
-              expr: '14'
-        - - expr: (fromEnum, fromEnum, (12))
-          - Right:
-              expr: '12'
-        - - expr: (fromEnum, fromEnum, (13))
-          - Right:
-              expr: '13'
-        - - expr: (fromEnum, fromEnum, (16))
-          - Right:
-              expr: '16'
-        - - expr: (fromEnum, fromEnum, (6))
-          - Right:
-              expr: '6'
-        - - expr: (fromEnum, fromEnum, (3))
-          - Right:
-              expr: '3'
-        - - expr: (fromEnum, fromEnum, (-17))
-          - Right:
-              expr: (-17)
-        - - expr: (fromEnum, fromEnum, (17))
-          - Right:
-              expr: '17'
+              expr: ('0', '0')
 - - expr: fromEnum
-  - - - - type: Int
+  - - - - type: Char
         - type: Int
-      - - - expr: ((-2))
+      - - - expr: ('7')
           - Right:
-              expr: (-2)
-        - - expr: ((4))
+              expr: '55'
+        - - expr: ('1')
           - Right:
-              expr: '4'
-        - - expr: ((14))
+              expr: '49'
+        - - expr: ('9')
           - Right:
-              expr: '14'
-        - - expr: ((12))
+              expr: '57'
+        - - expr: ('3')
           - Right:
-              expr: '12'
-        - - expr: ((13))
+              expr: '51'
+        - - expr: ('6')
           - Right:
-              expr: '13'
-        - - expr: ((16))
+              expr: '54'
+        - - expr: ('0')
           - Right:
-              expr: '16'
-        - - expr: ((6))
-          - Right:
-              expr: '6'
-        - - expr: ((3))
-          - Right:
-              expr: '3'
-        - - expr: ((-17))
-          - Right:
-              expr: (-17)
-        - - expr: ((17))
-          - Right:
-              expr: '17'
+              expr: '48'
 - - expr: let just = Just in just
-  - - - - type: Int
-        - type: Maybe Int
-      - - - expr: ((-2))
+  - - - - type: Char
+        - type: Maybe Char
+      - - - expr: ('7')
           - Right:
-              expr: (Just (-2))
-        - - expr: ((4))
+              expr: (Just '7')
+        - - expr: ('1')
           - Right:
-              expr: (Just 4)
-        - - expr: ((14))
+              expr: (Just '1')
+        - - expr: ('9')
           - Right:
-              expr: (Just 14)
-        - - expr: ((12))
+              expr: (Just '9')
+        - - expr: ('3')
           - Right:
-              expr: (Just 12)
-        - - expr: ((13))
+              expr: (Just '3')
+        - - expr: ('6')
           - Right:
-              expr: (Just 13)
-        - - expr: ((16))
+              expr: (Just '6')
+        - - expr: ('0')
           - Right:
-              expr: (Just 16)
-        - - expr: ((6))
-          - Right:
-              expr: (Just 6)
-        - - expr: ((3))
-          - Right:
-              expr: (Just 3)
-        - - expr: ((-17))
-          - Right:
-              expr: (Just (-17))
-        - - expr: ((17))
-          - Right:
-              expr: (Just 17)
+              expr: (Just '0')
 - - expr: elem
-  - - - - type: (Int, [] Int)
+  - - - - type: (Char, [] Char)
         - type: Bool
-      - - - expr: ((-2), [(-2), (4), (14), (12), (13)])
+      - - - expr: ('7', ['7', '1', '9', '3'])
           - Right:
               expr: 'True'
-        - - expr: ((-2), [(-2), (4), (14), (12)])
+        - - expr: ('7', ['7'])
           - Right:
               expr: 'True'
-        - - expr: ((-2), [(-2)])
+        - - expr: ('7', [])
+          - Right:
+              expr: 'False'
+        - - expr: ('7', ['7', '1'])
           - Right:
               expr: 'True'
-        - - expr: ((-2), [(-2), (4), (14)])
+        - - expr: ('1', ['7', '1', '9', '3'])
           - Right:
               expr: 'True'
-        - - expr: ((-2), [(-2), (4)])
+        - - expr: ('1', ['7'])
+          - Right:
+              expr: 'False'
+        - - expr: ('1', [])
+          - Right:
+              expr: 'False'
+        - - expr: ('1', ['7', '1'])
           - Right:
               expr: 'True'
-        - - expr: ((4), [(-2), (4), (14), (12), (13)])
+        - - expr: ('9', ['7', '1', '9', '3'])
           - Right:
               expr: 'True'
-        - - expr: ((4), [(-2), (4), (14), (12)])
+        - - expr: ('9', ['7'])
+          - Right:
+              expr: 'False'
+        - - expr: ('9', [])
+          - Right:
+              expr: 'False'
+        - - expr: ('9', ['7', '1'])
+          - Right:
+              expr: 'False'
+        - - expr: ('3', ['7', '1', '9', '3'])
           - Right:
               expr: 'True'
-        - - expr: ((4), [(-2)])
+        - - expr: ('3', ['7'])
           - Right:
               expr: 'False'
-        - - expr: ((4), [(-2), (4), (14)])
-          - Right:
-              expr: 'True'
-        - - expr: ((4), [(-2), (4)])
-          - Right:
-              expr: 'True'
-        - - expr: ((14), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'True'
-        - - expr: ((14), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'True'
-        - - expr: ((14), [(-2)])
+        - - expr: ('3', [])
           - Right:
               expr: 'False'
-        - - expr: ((14), [(-2), (4), (14)])
-          - Right:
-              expr: 'True'
-        - - expr: ((14), [(-2), (4)])
+        - - expr: ('3', ['7', '1'])
           - Right:
               expr: 'False'
-        - - expr: ((12), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'True'
-        - - expr: ((12), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'True'
-        - - expr: ((12), [(-2)])
+        - - expr: ('6', ['7', '1', '9', '3'])
           - Right:
               expr: 'False'
-        - - expr: ((12), [(-2), (4), (14)])
+        - - expr: ('6', ['7'])
           - Right:
               expr: 'False'
-        - - expr: ((12), [(-2), (4)])
+        - - expr: ('6', [])
           - Right:
               expr: 'False'
-        - - expr: ((13), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'True'
-        - - expr: ((13), [(-2), (4), (14), (12)])
+        - - expr: ('6', ['7', '1'])
           - Right:
               expr: 'False'
-        - - expr: ((13), [(-2)])
+        - - expr: ('0', ['7', '1', '9', '3'])
           - Right:
               expr: 'False'
-        - - expr: ((13), [(-2), (4), (14)])
+        - - expr: ('0', ['7'])
           - Right:
               expr: 'False'
-        - - expr: ((13), [(-2), (4)])
+        - - expr: ('0', [])
           - Right:
               expr: 'False'
-        - - expr: ((16), [(-2), (4), (14), (12), (13)])
+        - - expr: ('0', ['7', '1'])
           - Right:
               expr: 'False'
-        - - expr: ((16), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'False'
-        - - expr: ((16), [(-2)])
-          - Right:
-              expr: 'False'
-        - - expr: ((16), [(-2), (4), (14)])
-          - Right:
-              expr: 'False'
-        - - expr: ((16), [(-2), (4)])
-          - Right:
-              expr: 'False'
-        - - expr: ((6), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'False'
-        - - expr: ((6), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'False'
-        - - expr: ((6), [(-2)])
-          - Right:
-              expr: 'False'
-        - - expr: ((6), [(-2), (4), (14)])
-          - Right:
-              expr: 'False'
-        - - expr: ((6), [(-2), (4)])
-          - Right:
-              expr: 'False'
-        - - expr: ((3), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'False'
-        - - expr: ((3), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'False'
-        - - expr: ((3), [(-2)])
-          - Right:
-              expr: 'False'
-        - - expr: ((3), [(-2), (4), (14)])
-          - Right:
-              expr: 'False'
-        - - expr: ((3), [(-2), (4)])
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), [(-2)])
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), [(-2), (4), (14)])
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), [(-2), (4)])
-          - Right:
-              expr: 'False'
-        - - expr: ((17), [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: 'False'
-        - - expr: ((17), [(-2), (4), (14), (12)])
-          - Right:
-              expr: 'False'
-        - - expr: ((17), [(-2)])
-          - Right:
-              expr: 'False'
-        - - expr: ((17), [(-2), (4), (14)])
-          - Right:
-              expr: 'False'
-        - - expr: ((17), [(-2), (4)])
-          - Right:
-              expr: 'False'
-    - - - type: (Int, Maybe Int)
+    - - - type: (Char, Maybe Char)
         - type: Bool
-      - - - expr: ((-2), Just (-2))
+      - - - expr: ('7', Just '7')
           - Right:
               expr: 'True'
-        - - expr: ((-2), Just (4))
+        - - expr: ('7', Just '1')
           - Right:
               expr: 'False'
-        - - expr: ((-2), Nothing)
+        - - expr: ('7', Just '9')
           - Right:
               expr: 'False'
-        - - expr: ((-2), Just (13))
+        - - expr: ('7', Just '3')
           - Right:
               expr: 'False'
-        - - expr: ((-2), Just (16))
+        - - expr: ('7', Just '6')
           - Right:
               expr: 'False'
-        - - expr: ((-2), Just (6))
+        - - expr: ('7', Just '0')
           - Right:
               expr: 'False'
-        - - expr: ((-2), Just (3))
+        - - expr: ('1', Just '7')
           - Right:
               expr: 'False'
-        - - expr: ((4), Just (-2))
-          - Right:
-              expr: 'False'
-        - - expr: ((4), Just (4))
+        - - expr: ('1', Just '1')
           - Right:
               expr: 'True'
-        - - expr: ((4), Nothing)
+        - - expr: ('1', Just '9')
           - Right:
               expr: 'False'
-        - - expr: ((4), Just (13))
+        - - expr: ('1', Just '3')
           - Right:
               expr: 'False'
-        - - expr: ((4), Just (16))
+        - - expr: ('1', Just '6')
           - Right:
               expr: 'False'
-        - - expr: ((4), Just (6))
+        - - expr: ('1', Just '0')
           - Right:
               expr: 'False'
-        - - expr: ((4), Just (3))
+        - - expr: ('9', Just '7')
           - Right:
               expr: 'False'
-        - - expr: ((14), Just (-2))
+        - - expr: ('9', Just '1')
           - Right:
               expr: 'False'
-        - - expr: ((14), Just (4))
-          - Right:
-              expr: 'False'
-        - - expr: ((14), Nothing)
-          - Right:
-              expr: 'False'
-        - - expr: ((14), Just (13))
-          - Right:
-              expr: 'False'
-        - - expr: ((14), Just (16))
-          - Right:
-              expr: 'False'
-        - - expr: ((14), Just (6))
-          - Right:
-              expr: 'False'
-        - - expr: ((14), Just (3))
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Just (-2))
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Just (4))
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Nothing)
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Just (13))
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Just (16))
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Just (6))
-          - Right:
-              expr: 'False'
-        - - expr: ((12), Just (3))
-          - Right:
-              expr: 'False'
-        - - expr: ((13), Just (-2))
-          - Right:
-              expr: 'False'
-        - - expr: ((13), Just (4))
-          - Right:
-              expr: 'False'
-        - - expr: ((13), Nothing)
-          - Right:
-              expr: 'False'
-        - - expr: ((13), Just (13))
+        - - expr: ('9', Just '9')
           - Right:
               expr: 'True'
-        - - expr: ((13), Just (16))
+        - - expr: ('9', Just '3')
           - Right:
               expr: 'False'
-        - - expr: ((13), Just (6))
+        - - expr: ('9', Just '6')
           - Right:
               expr: 'False'
-        - - expr: ((13), Just (3))
+        - - expr: ('9', Just '0')
           - Right:
               expr: 'False'
-        - - expr: ((16), Just (-2))
+        - - expr: ('3', Just '7')
           - Right:
               expr: 'False'
-        - - expr: ((16), Just (4))
+        - - expr: ('3', Just '1')
           - Right:
               expr: 'False'
-        - - expr: ((16), Nothing)
+        - - expr: ('3', Just '9')
           - Right:
               expr: 'False'
-        - - expr: ((16), Just (13))
-          - Right:
-              expr: 'False'
-        - - expr: ((16), Just (16))
+        - - expr: ('3', Just '3')
           - Right:
               expr: 'True'
-        - - expr: ((16), Just (6))
+        - - expr: ('3', Just '6')
           - Right:
               expr: 'False'
-        - - expr: ((16), Just (3))
+        - - expr: ('3', Just '0')
           - Right:
               expr: 'False'
-        - - expr: ((6), Just (-2))
+        - - expr: ('6', Just '7')
           - Right:
               expr: 'False'
-        - - expr: ((6), Just (4))
+        - - expr: ('6', Just '1')
           - Right:
               expr: 'False'
-        - - expr: ((6), Nothing)
+        - - expr: ('6', Just '9')
           - Right:
               expr: 'False'
-        - - expr: ((6), Just (13))
+        - - expr: ('6', Just '3')
           - Right:
               expr: 'False'
-        - - expr: ((6), Just (16))
-          - Right:
-              expr: 'False'
-        - - expr: ((6), Just (6))
+        - - expr: ('6', Just '6')
           - Right:
               expr: 'True'
-        - - expr: ((6), Just (3))
+        - - expr: ('6', Just '0')
           - Right:
               expr: 'False'
-        - - expr: ((3), Just (-2))
+        - - expr: ('0', Just '7')
           - Right:
               expr: 'False'
-        - - expr: ((3), Just (4))
+        - - expr: ('0', Just '1')
           - Right:
               expr: 'False'
-        - - expr: ((3), Nothing)
+        - - expr: ('0', Just '9')
           - Right:
               expr: 'False'
-        - - expr: ((3), Just (13))
+        - - expr: ('0', Just '3')
           - Right:
               expr: 'False'
-        - - expr: ((3), Just (16))
+        - - expr: ('0', Just '6')
           - Right:
               expr: 'False'
-        - - expr: ((3), Just (6))
-          - Right:
-              expr: 'False'
-        - - expr: ((3), Just (3))
+        - - expr: ('0', Just '0')
           - Right:
               expr: 'True'
-        - - expr: ((-17), Just (-2))
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), Just (4))
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), Nothing)
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), Just (13))
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), Just (16))
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), Just (6))
-          - Right:
-              expr: 'False'
-        - - expr: ((-17), Just (3))
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Just (-2))
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Just (4))
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Nothing)
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Just (13))
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Just (16))
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Just (6))
-          - Right:
-              expr: 'False'
-        - - expr: ((17), Just (3))
-          - Right:
-              expr: 'False'
-- - expr: traverse
-  - - - - type: ((Int -> [] Int), Maybe Int)
-        - type: '[] (Maybe Int)'
-      - - - expr: (pure, Just (-2))
-          - Right:
-              expr: '[Just (-2)]'
-        - - expr: (pure, Just (4))
-          - Right:
-              expr: '[Just 4]'
-        - - expr: (pure, Nothing)
-          - Right:
-              expr: '[Nothing]'
-        - - expr: (pure, Just (13))
-          - Right:
-              expr: '[Just 13]'
-        - - expr: (pure, Just (16))
-          - Right:
-              expr: '[Just 16]'
-        - - expr: (pure, Just (6))
-          - Right:
-              expr: '[Just 6]'
-        - - expr: (pure, Just (3))
-          - Right:
-              expr: '[Just 3]'
-    - - - type: ((Int -> Maybe Int), [] Int)
-        - type: Maybe ([] Int)
-      - - - expr: (let just = Just in just, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (Just [-2, 4, 14, 12, 13])
-        - - expr: (let just = Just in just, [(-2), (4), (14), (12)])
-          - Right:
-              expr: (Just [-2, 4, 14, 12])
-        - - expr: (let just = Just in just, [(-2)])
-          - Right:
-              expr: (Just [-2])
-        - - expr: (let just = Just in just, [(-2), (4), (14)])
-          - Right:
-              expr: (Just [-2, 4, 14])
-        - - expr: (let just = Just in just, [(-2), (4)])
-          - Right:
-              expr: (Just [-2, 4])
-        - - expr: (pure, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: (Just [-2, 4, 14, 12, 13])
-        - - expr: (pure, [(-2), (4), (14), (12)])
-          - Right:
-              expr: (Just [-2, 4, 14, 12])
-        - - expr: (pure, [(-2)])
-          - Right:
-              expr: (Just [-2])
-        - - expr: (pure, [(-2), (4), (14)])
-          - Right:
-              expr: (Just [-2, 4, 14])
-        - - expr: (pure, [(-2), (4)])
-          - Right:
-              expr: (Just [-2, 4])
-    - - - type: ((Int -> Maybe Int), Maybe Int)
-        - type: Maybe (Maybe Int)
-      - - - expr: (let just = Just in just, Just (-2))
-          - Right:
-              expr: (Just (Just (-2)))
-        - - expr: (let just = Just in just, Just (4))
-          - Right:
-              expr: (Just (Just 4))
-        - - expr: (let just = Just in just, Nothing)
-          - Right:
-              expr: (Just Nothing)
-        - - expr: (let just = Just in just, Just (13))
-          - Right:
-              expr: (Just (Just 13))
-        - - expr: (let just = Just in just, Just (16))
-          - Right:
-              expr: (Just (Just 16))
-        - - expr: (let just = Just in just, Just (6))
-          - Right:
-              expr: (Just (Just 6))
-        - - expr: (let just = Just in just, Just (3))
-          - Right:
-              expr: (Just (Just 3))
-        - - expr: (pure, Just (-2))
-          - Right:
-              expr: (Just (Just (-2)))
-        - - expr: (pure, Just (4))
-          - Right:
-              expr: (Just (Just 4))
-        - - expr: (pure, Nothing)
-          - Right:
-              expr: (Just Nothing)
-        - - expr: (pure, Just (13))
-          - Right:
-              expr: (Just (Just 13))
-        - - expr: (pure, Just (16))
-          - Right:
-              expr: (Just (Just 16))
-        - - expr: (pure, Just (6))
-          - Right:
-              expr: (Just (Just 6))
-        - - expr: (pure, Just (3))
-          - Right:
-              expr: (Just (Just 3))
-    - - - type: ((Int -> [] Int), [] Int)
-        - type: '[] ([] Int)'
-      - - - expr: (pure, [(-2), (4), (14), (12), (13)])
-          - Right:
-              expr: '[[-2, 4, 14, 12, 13]]'
-        - - expr: (pure, [(-2), (4), (14), (12)])
-          - Right:
-              expr: '[[-2, 4, 14, 12]]'
-        - - expr: (pure, [(-2)])
-          - Right:
-              expr: '[[-2]]'
-        - - expr: (pure, [(-2), (4), (14)])
-          - Right:
-              expr: '[[-2, 4, 14]]'
-        - - expr: (pure, [(-2), (4)])
-          - Right:
-              expr: '[[-2, 4]]'
 generationCfg:
   numMin: -20
-  seed: 1312
+  seed: 69
   charMin: '0'
   crashOnError: true
-  verbosity: warning
+  verbosity: notice
   test: 0.3
-  maxInstances: 5
+  maxInstances: 10
   maxHoles: 1
   nestLimit: 1
   charMax: '9'
@@ -3832,13 +736,6 @@ variantTypes:
 - type: '[a] -> [b] -> [(a, b)]'
 - type: '[b] -> [(a, b)]'
 - type: '[(a, b)]'
-- type: '  Show a => a -> String'
-- type: 'String'
-- type: '  Enum a => a -> a'
-- type: '  Enum a => a'
-- type: '  (Traversable t, Applicative f) => (a -> f b) -> t a -> f (t b)'
-- type: '  (Traversable t, Applicative f) => t a -> f (t b)'
-- type: '  (Traversable t, Applicative f) => f (t b)'
 - type: a -> [a] -> [a]
 - type: '[a] -> [a]'
 - type: '[a]'
@@ -3846,39 +743,24 @@ variantTypes:
 - type: ([a], [b])
 - type: '  (Foldable t, Eq a) => a -> t a -> Bool'
 - type: '  (Foldable t, Eq a) => t a -> Bool'
-- type: 'Bool'
+- type: Bool
 - type: '  Num p => p'
 - type: a -> Maybe a
 - type: Maybe a
-- type: '  Applicative f => a -> f a'
-- type: '  Applicative f => f a'
 - type: '  Monoid a => a'
 - type: '  Enum a => Int -> a'
 - type: '  Enum a => a'
 - type: '  Foldable t => t a -> Int'
-- type: 'Int'
-- type: '  Monad m => m a -> (a -> m b) -> m b'
-- type: '  Monad m => (a -> m b) -> m b'
-- type: '  Monad m => m b'
+- type: Int
 - type: a -> b -> (a, b)
 - type: b -> (a, b)
 - type: (a, b)
-- type: '  GHC.Base.Alternative f => f a'
-- type: '  Foldable t => (a -> a -> a) -> t a -> a'
-- type: '  Foldable t => t a -> a'
-- type: 'a'
 - type: '  (Traversable t, Monad m) => t (m a) -> m (t a)'
 - type: '  (Traversable t, Monad m) => m (t a)'
 - type: '  (Traversable t, Applicative f) => t (f a) -> f (t a)'
 - type: '  (Traversable t, Applicative f) => f (t a)'
 - type: '  Enum a => a -> Int'
-- type: 'Int'
-- type: '  (Traversable t, Monad m) => (a -> m b) -> t a -> m (t b)'
-- type: '  (Traversable t, Monad m) => t a -> m (t b)'
-- type: '  (Traversable t, Monad m) => m (t b)'
-- type: a -> b -> a
-- type: b -> a
-- type: a
+- type: Int
 - type: '  (Foldable t, Monoid m) => (a -> m) -> t a -> m'
 - type: '  (Foldable t, Monoid m) => t a -> m'
 - type: 'Monoid m => m'
@@ -3888,174 +770,132 @@ variantTypes:
 - type: '  Semigroup a => a -> a -> a'
 - type: '  Semigroup a => a -> a'
 - type: '  Semigroup a => a'
-- type: '  Foldable t => t a -> Bool'
-- type: 'Bool'
 - type: b -> (a -> b) -> Maybe a -> b
 - type: (a -> b) -> Maybe a -> b
 - type: Maybe a -> b
 - type: b
-- type: '  Applicative f => f (a -> b) -> f a -> f b'
-- type: '  Applicative f => f a -> f b'
-- type: '  Applicative f => f b'
-- type: '  Foldable t => (a -> b -> b) -> b -> t a -> b'
-- type: '  Foldable t => b -> t a -> b'
-- type: '  Foldable t => t a -> b'
-- type: 'b'
 - type: (b -> c) -> (a -> b) -> a -> c
 - type: (a -> b) -> a -> c
 - type: a -> c
 - type: c
-- type: '  (Eq k, Hashable k) => k -> v -> HashMap k v -> HashMap k v'
-- type: '  (Eq k, Hashable k) => v -> HashMap k v -> HashMap k v'
-- type: '  (Eq k, Hashable k) => HashMap k v -> HashMap k v'
-- type: '  (Eq k, Hashable k) => HashMap k v'
 ruleCharMap:
   ',': 5
-  \: 23
-  l: 35
-  g: 31
-  w: 46
-  G: 15
+  \: 19
+  l: 29
+  g: 27
   '*': 4
-  m: 36
+  m: 30
   '-': 6
-  M: 18
-  =: 8
-  ']': 24
-  p: 39
+  M: 14
+  =: 7
+  ']': 20
+  p: 33
   ' ': 0
-  '[': 22
-  k: 34
-  .: 7
-  'N': 19
-  '>': 9
-  'n': 37
-  a: 25
-  q: 40
-  A: 10
-  d: 28
-  t: 43
-  T: 21
-  o: 38
+  '[': 18
+  'N': 15
+  '>': 8
+  'n': 31
+  a: 21
+  q: 34
+  A: 9
+  d: 24
+  t: 37
+  T: 17
+  o: 32
   '"': 1
-  B: 11
-  b: 26
-  r: 41
-  u: 44
-  E: 13
-  e: 29
-  h: 32
+  B: 10
+  b: 22
+  r: 35
+  u: 38
+  E: 11
+  e: 25
   (: 2
-  H: 16
-  c: 27
-  s: 42
-  C: 12
-  S: 20
-  f: 30
-  v: 45
-  F: 14
-  i: 33
-  'y': 47
+  c: 23
+  s: 36
+  S: 16
+  f: 26
+  v: 39
+  F: 12
+  i: 28
+  'y': 40
   ): 3
-  I: 17
+  I: 13
 bothCharMap:
   ',': 5
   L: 25
   \: 32
-  l: 44
+  l: 43
   g: 40
-  '7': 14
-  j: 43
+  '''': 2
+  '7': 15
   J: 24
-  ':': 17
-  ? |2+
-
-  : 0
-  m: 45
+  ':': 18
+  m: 44
   '-': 6
   M: 26
-  =: 18
   ']': 33
-  '0': 7
-  p: 48
-  ' ': 1
+  '0': 8
+  P: 27
+  ' ': 0
   '[': 31
-  'N': 27
-  '>': 19
-  'n': 46
+  .: 7
+  'n': 45
   a: 34
-  '1': 8
+  '1': 9
   d: 37
-  t: 51
-  '4': 11
+  t: 49
+  D: 21
+  '4': 12
   T: 30
-  o: 47
-  '"': 2
-  B: 20
-  '2': 9
+  o: 46
+  '"': 1
+  B: 19
+  '2': 10
   R: 28
   b: 35
-  r: 49
-  u: 52
-  E: 21
-  '5': 12
+  r: 47
+  u: 50
+  '5': 13
   e: 38
   h: 41
   (: 3
-  '8': 15
+  '8': 16
   c: 36
-  s: 50
-  '3': 10
+  s: 48
+  C: 20
+  '3': 11
   S: 29
   f: 39
   F: 22
-  '6': 13
-  '9': 16
+  '6': 14
+  '9': 17
   i: 42
-  'y': 53
+  'y': 51
   ): 4
   I: 23
 dsl:
   length:
     expr: length
-  insert:
-    expr: insert
   maybe:
     expr: maybe
   foldMap:
     expr: foldMap
-  empty:
-    expr: empty
   fromEnum:
     expr: fromEnum
   unzip:
     expr: unzip
   just:
     expr: Just
-  'null':
-    expr: 'null'
-  foldr:
-    expr: foldr
   zip:
     expr: zip
-  app:
-    expr: (<*>)
   elem:
     expr: elem
-  bind:
-    expr: (>>=)
   sequence:
     expr: sequence
   zero:
     expr: '0'
-  foldr1:
-    expr: foldr1
   fmap:
     expr: fmap
-  pure:
-    expr: pure
-  const:
-    expr: const
   toEnum:
     expr: toEnum
   mempty:
@@ -4066,16 +906,8 @@ dsl:
     expr: (,)
   prepend:
     expr: (:)
-  traverse:
-    expr: traverse
-  show:
-    expr: show
-  succ:
-    expr: succ
   sequenceA:
     expr: sequenceA
-  mapM:
-    expr: mapM
   conc:
     expr: (<>)
 fnTypes:
@@ -4089,111 +921,73 @@ fnTypes:
   - type: '[a] -> [b] -> [(a, b)]'
 - - expr: unzip
   - type: '[(a, b)] -> ([a], [b])'
-- - expr: succ
-  - type: '  Enum a => a -> a'
-- - expr: 'null'
-  - type: '  Foldable t => t a -> Bool'
-- - expr: let bind = (>>=) in bind
-  - type: '  Monad m => m a -> (a -> m b) -> m b'
-- - expr: const
-  - type: a -> b -> a
 - - expr: let prepend = (:) in prepend
   - type: a -> [a] -> [a]
-- - expr: pure
-  - type: '  Applicative f => a -> f a'
-- - expr: show
-  - type: '  Show a => a -> String'
 - - expr: let tpl = (,) in tpl
   - type: a -> b -> (a, b)
-- - expr: fmap
-  - type: '  Functor f => (a -> b) -> f a -> f b'
-- - expr: maybe
-  - type: b -> (a -> b) -> Maybe a -> b
-- - expr: foldr
-  - type: '  Foldable t => (a -> b -> b) -> b -> t a -> b'
-- - expr: foldr1
-  - type: '  Foldable t => (a -> a -> a) -> t a -> a'
-- - expr: let compose = (.) in compose
-  - type: (b -> c) -> (a -> b) -> a -> c
 - - expr: fromEnum
   - type: '  Enum a => a -> Int'
 - - expr: let just = Just in just
   - type: a -> Maybe a
 - - expr: elem
   - type: '  (Foldable t, Eq a) => a -> t a -> Bool'
-- - expr: traverse
-  - type: '  (Traversable t, Applicative f) => (a -> f b) -> t a -> f (t b)'
 exprCharMap:
   ',': 5
-  L: 22
-  \: 27
-  l: 38
-  g: 34
-  '7': 14
-  j: 37
-  J: 21
-  ':': 17
-  ? |2+
-
-  : 0
-  m: 39
+  L: 24
+  \: 30
+  l: 41
+  g: 38
+  '''': 2
+  '7': 15
+  J: 23
+  ':': 18
+  m: 42
   '-': 6
-  =: 18
-  ']': 28
-  '0': 7
-  p: 42
-  ' ': 1
-  '[': 26
-  'N': 23
-  'n': 40
-  a: 29
-  '1': 8
-  d: 31
-  t: 45
-  '4': 11
-  T: 25
-  o: 41
-  '"': 2
-  '2': 9
-  R: 24
-  r: 43
-  u: 46
-  E: 19
-  '5': 12
-  e: 32
-  h: 35
+  ']': 31
+  '0': 8
+  P: 25
+  ' ': 0
+  '[': 29
+  .: 7
+  'n': 43
+  a: 32
+  '1': 9
+  d: 35
+  t: 46
+  D: 20
+  '4': 12
+  T: 28
+  '"': 1
+  '2': 10
+  R: 26
+  b: 33
+  r: 44
+  u: 47
+  '5': 13
+  e: 36
+  h: 39
   (: 3
-  '8': 15
-  c: 30
-  s: 44
-  '3': 10
-  f: 33
-  F: 20
-  '6': 13
-  '9': 16
-  i: 36
-  'y': 47
+  '8': 16
+  c: 34
+  s: 45
+  C: 19
+  '3': 11
+  S: 27
+  f: 37
+  F: 21
+  '6': 14
+  '9': 17
+  i: 40
   ): 4
+  I: 22
 datasets:
-- - expr: let bind = (>>=) in bind
-  - expr: zip
-  - expr: succ
-  - expr: fmap
-  - expr: pure
-  - expr: show
-  - expr: traverse
-  - expr: let tpl = (,) in tpl
-- - expr: sequenceA
-  - expr: const
-  - expr: let prepend = (:) in prepend
-  - expr: 'null'
-  - expr: let compose = (.) in compose
-  - expr: foldr1
-  - expr: fromEnum
-  - expr: let just = Just in just
-- - expr: length
+- - expr: elem
+  - expr: length
   - expr: toEnum
-  - expr: foldr
-  - expr: maybe
-  - expr: elem
+  - expr: sequenceA
+- - expr: let tpl = (,) in tpl
   - expr: unzip
+  - expr: zip
+  - expr: let just = Just in just
+- - expr: fromEnum
+  - expr: let prepend = (:) in prepend
