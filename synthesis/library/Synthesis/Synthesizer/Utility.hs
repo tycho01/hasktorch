@@ -368,10 +368,6 @@ unravelIdx t idx = snd . foldr (\ dim_ (idx_, idxs) -> (idx_ `Prelude.div` dim_,
 crossEntropy :: D.Tensor -> Int -> D.Tensor -> D.Tensor
 crossEntropy target dim input = D.toDevice (D.device target) $ F.nllLoss' (D.toDevice cpu target) $ F.logSoftmax (F.Dim dim) $ D.toDevice cpu $ input
 
--- -- | TODO: replace with actual F.squeezeDim
-f_squeezeDim :: Int -> D.Tensor -> D.Tensor
-f_squeezeDim dim t = I.squeezeDim t dim
-
 -- | adjusted Torch.Typed.NN.Recurrent.LSTM.lstm to dynamically calculate batch size
 -- | TODO: just batch inputs, ensuring dummy items won't influence results?
 lstmDynamicBatch
