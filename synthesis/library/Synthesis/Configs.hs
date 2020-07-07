@@ -6,84 +6,23 @@ import Data.Semigroup ((<>))
 
 generationConfig :: Parser GenerationConfig
 generationConfig = GenerationConfig
-    <$> strOption
-        ( long "taskPath"
-        <> short 'f'
-        <> value "./run-results/datasets.yml"
-        <> showDefault
-        <> help "the file path at which to store generated datasets" )
-    <*> switch
-        ( long "crashOnError"
-        <> short 'c'
-        <> help "when specified just crash on error while calculating function outputs. otherwise perform an additional typecheck (slower)." )
+    <$> genTaskPathOpt
+    <*> crashOnErrorOpt
     <*> seedOpt
-    <*> option auto
-        ( long "nestLimit"
-        <> value 1
-        <> showDefault
-        <> help "max number of levels of nesting for generated types. high values make for big logs while debugging..." )
-    <*> option auto
-        ( long "maxInstances"
-        <> value 5
-        <> showDefault
-        <> help "max number of type instantiations to generate for any type variable. may get less after deduplicating type instances." )
-    -- NSPS: for all results, the program tree generation is conditioned on a set of 10 input/output string pairs.
+    <*> nestLimitOpt
+    <*> maxInstancesOpt
     <*> maxHolesOpt
-    <*> option auto
-        ( long "numInputs"
-        <> value 10
-        <> showDefault
-        <> help "max number of inputs to generate. may get less after nub filters out duplicates." )
-    <*> option auto
-        ( long "numMin"
-        <> value (-20)
-        <> showDefault
-        <> help "the minimum value for numbers to generate" )
-    <*> option auto
-        ( long "numMax"
-        <> value 20
-        <> showDefault
-        <> help "the maximum value for numbers to generate" )
-    <*> option auto
-        ( long "charMin"
-        <> value '0'
-        <> showDefault
-        <> help "the minimum value for characters to generate" )
-    <*> option auto
-        ( long "charMax"
-        <> value '9'
-        <> showDefault
-        <> help "the maximum value for characters to generate" )
-    <*> option auto
-        ( long "listMin"
-        <> value 0
-        <> showDefault
-        <> help "the minimum number of elements to generate for list types" )
-    <*> option auto
-        ( long "listMax"
-        <> value 5
-        <> showDefault
-        <> help "the maximum number of elements to generate for list types" )
-    <*> option auto
-        ( long "train"
-        <> value 0.35
-        <> showDefault
-        <> help "how much of our dataset to allocate to the training set" )
-    <*> option auto
-        ( long "validation"
-        <> value 0.35
-        <> showDefault
-        <> help "how much of our dataset to allocate to the validation set" )
-    <*> option auto
-        ( long "test"
-        <> value 0.3
-        <> showDefault
-        <> help "how much of our dataset to allocate to the test set" )
-    <*> option auto
-        ( long "maxDataset"
-        <> value 1000
-        <> showDefault
-        <> help "the maximum number of programs we will consider for use in our dataset (before further filtering)" )
+    <*> numInputsOpt
+    <*> numMinOpt
+    <*> numMaxOpt
+    <*> charMinOpt
+    <*> charMaxOpt
+    <*> listMinOpt
+    <*> listMaxOpt
+    <*> trainOpt
+    <*> validationOpt
+    <*> testOpt
+    <*> maxDatasetOpt
     <*> verbosityOpt
 
 parseGenerationConfig :: IO GenerationConfig
@@ -196,6 +135,110 @@ parseViewDatasetConfig = execParser opts
      <> header "program synthesizer" )
 
 -- shared options
+
+genTaskPathOpt = strOption
+    ( long "taskPath"
+    <> short 'f'
+    <> value "./run-results/datasets.yml"
+    <> showDefault
+    <> help "the file path at which to store generated datasets" )
+
+crashOnErrorOpt = switch
+    ( long "crashOnError"
+    <> short 'c'
+    <> help "when specified just crash on error while calculating function outputs. otherwise perform an additional typecheck (slower)." )
+
+nestLimitDef :: Int = 1
+nestLimitOpt = option auto
+    ( long "nestLimit"
+    <> value nestLimitDef
+    <> showDefault
+    <> help "max number of levels of nesting for generated types. high values make for big logs while debugging..." )
+
+maxInstancesDef :: Int = 5
+maxInstancesOpt = option auto
+    ( long "maxInstances"
+    <> value maxInstancesDef
+    <> showDefault
+    <> help "max number of type instantiations to generate for any type variable. may get less after deduplicating type instances." )
+
+-- NSPS: for all results, the program tree generation is conditioned on a set of 10 input/output string pairs.
+numInputsDef :: Int = 10
+numInputsOpt = option auto
+    ( long "numInputs"
+    <> value numInputsDef
+    <> showDefault
+    <> help "max number of inputs to generate. may get less after nub filters out duplicates." )
+
+numMinDef :: Integer = -20
+numMinOpt = option auto
+    ( long "numMin"
+    <> value numMinDef
+    <> showDefault
+    <> help "the minimum value for numbers to generate" )
+
+numMaxDef :: Integer = 20
+numMaxOpt = option auto
+    ( long "numMax"
+    <> value numMaxDef
+    <> showDefault
+    <> help "the maximum value for numbers to generate" )
+
+charMinDef = '0'
+charMinOpt = option auto
+    ( long "charMin"
+    <> value charMinDef
+    <> showDefault
+    <> help "the minimum value for characters to generate" )
+
+charMaxDef = '9'
+charMaxOpt = option auto
+    ( long "charMax"
+    <> value charMaxDef
+    <> showDefault
+    <> help "the maximum value for characters to generate" )
+
+listMinDef :: Int = 0
+listMinOpt = option auto
+    ( long "listMin"
+    <> value listMinDef
+    <> showDefault
+    <> help "the minimum number of elements to generate for list types" )
+
+listMaxDef :: Int = 5
+listMaxOpt = option auto
+    ( long "listMax"
+    <> value listMaxDef
+    <> showDefault
+    <> help "the maximum number of elements to generate for list types" )
+
+trainDef :: Double = 0.35
+trainOpt = option auto
+    ( long "train"
+    <> value trainDef
+    <> showDefault
+    <> help "how much of our dataset to allocate to the training set" )
+
+validationDef :: Double = 0.35
+validationOpt = option auto
+    ( long "validation"
+    <> value validationDef
+    <> showDefault
+    <> help "how much of our dataset to allocate to the validation set" )
+
+testDef :: Double = 0.3
+testOpt = option auto
+    ( long "test"
+    <> value testDef
+    <> showDefault
+    <> help "how much of our dataset to allocate to the test set" )
+
+maxDatasetDef :: Int = 1000
+maxDatasetOpt = option auto
+    ( long "maxDataset"
+    <> value maxDatasetDef
+    <> showDefault
+    <> help "the maximum number of programs we will consider for use in our dataset (before further filtering)" )
 
 taskPathOpt = strOption
     ( long "taskPath"
