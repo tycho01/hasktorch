@@ -8,9 +8,9 @@ import Synthesis.Data
 -- | synthesized types, categorized by arity
 typesByArity :: HashMap Int [String]
 typesByArity =
-  insert 2 ["(,)", "Either", "HashMap"] $
-  insert 1 ["[]", "Maybe"] $ -- , "Set"
-  singleton 0 ["Bool", "Int", "Char"]
+  insert 2 ["(,)", "Either"] $ -- "HashMap"
+  insert 1 ["[]", "Maybe"] $ -- "Set"
+  singleton 0 ["Int", "Char"] -- "Bool"
 
 -- | building blocks
 -- | cf. NSPS: A DSL can be considered a context-free grammar with a start symbol S and a
@@ -40,7 +40,7 @@ blockAstsCategoryTheory =
     $ insert "maybe" "maybe"
     -- List
     $ insert "prepend" "(:)"
-    $ insert "null" "null"
+    -- $ insert "null" "null"
     $ insert "length" "length"
     -- (,)
     $ insert "tpl" "(,)"
@@ -49,37 +49,37 @@ blockAstsCategoryTheory =
     -- -- Set
     -- -- TODO: having this definition in a let-in construction errors as it suddenly wants a monomorphic type for some reason. should I manually type-annotate all of these myself?
     -- $ insert "insertSet" "Set.insert"
-    -- HashMap
-    $ insert "insert" "insert"
+    -- -- HashMap
+    -- $ insert "insert" "insert"
     -- Enum
-    $ insert "succ" "succ"
+    -- $ insert "succ" "succ"
     $ insert "toEnum" "toEnum"
     $ insert "fromEnum" "fromEnum"
     -- Foldable
     $ insert "foldMap" "foldMap"
-    $ insert "foldr" "foldr"
-    $ insert "foldr1" "foldr1"
+    -- $ insert "foldr" "foldr"
+    -- $ insert "foldr1" "foldr1"
     $ insert "elem" "elem"
     -- Traversable
-    $ insert "traverse" "traverse"
+    -- $ insert "traverse" "traverse"
     $ insert "sequenceA" "sequenceA"
-    $ insert "mapM" "mapM"
+    -- $ insert "mapM" "mapM"
     $ insert "sequence" "sequence"
     -- Functor
     $ insert "fmap" "fmap"
-    -- Monad
-    $ insert "bind" "(>>=)"
-    -- Applicative
-    $ insert "pure" "pure"
-    $ insert "app" "(<*>)"
-    -- Alternative
-    $ insert "empty" "empty"
+    -- -- Monad
+    -- $ insert "bind" "(>>=)"
+    -- -- Applicative
+    -- $ insert "pure" "pure"
+    -- $ insert "app" "(<*>)"
+    -- -- Alternative
+    -- $ insert "empty" "empty"
     -- Monoid
     $ insert "mempty" "mempty"
     -- Semigroup
     $ insert "conc" "(<>)"
-    -- Show
-    $ insert "show" "show"
+    -- -- Show
+    -- $ insert "show" "show"
     -- -- Bifunctor
     -- $ insert "bimap" "bimap"
     -- $ insert "first" "first"
@@ -90,7 +90,7 @@ blockAstsCategoryTheory =
     -- -- Bitraversable
     -- $ insert "bitraverse" "bitraverse"
     -- misc
-    $ insert "const" "const"
+    -- $ insert "const" "const"
     -- $ insert "" ""
     $ singleton "compose" "(.)"
 
