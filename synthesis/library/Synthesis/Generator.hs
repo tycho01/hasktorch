@@ -67,7 +67,7 @@ main = do
     say_ "\ntask_types:"
     notice_ $ pp_ task_types
     -- generated types we will use for instantiating type variables
-    fill_types :: HashMap Int [Tp] <- genTypes seed typesByArity nestLimit maxInstances
+    fill_types :: HashMap Int [Tp] <- genTypes typesByArity nestLimit maxInstances
     say_ "\nfill_types:"
     notice_ $ pp_ fill_types
     let fn_input_types :: HashMap Expr [Tp] = fnInputTypes <$> fn_types
