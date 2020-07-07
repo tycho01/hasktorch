@@ -36,6 +36,9 @@ cabal run synthesizer -- --help
 # Generate documentation.
 cabal build --enable-documentation
 
+# running specific tests
+cabal test --test-options='-p "TypeGen"'
+
 # Profile
 cabal build --enable-profiling --ghc-options="-fno-prof-auto"
 `cabal exec which generator` +RTS -p
