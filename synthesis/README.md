@@ -41,7 +41,7 @@ cabal test --test-options='-p "TypeGen"'
 
 # Profile
 cabal build --enable-profiling --ghc-options="-fno-prof-auto"
-`cabal exec which generator` +RTS -p
+`cabal exec which generator` +RTS -hr -hcB
 
 # viz profiling
 cabal install ghc-prof-flamegraph
