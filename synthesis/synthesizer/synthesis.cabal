@@ -1,0 +1,142 @@
+cabal-version:  2.3
+name:           synthesizer
+version:        0.2.0.0
+synopsis:       typed neural program synthesis
+description:    code-base for my UvA MSc AI thesis on typed neural program synthesis
+category:       Machine Learning
+homepage:       https://github.com/tycho01/synthesis#readme
+bug-reports:    https://github.com/tycho01/synthesis/issues
+author:         Kiara Grouwstra
+maintainer:     Kiara Grouwstra
+license:        MIT
+build-type:     Simple
+extra-source-files:
+    package.yaml
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/tycho01/synthesis
+
+common config
+  default-language:    Haskell2010
+  ghc-options:         -fplugin GHC.TypeLits.Normalise -fplugin GHC.TypeLits.KnownNat.Solver -fplugin GHC.TypeLits.Extra.Solver -fconstraint-solver-iterations=0 -rtsopts
+  default-extensions: LambdaCase ScopedTypeVariables UnicodeSyntax RankNTypes
+  ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N
+  other-modules:
+      Paths_synthesizer
+  build-depends:      base >= 4.7 && < 5
+                    , mtl
+                    , aeson
+                    , base
+                    , bytestring
+                    , cassava
+                    , containers
+                    , directory
+                    , ghc-lib-parser
+                    , hashable
+                    , haskell-src-exts
+                    , hint
+                    , hslogger
+                    , io-memoize
+                    , optparse-applicative
+                    , prettyprinter
+                    , random
+                    , split
+                    , store
+                    , terminal-progress-bar
+                    , text
+                    , unordered-containers
+                    , yaml
+                    , spork
+
+common synth
+  build-depends:      hasktorch
+                    , libtorch-ffi
+                    , ghc-typelits-extra
+                    , ghc-typelits-knownnat
+                    , ghc-typelits-natnormalise
+                    , GA
+
+library
+  import: config, synth
+  hs-source-dirs:
+      library
+  exposed-modules:
+    --   Synthesis.Ast
+    --   Synthesis.Blocks
+    --   Synthesis.Configs
+    --   Synthesis.Data
+    --   Synthesis.Evolutionary
+    --   Synthesis.FindHoles
+    --   Synthesis.Generation
+    --   Synthesis.Generator
+    --   Synthesis.GridSearch
+    --   Synthesis.Hint
+    --   Synthesis.Orphanage
+    --   Synthesis.Synthesis
+    --   Synthesis.Synthesize
+      Synthesizer
+    --   Synthesizer.Encoder
+    --   Synthesizer.NSPS
+    --   Synthesizer.Params
+    --   Synthesizer.R3NN
+    --   Synthesizer.Random
+    --   Synthesizer.Synthesizer
+    --   Synthesizer.Train
+    --   Synthesizer.TypeEncoder
+    --   Synthesizer.UntypedMLP
+    --   Synthesizer.Utility
+    --   Synthesis.TypeGen
+    --   Synthesis.Types
+    --   Synthesis.Utility
+    --   Synthesis.ViewDataset
+
+executable evolutionary
+  import: config, synth
+  main-is: Main.hs
+  hs-source-dirs:
+      evolutionary
+  build-depends:
+      synthesizer
+
+executable grid-search
+  import: config, synth
+  main-is: Main.hs
+  hs-source-dirs:
+      grid-search
+  build-depends:
+      synthesizer
+
+executable synthesizer
+  import: config, synth
+  main-is: Main.hs
+  hs-source-dirs:
+      synthesizer
+  build-depends:
+      synthesizer
+
+test-suite synthesis-test-suite
+  import: config, synth
+  hs-source-dirs:
+      test-suite
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  build-depends:
+      synthesizer
+    , tasty
+    , tasty-hspec
+    , tasty-hunit
+  other-modules:
+      Spec.Ast
+      Spec.FindHoles
+      Spec.Generation
+      Spec.Hint
+      Spec.Synthesizer.NSPS
+      Spec.Synthesizer.Optimization
+      Spec.Synthesizer.Types
+      Spec.Synthesizer.Utility
+      Spec.TypeGen
+      Spec.Types
+      Spec.Utility
+      Paths_synthesizer

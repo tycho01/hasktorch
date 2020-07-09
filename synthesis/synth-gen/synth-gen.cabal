@@ -1,0 +1,108 @@
+cabal-version:  2.3
+name:           synth-gen
+version:        0.2.0.0
+synopsis:       typed neural program synthesis
+description:    code-base for my UvA MSc AI thesis on typed neural program synthesis
+category:       Machine Learning
+homepage:       https://github.com/tycho01/synthesis#readme
+bug-reports:    https://github.com/tycho01/synthesis/issues
+author:         Kiara Grouwstra
+maintainer:     Kiara Grouwstra
+license:        MIT
+build-type:     Simple
+extra-source-files:
+    package.yaml
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/tycho01/synthesis
+
+common config
+  default-language:    Haskell2010
+  ghc-options:         -rtsopts
+  default-extensions: LambdaCase ScopedTypeVariables UnicodeSyntax RankNTypes
+  ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N
+  other-modules:
+      Paths_synth_gen
+  build-depends:      base >= 4.7 && < 5
+                    , mtl
+                    , aeson
+                    , base
+                    , bytestring
+                    , cassava
+                    , containers
+                    , directory
+                    , ghc-lib-parser
+                    , hashable
+                    , haskell-src-exts
+                    , hint
+                    , hslogger
+                    , io-memoize
+                    , optparse-applicative
+                    , prettyprinter
+                    , random
+                    , split
+                    , store
+                    , terminal-progress-bar
+                    , text
+                    , unordered-containers
+                    , yaml
+                    , spork
+
+library
+  import: config
+  hs-source-dirs:
+      library
+  exposed-modules:
+      Synthesis
+      Synthesis.Ast
+      Synthesis.Blocks
+      Synthesis.Configs
+      Synthesis.Data
+      Synthesis.FindHoles
+      Synthesis.Generation
+      Synthesis.Generator
+      Synthesis.Hint
+      Synthesis.Orphanage
+      Synthesis.TypeGen
+      Synthesis.Types
+      Synthesis.Utility
+      Synthesis.ViewDataset
+
+executable generator
+  import: config
+  main-is: Main.hs
+  hs-source-dirs:
+      generator
+  build-depends:
+      synth-gen
+
+executable view-dataset
+  import: config
+  main-is: Main.hs
+  hs-source-dirs:
+      view-dataset
+  build-depends:
+      synth-gen
+
+test-suite generator-test-suite
+  import: config
+  hs-source-dirs:
+      test-suite
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  build-depends:
+      synth-gen
+    , tasty
+    , tasty-hspec
+    , tasty-hunit
+  other-modules:
+      Spec.Ast
+      Spec.FindHoles
+      Spec.Generation
+      Spec.Hint
+      Spec.TypeGen
+      Spec.Types
+      Spec.Utility
+      Paths_synth_gen
