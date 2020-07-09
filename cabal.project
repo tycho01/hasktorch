@@ -5,7 +5,8 @@ packages:
     hasktorch/*.cabal
     examples/*.cabal
     experimental/*.cabal
-    synthesis/*.cabal
+    synthesis/synth-gen/*.cabal
+    synthesis/synthesizer/*.cabal
 
 write-ghc-environment-files: always
 tests: true
