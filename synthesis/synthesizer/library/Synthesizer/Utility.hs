@@ -521,13 +521,6 @@ knownNat = natVal $ Proxy @n
 knownNats :: forall n. KnownNat n => [Integer]
 knownNats = knownNat @n : knownNats @(n + 1)
 
-pgStyle = defStyle {
-              styleWidth = ConstantWidth 40
-            , stylePrefix = exact
-            , stylePostfix = Label (\ pg _ -> progressCustom pg)
-            -- , styleOnComplete = WriteNewline
-            }
-
 writeCsv :: Csv.ToNamedRecord a => FilePath -> Csv.Header -> [a] -> IO ()
 writeCsv filePath header =
     BS.writeFile filePath . BS.packChars . BL.unpackChars . Csv.encodeByName header
