@@ -19,6 +19,7 @@ import GHC.Exts (groupWith)
 import Language.Haskell.Exts.Pretty (Pretty, prettyPrint)
 import System.Random (RandomGen(..), StdGen, mkStdGen, randomR, randomRIO)
 import System.Log.Logger
+import System.ProgressBar
 
 -- | map over both elements of a bifunctor
 mapBoth :: Bifunctor p => (a -> b) -> p a a -> p b b
@@ -214,3 +215,13 @@ asPairs f = fromList . fmap f . toList
 safeIndexHM :: (Eq k, Hashable k, Show k) => HashMap k v -> k -> v
 safeIndexHM hm k = if member k hm then hm ! k
                                   else error $ "key " <> show k <> " not found!"
+
+mapKeys :: (Eq k2, Hashable k2) => (k1 -> k2) -> HashMap k1 v -> HashMap k2 v
+mapKeys = asPairs . first
+
+pgStyle = defStyle {
+              styleWidth = ConstantWidth 40
+            , stylePrefix = exact
+            , stylePostfix = Label (\ pg _ -> progressCustom pg)
+            -- , styleOnComplete = WriteNewline
+            }

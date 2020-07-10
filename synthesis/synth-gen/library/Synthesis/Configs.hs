@@ -7,6 +7,7 @@ import Data.Semigroup ((<>))
 generationConfig :: Parser GenerationConfig
 generationConfig = GenerationConfig
     <$> genTaskPathOpt
+    <*> jsonLinesPathOpt
     <*> crashOnErrorOpt
     <*> seedOpt
     <*> nestLimitOpt
@@ -143,6 +144,13 @@ genTaskPathOpt = strOption
     <> value "./run-results/datasets.yml"
     <> showDefault
     <> help "the file path at which to store generated datasets" )
+
+jsonLinesPathOpt = strOption
+    ( long "jsonLinesPath"
+    <> short 'j'
+    <> value "./run-results/ios.jsonl"
+    <> showDefault
+    <> help "the file path at which to temporarily store generated ios" )
 
 crashOnErrorOpt = switch
     ( long "crashOnError"

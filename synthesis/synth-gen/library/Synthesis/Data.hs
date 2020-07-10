@@ -46,6 +46,7 @@ data TaskFnDataset = TaskFnDataset
 
 data GenerationConfig = GenerationConfig
     { taskPath :: String
+    , jsonLinesPath :: String
     , crashOnError :: Bool
     , seed :: Int
     -- type generation
