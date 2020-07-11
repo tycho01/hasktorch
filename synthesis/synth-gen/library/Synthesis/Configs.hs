@@ -214,7 +214,7 @@ listMinOpt = option auto
     <> showDefault
     <> help "the minimum number of elements to generate for list types" )
 
-listMaxDef :: Int = 5
+listMaxDef :: Int = 3
 listMaxOpt = option auto
     ( long "listMax"
     <> value listMaxDef
