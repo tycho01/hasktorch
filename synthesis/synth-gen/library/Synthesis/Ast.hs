@@ -86,7 +86,7 @@ genInputs :: RandomGen g => g -> (Integer, Integer) -> (Char, Char) -> (Int, Int
 genInputs g intRange charRange listLengths n tp = nubPp . take n $ exprs
   where
     f = genInputs g intRange charRange listLengths
-    msg = "cannot generate from unknown type!"
+    msg = "cannot generate from unknown type: " <> pp tp
     lengths :: [Int] = randomRs listLengths g
     genList :: Tp -> [Expr] = \typ -> (\n_ -> list $ f n_ typ) <$> lengths
     genTpl2 :: Tp -> Tp -> [Expr] = \ a b -> (\(x,y) -> tuple [x,y]) <$> f n a `zip` f n b
