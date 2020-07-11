@@ -93,14 +93,17 @@ main = do
         say_ "\ninput_types:"
         notice_ $ pp_ input_types
         -- split the input types for our programs into functions vs other -- then instantiate others.
+        let typesByArity_ :: HashMap Int [Tp] = fmap parseType <$> typesByArity
         let fns_rest :: ([Tp], [Tp]) = partition isFn input_types
-        let mapRest :: [Tp] -> Interpreter [Tp] = concat <.> mapM (instantiateTypes typesByArity fill_types)
+        let mapRest :: [Tp] -> Interpreter [Tp] = concat <.> mapM (instantiateTypes typesByArity_ fill_types)
         (param_fn_types, rest_type_instantiations) :: ([Tp], [Tp]) <- interpretUnsafe $ secondM (nubPp <.> mapRest) $ first nubPp fns_rest
         say_ "\nparam_fn_types:"
         notice_ $ pp_ param_fn_types
         say_ "\nrest_type_instantiations:"
         notice_ $ pp_ rest_type_instantiations
-        task_instantiations :: [[Tp]] <- interpretUnsafe $ instantiateTypes typesByArity fill_types `mapM` task_types
+        task_instantiations :: [[Tp]] <- interpretUnsafe $ instantiateTypes typesByArity_ fill_types `mapM` task_types
+        say_ "\ntask_instantiations:"
+        notice_ $ pp_ task_instantiations
         -- for each function type, a list of type instantiations
         let type_fn_instantiations :: HashMap Tp [Tp] = fromList $ zip task_types task_instantiations
         say_ "\ntype_fn_instantiations:"
