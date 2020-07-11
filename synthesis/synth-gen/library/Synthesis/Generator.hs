@@ -67,7 +67,24 @@ main = do
 
     say_ "\ngenerating task functions:"
     block_fn_types :: HashMap String Tp <- interpretUnsafe $ mapM exprType blockAsts
+    say_ "\nblock_fn_types:"
+    notice_ $ pp_ block_fn_types
+    -- Hint-based `exprType` approach fails here for exprs with type-ambiguous variables e.g. `show undefined`, even if type-annotated. typing this does work in GHCI so I should probably swap Hint out for the compiler API...
+    let unaliasedBlockTypes :: HashMap String Tp = asPairs (first (pp . (safeIndexHM blockAsts))) block_fn_types
+    say_ "\nunaliasedBlockTypes:"
+    notice_ $ pp_ unaliasedBlockTypes
+    let unaliasedVariants :: [(String, Expr)] = genBlockVariants unaliasedBlockTypes
+    say_ "\nunaliasedVariants:"
+    notice_ $ pp_ unaliasedVariants
+    variantTypes :: [Tp] <- (tryType . snd) `mapM` unaliasedVariants
+    say_ "\nvariantTypes:"
+    notice_ $ pp_ variantTypes
+    let ruleCharMap :: HashMap Char Int = indexChars $ pp <$> variantTypes
+    say_ "\nruleCharMap:"
+    notice_ $ show ruleCharMap
     let variants :: [(String, Expr)] = genBlockVariants block_fn_types
+    say_ "\nvariants:"
+    notice_ $ pp_ variants
     let dsl :: HashMap String Expr = filterWithKey (\k v -> k /= pp v) blockAsts
     programs :: [Expr] <- interpretUnsafe $ genFns maxHoles variants dsl
     say_ "\nprograms:"
@@ -161,8 +178,8 @@ main = do
     let kept_fns = take maxDataset shuffled
     say_ "\nkept_fns:"
     notice_ $ pp_ kept_fns
-    let fn_types_ = pickKeys kept_fns fn_types
-    let fn_type_ios_ = HM.filter (not . null) <$> pickKeys kept_fns fn_type_ios
+    let fn_types_ = pickKeysByPp kept_fns fn_types
+    let fn_type_ios_ = HM.filter (not . null) <$> pickKeysByPp kept_fns fn_type_ios
 
     let tp_pairs :: [(Tp, Tp)] = join . elems $ keys <$> fn_type_ios
     let longest_tp_string :: Int =
@@ -177,11 +194,6 @@ main = do
 
     let longest_string :: Int = max longest_expr_string longest_tp_string
     let bothCharMap :: HashMap Char Int = mkCharMap $ elems fn_type_ios_
-    -- Hint-based `exprType` approach fails here for exprs with type-ambiguous variables e.g. `show undefined`, even if type-annotated. typing this does work in GHCI so I should probably swap Hint out for the compiler API...
-    let unaliasedBlockTypes :: HashMap String Tp = asPairs (first (pp . (blockAsts !))) block_fn_types
-    let unaliasedVariants :: [(String, Expr)] = genBlockVariants unaliasedBlockTypes
-    variantTypes :: [Tp] <- (tryType . snd) `mapM` unaliasedVariants
-    let ruleCharMap :: HashMap Char Int = indexChars $ pp <$> variantTypes
     let datasets :: ([Expr], [Expr], [Expr]) = randomSplit gen split kept_fns
 
     -- save task function data
