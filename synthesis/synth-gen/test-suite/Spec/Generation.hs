@@ -42,7 +42,7 @@ gen = parallel $ let
         bl = tyCon "Bool"
         int_ = tyCon "Int"
         tp = tyFun bl bl
-        types_by_arity = insert 1 ["[]"] (singleton 0 ["Bool", "Int"])
+        types_by_arity = insert 1 [tyCon "[]"] (singleton 0 [bl, int_])
     in do
 
     it "fnOutputs" $ do
@@ -73,12 +73,12 @@ gen = parallel $ let
 
     it "instantiateTypes" $ do
         let lst_ = tyCon "[]"
+        let a = tyVar "a"
         -- a => Set a
         let set_ s = tyApp (tyCon "Set") $ tyCon s
         l1 <- interpretUnsafe $ instantiateTypes types_by_arity (singleton 0 [bl, int_]) (tyApp (tyCon "Set") $ tyVar "b")
         (pp <$> l1) `shouldContain` (pp <$> [set_ "Bool", set_ "Int"])
         -- Num a => a -> a -> a
-        let a = tyVar "a"
         l2 <- interpretUnsafe $ instantiateTypes types_by_arity (singleton 0 [bl, int_]) (tyForall Nothing (Just $ cxTuple [typeA "Num" a]) $ tyFun a $ tyFun a a)
         (pp <$> l2) `shouldBe` (pp <$> [tyFun int_ $ tyFun int_ int_])
         -- Ord a => [a] -> [a]
@@ -91,6 +91,11 @@ gen = parallel $ let
         let t = tyVar "t"
         l5 <- interpretUnsafe $ instantiateTypes types_by_arity (insert 1 [lst_] $ singleton 0 [bl, int_]) (tyForall Nothing (Just $ cxTuple [typeA "Foldable" t]) $ tyFun (tyApp t a) bl)
         (pp <$> l5) `shouldBe` (pp <$> [tyFun (tyApp lst_ bl) bl, tyFun (tyApp lst_ int_) bl])
+        -- a -> Maybe a
+        let tp = tyFun a (tyApp (tyCon "Maybe") a)
+        let tps = insert 2 [tyCon "Either", tyCon "(,)"] $ insert 1 [lst_, tyCon "Maybe"] $ singleton 0 (parseType <$> ["[] Int", "(,) Int Int", "Either Char Char", "Maybe Char"])
+        l6 <- interpretUnsafe $ instantiateTypes types_by_arity tps tp
+        (pp <$> l6) `shouldNotBe` (pp <$> ([] :: [Tp]))
 
     it "instantiateTypeVars" $ do
         let lst_ = tyCon "[]"
