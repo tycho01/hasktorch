@@ -15,7 +15,7 @@ import Data.Text (Text)
 import qualified Data.ByteString as BS
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (toStrict, fromStrict)
-import Data.Bifunctor (first)
+import Data.Bifunctor (first, bimap)
 import Data.HashMap.Lazy
   ( (!),
     HashMap,
@@ -133,6 +133,7 @@ main = do
         pb <- newProgressBar pgStyle 1 (Progress 0 (size fn_type_instantiations) "generator")
         writeFile jsonLinesPath ""
         forM_ (toList fn_type_instantiations) $ \(fn, type_instantiations) -> do
+            notice_ $ "loop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
             (`finally` incProgress pb 1) . join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) <.> interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
 
     fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList . fmap (fromJust . Aeson.decode . fromStrict . pack) . init . lines <$> readFile jsonLinesPath
