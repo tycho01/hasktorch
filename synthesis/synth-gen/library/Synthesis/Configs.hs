@@ -20,6 +20,7 @@ generationConfig = GenerationConfig
     <*> charMaxOpt
     <*> listMinOpt
     <*> listMaxOpt
+    <*> maxInstantiationsOpt
     <*> trainOpt
     <*> validationOpt
     <*> testOpt
@@ -220,6 +221,13 @@ listMaxOpt = option auto
     <> value listMaxDef
     <> showDefault
     <> help "the maximum number of elements to generate for list types" )
+
+maxInstantiationsDef :: Int = 4
+maxInstantiationsOpt = option auto
+    ( long "maxInstantiations"
+    <> value maxInstantiationsDef
+    <> showDefault
+    <> help "the maximum number of type instantiations to sample for any given function" )
 
 trainDef :: Double = 0.35
 trainOpt = option auto

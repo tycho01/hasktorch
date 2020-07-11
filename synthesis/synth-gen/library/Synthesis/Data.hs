@@ -63,6 +63,7 @@ data GenerationConfig = GenerationConfig
     , listMin :: Int
     , listMax :: Int
     -- dataset generation
+    , maxInstantiations :: Int
     , training :: Double
     , validation :: Double
     , test :: Double
