@@ -8,7 +8,7 @@ import Data.Bifoldable (biList)
 import Data.List (replicate, intercalate, maximumBy, minimumBy)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (Bifunctor, bimap, first)
-import Data.HashMap.Lazy ((!), HashMap, fromList, toList, member)
+import Data.HashMap.Lazy ((!), HashMap, fromList, toList, member, elems)
 import qualified Data.HashMap.Lazy as HM
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -100,8 +100,12 @@ pp_ :: PP.Pretty a => a -> String
 pp_ = show . PP.pretty
 
 -- | pick some keys from a hashmap
-pickKeys :: (Hashable k, Eq k) => [k] -> HashMap k v -> HashMap k v
-pickKeys ks hashmap = fromKeys (hashmap !) ks
+pickKeys :: (Hashable k, Eq k, Show k) => [k] -> HashMap k v -> HashMap k v
+pickKeys ks hashmap = fromKeys (safeIndexHM hashmap) ks
+
+-- | pick some keys from a hashmap by printing them
+pickKeysByPp :: (Hashable k, Eq k, Pretty k) => [k] -> HashMap k v -> HashMap k v
+pickKeysByPp ks = fromList . elems . pickKeys (pp <$> ks) . asPairs (\(k,v) -> (pp k, (k,v)))
 
 -- | pick some keys from a hashmap
 pickKeysSafe :: (Hashable k, Eq k) => [k] -> HashMap k v -> HashMap k v
