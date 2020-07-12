@@ -51,7 +51,7 @@ import Synthesizer.GridSearch hiding (main)
 clamp' :: Ord a => a -> a -> a -> a
 clamp' lo hi = Prelude.max lo . Prelude.min hi
 
-class Variable variable a where
+class (Show a) => Variable variable a where
     genRand :: Int -> variable -> a
     mutate  :: Int -> variable -> a -> a
 
