@@ -5,7 +5,7 @@
 {-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Spec.Synthesizer.Types (module Spec.Synthesizer.Types) where
+module Spec.Types (module Spec.Types) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
 import           Test.Tasty.Hspec
