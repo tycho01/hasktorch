@@ -158,7 +158,7 @@ calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs vari
             fill = \(ppt, golds, predictions, filled) -> do
                     --  :: Tensor device 'D.Float '[num_holes, rules]
                     let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt io_feats
-                    debug_ $ "predicted: " <> show (shape' predicted)
+                    debug $ "predicted: " <> show (shape' predicted)
                     predicted' <- if not maskBad then pure predicted else do
                         --  :: Tensor device 'D.Float '[num_holes, rules]
                         mask <-
@@ -166,9 +166,9 @@ calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs vari
                             (\(hole_getter, hole_setter) -> mapM (fitExpr . hole_setter ppt . snd) variants)
                             `mapM` findHolesExpr ppt
                         return . Torch.Typed.Tensor.toDevice @device . asUntyped (F.mul $ toDynamic mask) $ predicted
-                    debug_ $ "predicted': " <> show (shape' predicted')
+                    debug $ "predicted': " <> show (shape' predicted')
                     (ppt', gold) <- liftIO $ fillHoleTrain variantMap ruleIdxs task_fn ppt predicted'
-                    debug_ $ "ppt': " <> pp ppt'
+                    debug $ "ppt': " <> pp ppt'
                     return (ppt', toDynamic gold : golds, toDynamic predicted' : predictions, filled + 1)
             in while (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
     let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
