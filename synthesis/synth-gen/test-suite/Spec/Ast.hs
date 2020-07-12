@@ -65,9 +65,9 @@ ast = parallel $ let
         let listLengths = (listMin, listMax)
         -- Bool
         pp <$> (genInputs stdGen intRange charRange listLengths 10 bl) `shouldContain` ["True"]
-        -- [Bool]
-        let lists = genInputs stdGen intRange charRange listLengths 10 $ tyList bl
-        (length . nubPp . concat . fmap unList) lists `shouldBe` 2
+        -- -- [Bool]
+        -- let lists = genInputs stdGen intRange charRange listLengths 10 $ tyList bl
+        -- (length . nubPp . concat . fmap unList) lists `shouldBe` 2
 
     it "genHoledVariants" $ do
         let tp = parseType "Int -> String -> Tp"
