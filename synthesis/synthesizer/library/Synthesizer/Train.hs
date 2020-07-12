@@ -13,7 +13,7 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 module Synthesizer.Train (module Synthesizer.Train) where
@@ -236,7 +236,7 @@ train synthesizerConfig taskFnDataset init_model = do
             -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
             let model' :: synthesizer = A.replaceParameters model newParam
-            incProgress pb 1
+            liftIO $ incProgress pb 1
             return (toDynamic loss : train_losses, model', optim', gen'')
 
         debug "finished epoch training"
