@@ -58,14 +58,14 @@ class (Show a) => Variable variable a where
 -- a list of categorical options
 data Categorical a where
     Categorical :: [a] -> Categorical a
-instance Variable (Categorical a) a where
+instance (Show a) => Variable (Categorical a) a where
     genRand seed (Categorical opts) = pickG seed opts
     mutate seed (Categorical opts) _v = pickG seed opts
 
 -- a list of options presumed to be ordinal, unique and sorted, so mutate only one step at a time
 data Ordinal a where
     Ordinal :: (Eq a, Hashable a) => [a] -> Ordinal a
-instance Variable (Ordinal a) a where
+instance (Show a) => Variable (Ordinal a) a where
     genRand seed (Ordinal opts) = pickG seed opts
     mutate seed (Ordinal opts) v = opts !! i'' where
         g = mkStdGen seed
@@ -78,7 +78,7 @@ instance Variable (Ordinal a) a where
 -- a variable that may take on any value within a bounded discrete range
 data Discrete a where
     Discrete :: (Ord a, Random a, Num a, Real a, Integral a) => (a, a) -> a -> Discrete a
-instance (Num a) => Variable (Discrete a) a where
+instance (Show a, Num a) => Variable (Discrete a) a where
     genRand seed (Discrete rng _base) = fst . randomR rng $ mkStdGen seed
     -- discrete/continuous are more granular; my simple approach here fixes how strongly to mutate this variable, but a better approach involges simultaneously evolving this, see e.g. http://hackage.haskell.org/package/cmaes
     -- under expensive evaluation this seems better for bayesian optimization than for evolutionary algorithms
@@ -91,7 +91,7 @@ instance (Num a) => Variable (Discrete a) a where
 -- `base` param indicates the maximum amount to multiply the variable by in a mutation
 data Continuous a where
     Continuous :: (Ord a, Random a, Fractional a, Floating a) => (a, a) -> a -> Continuous a
-instance (Fractional a) => Variable (Continuous a) a where
+instance (Show a, Fractional a) => Variable (Continuous a) a where
     genRand seed (Continuous rng _base) = fst . randomR rng $ mkStdGen seed
     mutate  seed (Continuous (lo, hi) base) v = v' where
         g = mkStdGen seed
