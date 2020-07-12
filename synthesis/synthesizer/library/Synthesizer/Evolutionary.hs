@@ -71,7 +71,7 @@ instance Variable (Ordinal a) a where
         g = mkStdGen seed
         index = indexList opts
         (bl, g') = random g
-        i = index ! v
+        i = safeIndexHM index v
         i' = (if bl then succ else pred) i
         i'' = clamp' 0 (length opts) i'
 
@@ -169,7 +169,7 @@ evolutionary = do
                 getRules @device @1 @0 cfg taskFnDataset hparCombs
     let hparMap :: HashMap HparComb (IO (EvalResult, IO ())) = fromList hparCombs'
     hparMap'    :: HashMap HparComb (IO (EvalResult, IO ())) <- once `mapM` hparMap
-    let getIO :: HparComb -> IO (EvalResult, IO ()) = (hparMap' !)
+    let getIO :: HparComb -> IO (EvalResult, IO ()) = safeIndexHM hparMap'
     let gaCfg = GAConfig 
             (ceiling . sqrt        . fromIntegral $ len) -- population size
             (ceiling . sqrt . sqrt . fromIntegral $ len) -- archive size (best entities to keep track of)
