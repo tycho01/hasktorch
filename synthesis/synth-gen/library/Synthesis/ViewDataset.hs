@@ -29,6 +29,9 @@ main = do
     let (train_set, validation_set, test_set) = datasets
     say_ $ show generationCfg
     -- say_ $ show taskFnDataset
+    let set_list = untuple3 datasets
+    forM_ (zip ["train", "validation", "test"] set_list) $ \(k, dataset) -> do
+        say_ $ k <> ": " <> show (length dataset)
     printTaskFns taskFnDataset train_set
 
 -- | print info on task functions
@@ -40,4 +43,4 @@ printTaskFns TaskFnDataset{..} train_set = do
         say_ "================================================"
         say_ $ "\n" ++ pp_ (expTypeSig (letRes ast) fn_type)
         let tp_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = fnTypeIOs ! ast
-        say_ $ pp_ tp_ios
+        notice_ $ pp_ tp_ios
