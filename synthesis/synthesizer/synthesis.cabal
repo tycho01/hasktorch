@@ -57,6 +57,7 @@ common synth
                     , ghc-typelits-knownnat
                     , ghc-typelits-natnormalise
                     , GA
+                    , synth-gen
 
 library
   import: config, synth
