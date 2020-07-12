@@ -20,7 +20,7 @@ import Data.HashMap.Lazy
     member,
   )
 import qualified Data.HashMap.Lazy as HM
-import Data.List (minimumBy, partition, nubBy)
+import Data.List (minimumBy, partition, nubBy, sort)
 import Data.Ord (Ordering (..))
 import Data.Set (Set, insert, delete, notMember, isProperSubsetOf)
 import Data.Bifunctor (first)
@@ -245,4 +245,4 @@ mkCharMap tps_ios = indexChars $ exprStrs <> tpStrs
     tpStrs   :: [String] = (\(i,o) -> pp i <> pp  o) <$> (join        $ keys  <$> tps_ios)
 
 indexChars :: [String] -> HashMap Char Int
-indexChars = indexList . Set.toList . flip (foldr Set.insert) "\\\"()" . Set.fromList . join
+indexChars = indexList . sort . Set.toList . flip (foldr Set.insert) "\\\"()" . Set.fromList . join
