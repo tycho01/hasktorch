@@ -833,7 +833,7 @@ ruleCharMap:
   '8': 48
   '9': 49
   '0': 50
-  '\n': 51
+  "\n": 51
 bothCharMap:
   ',': 5
   L: 25
@@ -887,7 +887,7 @@ bothCharMap:
   'y': 51
   ): 4
   I: 23
-  '\n': 52
+  "\n": 52
 dsl:
   length:
     expr: length
