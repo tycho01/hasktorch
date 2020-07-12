@@ -46,7 +46,7 @@ import Synthesis.Configs
 import Synthesis.Utility
 import Synthesis.Hint
 import Synthesizer.Utility
-import Synthesis.GridSearch hiding (main)
+import Synthesizer.GridSearch hiding (main)
 
 clamp' :: Ord a => a -> a -> a -> a
 clamp' lo hi = Prelude.max lo . Prelude.min hi
