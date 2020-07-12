@@ -16,7 +16,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 
-module Synthesis.Evolutionary (module Synthesis.Evolutionary) where
+module Synthesizer.Evolutionary (module Synthesizer.Evolutionary) where
 
 import           System.Random
 import           System.IO.Memoize

@@ -8,7 +8,7 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 -- | synthesizer logic
-module Synthesis.Synthesize (module Synthesis.Synthesize) where
+module Synthesizer.Synthesize (module Synthesizer.Synthesize) where
 
 import System.Log.Logger
 import GHC.TypeNats (type (+))
