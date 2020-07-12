@@ -225,22 +225,22 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = do
     let holeTypes :: [Tp] = holeType . (\gtr -> gtr ppt) <$> getters
     debug_ $ "holeTypes: " <> pp_ holeTypes
     holeTypeEmb :: Tensor device 'D.Float '[num_holes, maxStringLength * m] <-
-        typeEncoder @num_holes @maxStringLength @maxChar @device @m holeEncoder holeTypes
+            typeEncoder @num_holes @maxStringLength @maxChar @device @m holeEncoder holeTypes
     -- | expansion score z_e=ϕ′(e.l)⋅ω(e.r), for expansion e, expansion type e.r (for rule r∈R), leaf node e.l
     let useTypes = natValI @featMult > 1
     let scores :: Tensor device 'D.Float '[num_holes, rules] =
-        if useTypes then matmul (cat @1
-                (  node_embs'
-                :. holeTypeEmb
-                :. HNil
-                ))
-            . Torch.Typed.Tensor.toDevice . transpose @0 @1 $
-            cat @1
-                ( (Torch.Typed.Tensor.toDevice @device . Torch.Typed.Parameter.toDependent $ rule_emb)
-                :. rule_tp_emb
-                :. HNil
-                )
-        else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
+            if useTypes then matmul (cat @1
+                    (  node_embs'
+                    :. holeTypeEmb
+                    :. HNil
+                    ))
+                . Torch.Typed.Tensor.toDevice . transpose @0 @1 $
+                cat @1
+                    ( (Torch.Typed.Tensor.toDevice @device . Torch.Typed.Parameter.toDependent $ rule_emb)
+                    :. rule_tp_emb
+                    :. HNil
+                    )
+            else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
     return scores
     -- delay softmax for log-sum-exp trick (crossEntropy)
 
