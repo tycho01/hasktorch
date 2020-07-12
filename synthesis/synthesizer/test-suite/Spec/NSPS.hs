@@ -5,7 +5,7 @@
 {-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Spec.Synthesizer.NSPS (module Spec.Synthesizer.NSPS) where
+module Spec.NSPS (module Spec.NSPS) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
 import           Test.Tasty.Hspec
@@ -63,7 +63,7 @@ import           Synthesizer.NSPS
 import           Synthesizer.Train
 import           Synthesizer.Params
 import           Synthesizer.Synthesizer
-import           Spec.Synthesizer.Types
+import           Spec.Types
 
 type Device = Cpu
 
