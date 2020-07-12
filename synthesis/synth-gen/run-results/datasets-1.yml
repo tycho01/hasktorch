@@ -728,6 +728,7 @@ generationCfg:
   numMax: 20
   taskPath: ./run-results/datasets-1.yml
   training: 0.35
+  maxInstantiations: 4
   listMin: 0
   numInputs: 10
   validation: 0.35
