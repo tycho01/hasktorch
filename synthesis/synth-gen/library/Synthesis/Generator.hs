@@ -80,7 +80,7 @@ main = do
     say_ "\nvariantTypes:"
     notice_ $ pp_ variantTypes
     -- characters used in types: adding digits which may be added in type variables of synthesized functions
-    let ruleCharMap :: HashMap Char Int = indexChars $ (pp <$> variantTypes) : "1234567890"
+    let ruleCharMap :: HashMap Char Int = indexChars $ (:) "1234567890" $ pp <$> variantTypes
     say_ "\nruleCharMap:"
     notice_ $ show ruleCharMap
     let variants :: [(String, Expr)] = genBlockVariants block_fn_types
