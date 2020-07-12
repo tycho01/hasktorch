@@ -14,7 +14,7 @@
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 -- | grid-search logic
-module Synthesis.GridSearch (module Synthesis.GridSearch) where
+module Synthesizer.GridSearch (module Synthesizer.GridSearch) where
 
 import           System.Log.Logger
 import           System.ProgressBar
