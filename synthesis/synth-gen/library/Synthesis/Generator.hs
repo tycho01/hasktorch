@@ -79,8 +79,8 @@ main = do
     variantTypes :: [Tp] <- (tryType . snd) `mapM` unaliasedVariants
     say_ "\nvariantTypes:"
     notice_ $ pp_ variantTypes
-    -- characters used in types: adding digits which may be added in type variables of synthesized functions
-    let ruleCharMap :: HashMap Char Int = indexChars $ (:) "1234567890" $ pp <$> variantTypes
+    -- characters used in types: manually add stuff that may be added in types of synthesized functions
+    let ruleCharMap :: HashMap Char Int = indexChars $ (:) "1234567890\n" $ pp <$> variantTypes
     say_ "\nruleCharMap:"
     notice_ $ show ruleCharMap
     let variants :: [(String, Expr)] = genBlockVariants block_fn_types
