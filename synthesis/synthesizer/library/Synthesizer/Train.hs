@@ -80,24 +80,24 @@ import           Synthesizer.R3NN
 import           Synthesizer.Synthesizer
 import           Synthesizer.Params
 
--- | deterministically pick the most likely expansion to fill a hole in a PPT
--- | deprecated, not in use
--- TODO: replace this whole block with argmaxAll (argmax_t) returning non-flat index (like np.unravel_index)...
--- (hole_idx, rule_idx) :: (Int, Int) = unravelIdx . argmaxAll $ hole_expansion_probs
-argmaxExpansion :: forall num_holes rules device . Tensor device 'D.Float '[num_holes, rules] -> (Int, Int)
-argmaxExpansion hole_expansion_probs = (hole_idx, rule_idx) where
-    (hole_dim, rule_dim) :: (Int, Int) = (0, 1)
-    rule_idx_by_hole :: Tensor device 'D.Int64 '[num_holes] =
-            asUntyped (F.argmax (F.Dim rule_dim) F.RemoveDim) hole_expansion_probs
-    num_holes_ :: Int = shape' rule_idx_by_hole !! 0
-    best_prob_by_hole :: Tensor device 'D.Float '[num_holes] =
-            UnsafeMkTensor . D.reshape [num_holes_] $ I.gather  -- F.squeeze 1
-                (toDynamic hole_expansion_probs)
-                rule_dim
-                (toDynamic $ unsqueeze @1 rule_idx_by_hole)
-                False
-    hole_idx :: Int = D.asValue $ F.argmax (F.Dim 0) F.RemoveDim $ toDynamic best_prob_by_hole
-    rule_idx :: Int = D.asValue $ D.select (toDynamic rule_idx_by_hole) 0 hole_idx
+-- -- | deterministically pick the most likely expansion to fill a hole in a PPT
+-- -- | deprecated, not in use
+-- -- TODO: replace this whole block with argmaxAll (argmax_t) returning non-flat index (like np.unravel_index)...
+-- -- (hole_idx, rule_idx) :: (Int, Int) = unravelIdx . argmaxAll $ hole_expansion_probs
+-- argmaxExpansion :: forall num_holes rules device . Tensor device 'D.Float '[num_holes, rules] -> (Int, Int)
+-- argmaxExpansion hole_expansion_probs = (hole_idx, rule_idx) where
+--     (hole_dim, rule_dim) :: (Int, Int) = (0, 1)
+--     rule_idx_by_hole :: Tensor device 'D.Int64 '[num_holes] =
+--             asUntyped (F.argmax (F.Dim rule_dim) F.RemoveDim) hole_expansion_probs
+--     num_holes_ :: Int = shape' rule_idx_by_hole !! 0
+--     best_prob_by_hole :: Tensor device 'D.Float '[num_holes] =
+--             UnsafeMkTensor . D.reshape [num_holes_] $ I.gather  -- F.squeeze 1
+--                 (toDynamic hole_expansion_probs)
+--                 rule_dim
+--                 (toDynamic $ unsqueeze @1 rule_idx_by_hole)
+--                 False
+--     hole_idx :: Int = D.asValue $ F.argmax (F.Dim 0) F.RemoveDim $ toDynamic best_prob_by_hole
+--     rule_idx :: Int = D.asValue $ D.select (toDynamic rule_idx_by_hole) 0 hole_idx
 
 -- | fill a non-terminal leaf node in a PPT given hole/rule expansion probabilities
 predictHole :: forall num_holes rules device . [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
@@ -158,6 +158,7 @@ calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs vari
             fill = \(ppt, golds, predictions, filled) -> do
                     --  :: Tensor device 'D.Float '[num_holes, rules]
                     let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt io_feats
+                    debug_ $ "predicted: " <> show (shape' predicted)
                     predicted' <- if not maskBad then pure predicted else do
                         --  :: Tensor device 'D.Float '[num_holes, rules]
                         mask <-
@@ -165,13 +166,17 @@ calcLoss dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs vari
                             (\(hole_getter, hole_setter) -> mapM (fitExpr . hole_setter ppt . snd) variants)
                             `mapM` findHolesExpr ppt
                         return . Torch.Typed.Tensor.toDevice @device . asUntyped (F.mul $ toDynamic mask) $ predicted
+                    debug_ $ "predicted': " <> show (shape' predicted')
                     (ppt', gold) <- liftIO $ fillHoleTrain variantMap ruleIdxs task_fn ppt predicted'
-                    -- say_ $ "ppt': " <> pp ppt'
+                    debug_ $ "ppt': " <> pp ppt'
                     return (ppt', toDynamic gold : golds, toDynamic predicted' : predictions, filled + 1)
             in while (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
     let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
+    debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
     let hole_expansion_probs :: D.Tensor = F.cat (F.Dim 0) predictions
+    debug $ "hole_expansion_probs: " <> show (D.shape hole_expansion_probs)
     let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules @ruleFeats model variant_sizes $ UnsafeMkTensor $ crossEntropy gold_rule_probs rule_dim hole_expansion_probs
+    debug $ "loss: " <> show (shape' loss)
     return loss
 
 -- | pre-calculate DSL stuff
@@ -215,6 +220,10 @@ train synthesizerConfig taskFnDataset init_model = do
 
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
+    debug $ "variants: " <> pp_ variants
+    debug $ "variantMap: " <> pp_ variantMap
+    debug $ "symbolIdxs: " <> show symbolIdxs
+    debug $ "ruleIdxs: " <> show ruleIdxs
 
     -- MODELS
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
@@ -236,7 +245,9 @@ train synthesizerConfig taskFnDataset init_model = do
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
             let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
+            debug $ "io_feats: " <> show (shape' io_feats)
             loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
+            debug $ "loss: " <> show (shape' loss)
             -- TODO: do once for each mini-batch / fn?
             -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
