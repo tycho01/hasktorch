@@ -115,15 +115,8 @@ test-suite synthesis-test-suite
     , tasty-hspec
     , tasty-hunit
   other-modules:
-      Spec.Ast
-      Spec.FindHoles
-      Spec.Generation
-      Spec.Hint
-      Spec.Synthesizer.NSPS
-      Spec.Synthesizer.Optimization
-      Spec.Synthesizer.Types
-      Spec.Synthesizer.Utility
-      Spec.TypeGen
+      Spec.NSPS
+      Spec.Optimization
       Spec.Types
       Spec.Utility
       Paths_synthesizer
