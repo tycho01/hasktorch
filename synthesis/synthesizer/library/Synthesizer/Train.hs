@@ -13,6 +13,7 @@
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 module Synthesizer.Train (module Synthesizer.Train) where
@@ -22,6 +23,7 @@ import           System.Timeout                (timeout)
 import           System.Directory              (createDirectoryIfMissing)
 import           System.CPUTime
 import           System.ProgressBar
+import           Data.Text.Internal.Lazy (Text)
 import           Data.Foldable                 (foldrM)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
