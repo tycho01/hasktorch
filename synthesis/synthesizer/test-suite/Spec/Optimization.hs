@@ -63,7 +63,7 @@ import           Synthesizer.NSPS
 import           Synthesizer.Train
 
 import           Synthesizer.Params
-import           Synthesis.GridSearch
+import           Synthesizer.GridSearch
 import           Spec.Synthesizer.Types
 
 type Device = Cpu
