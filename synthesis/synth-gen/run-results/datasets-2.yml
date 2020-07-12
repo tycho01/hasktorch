@@ -1346,6 +1346,7 @@ ruleCharMap:
   '8': 48
   '9': 49
   '0': 50
+  '\n': 51
 bothCharMap:
   ',': 6
   L: 29
@@ -1410,6 +1411,7 @@ bothCharMap:
   'y': 59
   ): 5
   I: 27
+  '\n': 60
 dsl:
   length:
     expr: length
