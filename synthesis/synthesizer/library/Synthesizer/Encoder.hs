@@ -44,7 +44,7 @@ import           Torch.Typed.NN.Recurrent.LSTM
 
 import Synthesis.Orphanage ()
 import Synthesis.Data (Expr, Tp, Tpl2)
-import Synthesis.Utility (pp, mapBoth, asPairs)
+import Synthesis.Utility (pp, mapBoth, asPairs, safeIndexHM)
 import Synthesizer.Utility
 import Synthesizer.Params
 
