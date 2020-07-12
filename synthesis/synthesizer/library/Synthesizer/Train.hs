@@ -21,6 +21,7 @@ import           System.Random                 (StdGen, mkStdGen, setStdGen)
 import           System.Timeout                (timeout)
 import           System.Directory              (createDirectoryIfMissing)
 import           System.CPUTime
+import           System.ProgressBar
 import           Data.Foldable                 (foldrM)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
@@ -215,6 +216,7 @@ train synthesizerConfig taskFnDataset init_model = do
     (_, model, _, _, eval_results, _, _) <- foldLoop init_state numEpochs $ \ state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc) epoch -> if earlyStop then pure state else do
         notice $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
+        pb <- newProgressBar pgStyle 1 (Progress 0 (length train_set') ("task-fns" :: Text))
         start <- liftIO $ getCPUTime
         -- TRAIN LOOP
         (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
@@ -234,6 +236,7 @@ train synthesizerConfig taskFnDataset init_model = do
             -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
             let model' :: synthesizer = A.replaceParameters model newParam
+            incProgress pb 1
             return (toDynamic loss : train_losses, model', optim', gen'')
 
         debug "finished epoch training"
