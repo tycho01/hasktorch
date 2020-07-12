@@ -82,17 +82,17 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
     encode    :: synthesizer
                 -> StdGen
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-                -> (StdGen, Tensor device 'D.Float shape)
+                -> IO (StdGen, Tensor device 'D.Float shape)
     rule_encode :: synthesizer
                 -> [Tp]
-                -> Tensor device 'D.Float '[rules, ruleFeats]
+                -> IO (Tensor device 'D.Float '[rules, ruleFeats])
     predict   :: forall num_holes
                  . synthesizer
                 -> HashMap String Int
                 -> Expr
                 -> Tensor device 'D.Float '[rules, ruleFeats]
                 -> Tensor device 'D.Float shape
-                -> Tensor device 'D.Float '[num_holes, rules]
+                -> IO (Tensor device 'D.Float '[num_holes, rules])
     patchLoss ::   synthesizer
                 -> HashMap String Int
                 -> Tensor device 'D.Float '[]

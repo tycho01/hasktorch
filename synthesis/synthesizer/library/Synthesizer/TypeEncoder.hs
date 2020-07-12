@@ -44,6 +44,7 @@ import           Torch.Typed.NN.Recurrent.Aux
 import           Torch.Typed.NN.Recurrent.LSTM
 
 import Synthesis.Orphanage ()
+import Synthesis.Hint
 import Synthesis.Data (Expr, Tp, Tpl2)
 import Synthesis.Utility (pp, mapBoth, asPairs, safeIndexHM)
 import Synthesizer.Utility
@@ -85,20 +86,24 @@ typeEncoder
      . (KnownDevice device, KnownNat maxStringLength, KnownNat maxChar, KnownNat m, featTnsr ~ Tensor device 'D.Float '[1, maxStringLength, maxChar])
     => TypeEncoder device maxStringLength maxChar m
     -> [Tp]
-    -> Tensor device 'D.Float '[batch_size, maxStringLength * m]
-typeEncoder TypeEncoder{..} types = feat_vec where
-    maxStringLength_ :: Int = natValI @maxStringLength
-    max_char :: Int = natValI @maxChar
-    strs :: [String] = pp <$> types
-    str2tensor :: Int -> String -> featTnsr =
+    -> IO (Tensor device 'D.Float '[batch_size, maxStringLength * m])
+typeEncoder TypeEncoder{..} types = do
+    debug_ $ "typeEncoder"
+    let maxStringLength_ :: Int = natValI @maxStringLength
+    let max_char :: Int = natValI @maxChar
+    let strs :: [String] = pp <$> types
+    debug_ $ "strs: " <> show strs
+    let str2tensor :: Int -> String -> featTnsr =
         \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . flip I.one_hot max_char . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
-    vecs :: [featTnsr] = str2tensor maxStringLength_ <$> strs
-    mdl_vec :: Tensor device 'D.Float '[batch_size, maxStringLength, maxChar] =
+    let vecs :: [featTnsr] = str2tensor maxStringLength_ <$> strs
+    debug_ $ "vecs: " <> show (shape' vecs)
+    let mdl_vec :: Tensor device 'D.Float '[batch_size, maxStringLength, maxChar] =
             UnsafeMkTensor . stack' 0 $ toDynamic <$> vecs
-    emb_mdl :: Tensor device 'D.Float '[batch_size, maxStringLength, m] =
+    let emb_mdl :: Tensor device 'D.Float '[batch_size, maxStringLength, m] =
         -- asUntyped to type-check m*2/2
         asUntyped id .
         fstOf3 . lstmDynamicBatch @'BatchFirst dropoutOn ruleModel $ mdl_vec
             where dropoutOn = True
-    feat_vec :: Tensor device 'D.Float '[batch_size, maxStringLength * m] =
+    let feat_vec :: Tensor device 'D.Float '[batch_size, maxStringLength * m] =
             asUntyped (D.reshape [-1, natValI @maxStringLength * natValI @m]) $ emb_mdl
+    return feat_vec

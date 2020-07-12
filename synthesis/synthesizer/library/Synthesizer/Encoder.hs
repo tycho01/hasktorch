@@ -43,6 +43,7 @@ import           Torch.Typed.NN.Recurrent.Aux
 import           Torch.Typed.NN.Recurrent.LSTM
 
 import Synthesis.Orphanage ()
+import Synthesis.Hint
 import Synthesis.Data (Expr, Tp, Tpl2)
 import Synthesis.Utility (pp, mapBoth, asPairs, safeIndexHM)
 import Synthesizer.Utility
@@ -117,28 +118,31 @@ lstmEncoder
      . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat maxChar, KnownNat h, KnownNat featMult, featTnsr ~ Tensor device 'D.Float '[maxStringLength, maxChar])
     => LstmEncoder device maxStringLength batch_size maxChar h featMult
     -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-    -> Tensor device 'D.Float '[n', maxStringLength * (2 * featMult * Dirs * h)]
-lstmEncoder encoder tp_io_pairs = UnsafeMkTensor feat_vec where
-    LstmEncoder{..} = encoder
-    maxStringLength_ :: Int = natValI @maxStringLength
-    batch_size_ :: Int = natValI @batch_size
-    max_char :: Int = natValI @maxChar
+    -> IO (Tensor device 'D.Float '[n', maxStringLength * (2 * featMult * Dirs * h)])
+lstmEncoder encoder tp_io_pairs = do
+    debug_ $ "lstmEncoder"
+    let LstmEncoder{..} = encoder
+    let maxStringLength_ :: Int = natValI @maxStringLength
+    let batch_size_ :: Int = natValI @batch_size
+    let max_char :: Int = natValI @maxChar
 
     -- TODO: use tree encoding (R3NN) also for expressions instead of just converting to string
-    str_map :: HashMap (Tpl2 String) [(Tpl2 String)] =
+    let str_map :: HashMap (Tpl2 String) [(Tpl2 String)] =
             bimap (mapBoth pp) (fmap (bimap pp (show . second pp))) `asPairs` tp_io_pairs
+    debug_ $ "str_map: " <> show str_map
     -- convert char to one-hot encoding (byte -> 256 1/0s as float) as third lstm dimension
-    str2tensor :: Int -> String -> featTnsr =
+    let str2tensor :: Int -> String -> featTnsr =
             \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . (`I.one_hot` max_char) . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
 
-    both2t :: Tpl2 String -> Tpl2 featTnsr = mapBoth $ str2tensor maxStringLength_
-    useTypes = natValI @featMult > 1
-    addTypes :: (featTnsr, [featTnsr]) -> D.Tensor =
+    let both2t :: Tpl2 String -> Tpl2 featTnsr = mapBoth $ str2tensor maxStringLength_
+    let useTypes = natValI @featMult > 1
+    let addTypes :: (featTnsr, [featTnsr]) -> D.Tensor =
         \(tp, vecs) -> let sample_vec = stack' 0 (toDynamic <$> vecs) in if useTypes then F.cat (F.Dim 1) [sample_vec, repeatDim 0 (length vecs) (toDynamic tp)] else sample_vec
-    tp_ios :: [(Tpl2 featTnsr, [Tpl2 featTnsr])] = (bimap both2t $ fmap both2t) <$> toList str_map
-    vec_pairs :: [(D.Tensor, D.Tensor)] = (\((in_tp, out_tp), ios) -> let (ins, outs) = unzip ios in addTypes `mapBoth` ((in_tp, ins), (out_tp, outs))) <$> tp_ios
-    (in_vecs, out_vecs) :: (Tpl2 [Tensor device 'D.Float '[batch_size, featMult * maxStringLength, maxChar]]) =
+    let tp_ios :: [(Tpl2 featTnsr, [Tpl2 featTnsr])] = (bimap both2t $ fmap both2t) <$> toList str_map
+    let vec_pairs :: [(D.Tensor, D.Tensor)] = (\((in_tp, out_tp), ios) -> let (ins, outs) = unzip ios in addTypes `mapBoth` ((in_tp, ins), (out_tp, outs))) <$> tp_ios
+    let (in_vecs, out_vecs) :: (Tpl2 [Tensor device 'D.Float '[batch_size, featMult * maxStringLength, maxChar]]) =
             mapBoth (fmap UnsafeMkTensor . batchTensor batch_size_ . F.cat (F.Dim 0)) . unzip $ vec_pairs
-    feat_vecs :: [Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]] =
+    let feat_vecs :: [Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]] =
             uncurry (lstmBatch encoder) <$> zip in_vecs out_vecs
-    feat_vec :: D.Tensor = F.cat (F.Dim 0) $ toDynamic <$> feat_vecs
+    let feat_vec :: D.Tensor = F.cat (F.Dim 0) $ toDynamic <$> feat_vecs
+    return $ UnsafeMkTensor feat_vec

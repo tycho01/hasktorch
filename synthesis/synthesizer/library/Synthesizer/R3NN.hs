@@ -48,6 +48,7 @@ import Synthesis.Orphanage ()
 import Synthesis.Data (Expr, Tp)
 import Synthesis.Types (holeType)
 import Synthesis.FindHoles
+import Synthesis.Hint
 import Synthesis.Utility
 import Synthesizer.Utility
 import Synthesizer.UntypedMLP
@@ -191,41 +192,43 @@ runR3nn
     -> Expr
     -> Tensor device 'D.Float '[rules, maxStringLength * m]
     -> Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]
-    -- -> IO (Tensor device 'D.Float '[num_holes, rules])
-    -> Tensor device 'D.Float '[num_holes, rules]
--- runR3nn r3nn symbolIdxs ppt io_feats = do
-runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
-    R3NN{..} = r3nn
-    device = deviceVal @device
+    -> IO (Tensor device 'D.Float '[num_holes, rules])
+    -- -> Tensor device 'D.Float '[num_holes, rules]
+runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = do
+-- runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
+    debug_ $ "runR3nn"
+    let R3NN{..} = r3nn
+    let device = deviceVal @device
     -- | Pre-conditioning: example encodings are concatenated to the encoding of each tree leaf
-    io_feats' :: Tensor device 'D.Float '[batch_size * (maxStringLength * (2 * featMult * Dirs * h))] =
+    let io_feats' :: Tensor device 'D.Float '[batch_size * (maxStringLength * (2 * featMult * Dirs * h))] =
             -- reshape io_feats
             asUntyped (D.reshape [natValI @batch_size * (natValI @maxStringLength * (2 * natValI @featMult * natValI @Dirs * natValI @h))]) io_feats
-    conditioned :: Tensor device 'D.Float '[symbols, m + batch_size * maxStringLength * (2 * featMult * Dirs * h)] =
+    let conditioned :: Tensor device 'D.Float '[symbols, m + batch_size * maxStringLength * (2 * featMult * Dirs * h)] =
             UnsafeMkTensor $ F.cat (F.Dim 1) [(D.toDevice device . toDynamic . Torch.Typed.Parameter.toDependent $ symbol_emb), stacked_io]
             where stacked_io = repeatDim 0 (natValI @symbols) $ toDynamic io_feats'
     -- conditioning can use an MLP or (bidir) LSTM; LSTM learns more about the relative position of each leaf node in the tree.
-    conditioned' :: Tensor device 'D.Float '[symbols, m] = 
+    let conditioned' :: Tensor device 'D.Float '[symbols, m] = 
             -- asUntyped to type-check m*2/2
             asUntyped (\t -> I.squeezeDim t 0) .
             fstOf3 . lstmForwardWithDropout @'SequenceFirst condition_model . unsqueeze @0 $ conditioned
-    root_emb :: Tensor device 'D.Float '[1, m] = forwardPass @m r3nn symbolIdxs conditioned' ppt
-    node_embs :: Tensor device 'D.Float '[num_holes, m] = 
+    let root_emb :: Tensor device 'D.Float '[1, m] = forwardPass @m r3nn symbolIdxs conditioned' ppt
+    let node_embs :: Tensor device 'D.Float '[num_holes, m] = 
             UnsafeMkTensor $ F.cat (F.Dim 0) $ toDynamic <$> reversePass @m r3nn root_emb ppt
     -- | bidirectional LSTM to process the global leaf representations right before calculating the scores.
-    node_embs' :: Tensor device 'D.Float '[num_holes, m] =
+    let node_embs' :: Tensor device 'D.Float '[num_holes, m] =
             -- asUntyped to type-check m*2/2
             asUntyped (\t -> I.squeezeDim t 0) .
             fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn score_model . unsqueeze @0 $ node_embs
                     where dropoutOn = True
-    getters = fst <$> findHolesExpr ppt
+    let getters = fst <$> findHolesExpr ppt
     -- TODO: propagate constraints through to the hole types
-    holeTypes :: [Tp] = holeType . (\gtr -> gtr ppt) <$> getters
-    holeTypeEmb :: Tensor device 'D.Float '[num_holes, maxStringLength * m] =
+    let holeTypes :: [Tp] = holeType . (\gtr -> gtr ppt) <$> getters
+    debug_ $ "holeTypes: " <> pp_ holeTypes
+    holeTypeEmb :: Tensor device 'D.Float '[num_holes, maxStringLength * m] <-
         typeEncoder @num_holes @maxStringLength @maxChar @device @m holeEncoder holeTypes
     -- | expansion score z_e=ϕ′(e.l)⋅ω(e.r), for expansion e, expansion type e.r (for rule r∈R), leaf node e.l
-    useTypes = natValI @featMult > 1
-    scores :: Tensor device 'D.Float '[num_holes, rules] =
+    let useTypes = natValI @featMult > 1
+    let scores :: Tensor device 'D.Float '[num_holes, rules] =
         if useTypes then matmul (cat @1
                 (  node_embs'
                 :. holeTypeEmb
@@ -238,6 +241,7 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
                 :. HNil
                 )
         else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
+    return scores
     -- delay softmax for log-sum-exp trick (crossEntropy)
 
 variantInt :: Expr -> (String, Int)
