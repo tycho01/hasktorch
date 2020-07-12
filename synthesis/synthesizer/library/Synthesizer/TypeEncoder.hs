@@ -96,7 +96,7 @@ typeEncoder TypeEncoder{..} types = do
     let str2tensor :: Int -> String -> featTnsr =
             \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . flip I.one_hot max_char . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
     let vecs :: [featTnsr] = str2tensor maxStringLength_ <$> strs
-    debug_ $ "vecs: " <> show (shape' vecs)
+    debug_ $ "vecs: " <> show (shape' <$> vecs)
     let mdl_vec :: Tensor device 'D.Float '[batch_size, maxStringLength, maxChar] =
             UnsafeMkTensor . stack' 0 $ toDynamic <$> vecs
     let emb_mdl :: Tensor device 'D.Float '[batch_size, maxStringLength, m] =
