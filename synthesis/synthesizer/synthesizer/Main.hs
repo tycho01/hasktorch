@@ -2,7 +2,7 @@
 -- It is generally a good idea to keep all your business logic in your library
 -- and only use it in the executable. Doing so allows others to use what you
 -- wrote in their libraries.
-import qualified Synthesis.Synthesize
+import qualified Synthesizer.Synthesize
 
 main ∷ IO ()
-main = Synthesis.Synthesize.main
+main = Synthesizer.Synthesize.main
