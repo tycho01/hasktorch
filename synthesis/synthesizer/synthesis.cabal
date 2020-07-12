@@ -63,34 +63,20 @@ library
   hs-source-dirs:
       library
   exposed-modules:
-    --   Synthesis.Ast
-    --   Synthesis.Blocks
-    --   Synthesis.Configs
-    --   Synthesis.Data
-    --   Synthesis.Evolutionary
-    --   Synthesis.FindHoles
-    --   Synthesis.Generation
-    --   Synthesis.Generator
-    --   Synthesis.GridSearch
-    --   Synthesis.Hint
-    --   Synthesis.Orphanage
-    --   Synthesis.Synthesis
-    --   Synthesis.Synthesize
       Synthesizer
-    --   Synthesizer.Encoder
-    --   Synthesizer.NSPS
-    --   Synthesizer.Params
-    --   Synthesizer.R3NN
-    --   Synthesizer.Random
-    --   Synthesizer.Synthesizer
-    --   Synthesizer.Train
-    --   Synthesizer.TypeEncoder
-    --   Synthesizer.UntypedMLP
-    --   Synthesizer.Utility
-    --   Synthesis.TypeGen
-    --   Synthesis.Types
-    --   Synthesis.Utility
-    --   Synthesis.ViewDataset
+      Synthesizer.Evolutionary
+      Synthesizer.GridSearch
+      Synthesizer.Synthesize
+      Synthesizer.Encoder
+      Synthesizer.NSPS
+      Synthesizer.Params
+      Synthesizer.R3NN
+      Synthesizer.Random
+      Synthesizer.Synthesizer
+      Synthesizer.Train
+      Synthesizer.TypeEncoder
+      Synthesizer.UntypedMLP
+      Synthesizer.Utility
 
 executable evolutionary
   import: config, synth
