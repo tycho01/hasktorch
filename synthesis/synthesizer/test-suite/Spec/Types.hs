@@ -71,6 +71,7 @@ type EncoderBatch' = 1
 type R3nnBatch' = 1
 type FeatMultWithTypes = 2
 type FeatMultWithoutTypes = 1
+type RuleFeats = MaxStringLength * M
 
 numHoles     :: Int = natValI @NumHoles
 rules        :: Int = natValI @Rules

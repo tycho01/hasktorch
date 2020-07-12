@@ -99,7 +99,6 @@ data R3NN
         , symbol_emb :: Parameter device 'D.Float '[symbols, m]
         -- for each production rule r∈R, an M−dimensional representation: ω(r)∈R^M.
         , rule_emb   :: Parameter device 'D.Float '[rules  , m]
-        , holeEncoder :: TypeEncoder device maxStringLength maxChar m
         }
         -> R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
  deriving (Show, Generic)
@@ -143,8 +142,6 @@ instance ( KnownDevice device
             <*> (fmap UnsafeMkParameter . D.makeIndependent =<< D.randnIO' [symbols, m])
             -- rule_emb
             <*> (fmap UnsafeMkParameter . D.makeIndependent =<< D.randnIO' [rules,   m])
-            -- hole encoder
-            <*> A.sample holeEncoderSpec
             where
                 -- m must be divisible by Dirs for `Div` in the LSTM specs to work out due to integer division...
                 m = assertP ((== 0) . (`mod` natValI @Dirs)) $ natValI @m
@@ -188,12 +185,11 @@ runR3nn
     => R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
     -> HashMap String Int
     -> Expr
-    -> Tensor device 'D.Float '[rules, maxStringLength * m]
     -> Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]
     -- -> IO (Tensor device 'D.Float '[num_holes, rules])
     -> Tensor device 'D.Float '[num_holes, rules]
 -- runR3nn r3nn symbolIdxs ppt io_feats = do
-runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
+runR3nn r3nn symbolIdxs ppt io_feats = scores where
     R3NN{..} = r3nn
     device = deviceVal @device
     -- | Pre-conditioning: example encodings are concatenated to the encoding of each tree leaf
@@ -219,24 +215,10 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
                     where dropoutOn = True
     getters = fst <$> findHolesExpr ppt
     -- TODO: propagate constraints through to the hole types
-    holeTypes :: [Tp] = holeType . (\gtr -> gtr ppt) <$> getters
-    holeTypeEmb :: Tensor device 'D.Float '[num_holes, maxStringLength * m] =
-        typeEncoder @num_holes @maxStringLength @maxChar @device @m holeEncoder holeTypes
     -- | expansion score z_e=ϕ′(e.l)⋅ω(e.r), for expansion e, expansion type e.r (for rule r∈R), leaf node e.l
     useTypes = natValI @featMult > 1
     scores :: Tensor device 'D.Float '[num_holes, rules] =
-        if useTypes then matmul (cat @1
-                (  node_embs'
-                :. holeTypeEmb
-                :. HNil
-                ))
-            . Torch.Typed.Tensor.toDevice . transpose @0 @1 $
-            cat @1
-                ( (Torch.Typed.Tensor.toDevice @device . Torch.Typed.Parameter.toDependent $ rule_emb)
-                :. rule_tp_emb
-                :. HNil
-                )
-        else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
+            matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
     -- delay softmax for log-sum-exp trick (crossEntropy)
 
 variantInt :: Expr -> (String, Int)
