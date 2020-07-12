@@ -128,7 +128,7 @@ superviseHole variantMap num_holes task_fn ppt = do
     let hole_idx :: Int = toInt hole_idx'
     let (hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
-    let rule_expr :: Expr = (variantMap !) . nodeRule . hole_getter $ task_fn
+    let rule_expr :: Expr = safeIndexHM variantMap . nodeRule . hole_getter $ task_fn
     let ppt' :: Expr = hole_setter ppt rule_expr
     return ppt'
 
@@ -141,7 +141,7 @@ fillHoleTrain variantMap ruleIdxs task_fn ppt hole_expansion_probs = do
     ppt' :: Expr <- superviseHole @device variantMap num_holes task_fn ppt
     -- iterate over holes to get their intended expansion 'probabilities', used in calculating the loss
     let gold_rule_probs :: Tensor device 'D.Float '[num_holes] = UnsafeMkTensor . D.toDevice (deviceVal @device) . D.asTensor $ getGold . fst <$> findHolesExpr ppt
-            where getGold = \gtr -> (ruleIdxs !) . nodeRule . gtr $ task_fn
+            where getGold = \gtr -> safeIndexHM ruleIdxs . nodeRule . gtr $ task_fn
     return (ppt', gold_rule_probs)
 
 -- | calculate the loss by comparing the predicted expansions to the intended programs
@@ -223,10 +223,10 @@ train synthesizerConfig taskFnDataset init_model = do
         -- TRAIN LOOP
         (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
             info $ "task_fn: \n" <> pp task_fn
-            let taskType :: Tp = fnTypes ! task_fn
+            let taskType :: Tp = safeIndexHM fnTypes task_fn
             info $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
-                    fnTypeIOs ! task_fn
+                    safeIndexHM fnTypeIOs task_fn
             info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
@@ -302,12 +302,12 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
     debug "evaluate"
     (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \task_fn (gen_, eval_stats) -> do
 
-        let taskType :: Tp = fnTypes ! task_fn
+        let taskType :: Tp = safeIndexHM fnTypes task_fn
         debug $ "taskType: " <> pp taskType
-        let type_ins :: HashMap (Tp, Tp) [Expr] = task_type_ins ! task_fn
+        let type_ins :: HashMap (Tp, Tp) [Expr] = safeIndexHM task_type_ins task_fn
         debug $ "type_ins: " <> pp_ type_ins
-        let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = fnTypeIOs ! task_fn
-        let target_outputs :: [Either String Expr] = task_outputs ! task_fn
+        let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = safeIndexHM fnTypeIOs task_fn
+        let target_outputs :: [Either String Expr] = safeIndexHM task_outputs task_fn
 
         let (gen', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
         loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
