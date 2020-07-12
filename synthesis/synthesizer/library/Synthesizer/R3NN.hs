@@ -48,6 +48,7 @@ import Synthesis.Orphanage ()
 import Synthesis.Data (Expr, Tp)
 import Synthesis.Types (holeType)
 import Synthesis.FindHoles
+import Synthesis.Utility
 import Synthesizer.Utility
 import Synthesizer.UntypedMLP
 import Synthesizer.TypeEncoder
@@ -228,7 +229,7 @@ variantInt = (appRule &&& length) . fnAppNodes
 patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h maxChar featMult . (KnownNat m, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h maxChar featMult -> HashMap String Int -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
 patchR3nnLoss r3nn_model variant_sizes = let
         m :: Int = natValI @m
-        left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = variant_sizes ! k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
+        left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
         right_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\   mlp_  ->                              mlp mlp_ $ D.zeros' [1,  m]) $ elems  $ right_nnets r3nn_model
     in add $ Torch.Typed.Tensor.toDevice $ left_dummy `add` right_dummy
 
@@ -249,7 +250,7 @@ forwardPass r3nn symbolIdxs conditioned' expr = let
         ExpTypeSig _l xpr _tp -> f xpr
         Var _l qname -> let idx = case qname of
                                 UnQual _l name -> case name of
-                                    Ident _l str -> symbolIdxs ! str
+                                    Ident _l str -> safeIndexHM symbolIdxs str
                                     _ -> error $ "unexpected Name: " ++ show name
                                 _ -> error $ "unexpected QName: " ++ show qname
                             -- | for each leaf l∈L get its representation ϕ(S(l)).

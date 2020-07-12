@@ -45,7 +45,7 @@ import           Torch.Typed.NN.Recurrent.LSTM
 
 import Synthesis.Orphanage ()
 import Synthesis.Data (Expr, Tp, Tpl2)
-import Synthesis.Utility (pp, mapBoth, asPairs)
+import Synthesis.Utility (pp, mapBoth, asPairs, safeIndexHM)
 import Synthesizer.Utility
 import Synthesizer.Params
 import Synthesizer.Encoder
@@ -91,7 +91,7 @@ typeEncoder TypeEncoder{..} types = feat_vec where
     max_char :: Int = natValI @maxChar
     strs :: [String] = pp <$> types
     str2tensor :: Int -> String -> featTnsr =
-        \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . flip I.one_hot max_char . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . (!) charMap)
+        \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . flip I.one_hot max_char . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
     vecs :: [featTnsr] = str2tensor maxStringLength_ <$> strs
     mdl_vec :: Tensor device 'D.Float '[batch_size, maxStringLength, maxChar] =
             UnsafeMkTensor . stack' 0 $ toDynamic <$> vecs
