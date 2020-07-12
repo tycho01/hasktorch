@@ -227,5 +227,5 @@ pgStyle = defStyle {
               styleWidth = ConstantWidth 40
             , stylePrefix = exact
             , stylePostfix = Label (\ pg _ -> progressCustom pg)
-            -- , styleOnComplete = WriteNewline
+            , styleOnComplete = Clear
             }
