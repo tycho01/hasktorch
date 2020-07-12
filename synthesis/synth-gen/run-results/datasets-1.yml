@@ -718,6 +718,7 @@ generationCfg:
   seed: 69
   charMin: '0'
   crashOnError: true
+  jsonLinesPath: ./run-results/ios.jsonl
   verbosity: notice
   test: 0.3
   maxInstances: 10
