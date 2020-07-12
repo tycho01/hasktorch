@@ -127,7 +127,7 @@ parseEvolutionaryConfig = execParser opts
 
 viewDatasetConfig :: Parser ViewDatasetConfig
 viewDatasetConfig = ViewDatasetConfig
-    <$> taskPathOpt
+    <$> genTaskPathOpt
 
 parseViewDatasetConfig :: IO ViewDatasetConfig
 parseViewDatasetConfig = execParser opts
@@ -267,7 +267,7 @@ maxParamsOpt = option auto
 taskPathOpt = strOption
     ( long "taskPath"
     <> short 'f'
-    <> value "./run-results/datasets.yml"
+    <> value "../synth-gen/run-results/datasets.yml"
     <> showDefault
     <> help "the file path from which to load generated datasets" )
 
