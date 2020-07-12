@@ -126,10 +126,13 @@ superviseHole variantMap num_holes task_fn ppt = do
     -- technically holes closer to the root may go thru more rounds tho, creating more opportunities to randomly get picked
     hole_idx' :: Tensor device 'D.Int64 '[] <- randint 0 num_holes
     let hole_idx :: Int = toInt hole_idx'
+    debug_ $ "hole_idx: " <> show hole_idx
     let (hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
     let rule_expr :: Expr = safeIndexHM variantMap . nodeRule . hole_getter $ task_fn
+    debug_ $ "rule_expr: " <> pp rule_expr
     let ppt' :: Expr = hole_setter ppt rule_expr
+    debug_ $ "ppt': " <> pp ppt'
     return ppt'
 
 -- | supervise with task program to calculate the loss of the predicted hole/rule expansion probabilities for this PPT
@@ -138,7 +141,9 @@ fillHoleTrain variantMap ruleIdxs task_fn ppt hole_expansion_probs = do
     debug_ "fillHoleTrain"
     let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
     let [num_holes, _rules] :: [Int] = shape' hole_expansion_probs
+    debug_ $ "num_holes: " <> show num_holes
     ppt' :: Expr <- superviseHole @device variantMap num_holes task_fn ppt
+    debug_ $ "ppt': " <> pp ppt'
     -- iterate over holes to get their intended expansion 'probabilities', used in calculating the loss
     let gold_rule_probs :: Tensor device 'D.Float '[num_holes] = UnsafeMkTensor . D.toDevice (deviceVal @device) . D.asTensor $ getGold . fst <$> findHolesExpr ppt
             where getGold = \gtr -> safeIndexHM ruleIdxs . nodeRule . gtr $ task_fn
