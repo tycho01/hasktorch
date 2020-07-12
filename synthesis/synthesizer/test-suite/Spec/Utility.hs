@@ -5,7 +5,7 @@
 {-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Spec.Synthesizer.Utility (module Spec.Synthesizer.Utility) where
+module Spec.Utility (module Spec.Utility) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
 import           Test.Tasty.Hspec

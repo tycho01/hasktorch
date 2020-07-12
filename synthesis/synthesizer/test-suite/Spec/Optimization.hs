@@ -5,7 +5,7 @@
 {-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Spec.Synthesizer.Optimization (module Spec.Synthesizer.Optimization) where
+module Spec.Optimization (module Spec.Optimization) where
 
 import           Test.Tasty                   (TestTree, defaultMain, testGroup)
 import           Test.Tasty.Hspec
@@ -64,7 +64,7 @@ import           Synthesizer.Train
 
 import           Synthesizer.Params
 import           Synthesizer.GridSearch
-import           Spec.Synthesizer.Types
+import           Spec.Types
 
 type Device = Cpu
 
