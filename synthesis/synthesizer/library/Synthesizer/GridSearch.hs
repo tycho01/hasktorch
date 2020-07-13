@@ -128,14 +128,14 @@ getRules cfg taskFnDataset hparCombs = let
     useTypes = natValI @featMult > 1
     charMap = if useTypes then bothCharMap else exprCharMap
     in (:)
-        ((!! (size charMap + 1)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset hparCombs)
+        ((!! (size charMap + 2)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset hparCombs)
         $ getRules @device @featMult @(rules + 1) cfg taskFnDataset hparCombs
 
 getEncoderChars :: forall device featMult rules encoderChars . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat featMult, KnownNat rules, KnownNat encoderChars) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
 getEncoderChars cfg taskFnDataset hparCombs = let
     TaskFnDataset{..} = taskFnDataset
     in (:)
-        ((!! (size ruleCharMap)) $ getTypeEncoderChars @device @featMult @rules @encoderChars @0 cfg taskFnDataset hparCombs)
+        ((!! (size ruleCharMap + 2)) $ getTypeEncoderChars @device @featMult @rules @encoderChars @0 cfg taskFnDataset hparCombs)
         $ getEncoderChars @device @featMult @rules @(encoderChars + 1) cfg taskFnDataset hparCombs
 
 getTypeEncoderChars :: forall device featMult rules encoderChars typeEncoderChars . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
