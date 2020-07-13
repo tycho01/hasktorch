@@ -129,7 +129,7 @@ lstmEncoder encoder tp_io_pairs = UnsafeMkTensor feat_vec where
             bimap (mapBoth pp) (fmap (bimap pp (show . second pp))) `asPairs` tp_io_pairs
     -- convert char to one-hot encoding (byte -> 256 1/0s as float) as third lstm dimension
     str2tensor :: Int -> String -> featTnsr =
-            \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . (`I.one_hot` max_char) . D.asTensor . padRight 0 len . showTraceOf "indexed_str" . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
+            \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . (`I.one_hot` max_char) . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
 
     both2t :: Tpl2 String -> Tpl2 featTnsr = mapBoth $ str2tensor maxStringLength_
     useTypes = natValI @featMult > 1
