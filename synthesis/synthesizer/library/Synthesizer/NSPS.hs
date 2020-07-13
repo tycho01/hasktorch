@@ -159,3 +159,4 @@ instance ( KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat m, Kno
         encoder     <- A.sample encoderSpec
         r3nn        <- A.sample r3nnSpec
         return $ NSPS encoder r3nn
+
