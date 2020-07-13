@@ -19,7 +19,7 @@ import           Data.Either                  (fromRight, isRight)
 import           Data.Functor                 (void, (<&>))
 import           Data.Bifunctor               (first, second)
 import           Data.HashMap.Lazy            (HashMap, empty, insert, singleton, (!), keys, fromList)
-import qualified Data.Set
+import qualified Data.Set as Set
 import           System.Random                (StdGen, mkStdGen)
 import           System.Timeout               (timeout)
 import           Language.Haskell.Interpreter (as, interpret, liftIO, typeChecks, typeChecksWithDetails)
@@ -57,13 +57,13 @@ gen = parallel $ let
     it "fillHole" $ do
         let blockAsts' = singleton "not_" $ var "not"
         let expr = letIn blockAsts' $ expTypeSig holeExpr tp
-        lst <- interpretUnsafe (fillHole blockAsts' Data.Set.empty [("not_", var "not_")] expr) <&> snd
+        lst <- interpretUnsafe (fillHole blockAsts' Set.empty [("not_", var "not_")] expr) <&> snd
         (gtrExpr . fstOf3 <$> lst) `shouldContain` [var "not_"]
 
     it "fillHoles" $ do
         let blockAsts' = singleton "not_" $ var "not"
         let expr = expTypeSig holeExpr tp
-        lst <- interpretUnsafe $ fillHoles 1 blockAsts' Data.Set.empty [("not_", var "not_")] expr
+        lst <- interpretUnsafe $ fillHoles 1 blockAsts' Set.empty [("not_", var "not_")] expr
         (gtrExpr <$> lst) `shouldContain` [var "not_"]
 
     it "genFns" $ do
@@ -141,3 +141,7 @@ gen = parallel $ let
         let lst = tyCon "[]"
         z <- interpretUnsafe $ matchesConstraints 1 lst [tyCon "Foldable"]
         z `shouldBe` True
+
+    it "indexChars" $ do
+        let ruleCharMap :: HashMap Char Int = indexChars ["01", "2\n"]
+        ruleCharMap `shouldBe` fromList [('0',4),('1',5),('"',1),('2',6),('(',2),(')',3),('\n',0),('\\',7)]
