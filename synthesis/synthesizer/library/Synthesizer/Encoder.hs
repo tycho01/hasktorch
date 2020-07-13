@@ -53,27 +53,27 @@ data LstmEncoderSpec
     (device :: (D.DeviceType, Nat))
     (maxStringLength :: Nat)
     (batch_size :: Nat)
-    (maxChar :: Nat)
+    (numChars :: Nat)
     (h :: Nat)
     (featMult :: Nat)
  where LstmEncoderSpec :: {
         charMap :: HashMap Char Int,
-        lstmSpec :: LSTMSpec maxChar h NumLayers Dir 'D.Float device
-    } -> LstmEncoderSpec device maxStringLength batch_size maxChar h featMult
+        lstmSpec :: LSTMSpec numChars h NumLayers Dir 'D.Float device
+    } -> LstmEncoderSpec device maxStringLength batch_size numChars h featMult
  deriving (Show)
 
 data LstmEncoder
     (device :: (D.DeviceType, Nat))
     (maxStringLength :: Nat)
     (batch_size :: Nat)
-    (maxChar :: Nat)
+    (numChars :: Nat)
     (h :: Nat)
     (featMult :: Nat)
  where LstmEncoder :: {
     charMap :: HashMap Char Int,
-    inModel  :: LSTMWithInit maxChar h NumLayers Dir 'ConstantInitialization 'D.Float device,
-    outModel :: LSTMWithInit maxChar h NumLayers Dir 'ConstantInitialization 'D.Float device
-    } -> LstmEncoder device maxStringLength batch_size maxChar h featMult
+    inModel  :: LSTMWithInit numChars h NumLayers Dir 'ConstantInitialization 'D.Float device,
+    outModel :: LSTMWithInit numChars h NumLayers Dir 'ConstantInitialization 'D.Float device
+    } -> LstmEncoder device maxStringLength batch_size numChars h featMult
  deriving (Show, Generic)
 
 -- instance (Scalar a) => A.Parameterized a where
@@ -81,27 +81,27 @@ instance A.Parameterized Int where
   flattenParameters _ = []
   replaceOwnParameters = return
 
-instance A.Parameterized (LstmEncoder device maxStringLength batch_size maxChar h featMult)
+instance A.Parameterized (LstmEncoder device maxStringLength batch_size numChars h featMult)
 
-instance (KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat maxChar, KnownNat h) => A.Randomizable (LstmEncoderSpec device maxStringLength batch_size maxChar h featMult) (LstmEncoder device maxStringLength batch_size maxChar h featMult) where
+instance (KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat numChars, KnownNat h) => A.Randomizable (LstmEncoderSpec device maxStringLength batch_size numChars h featMult) (LstmEncoder device maxStringLength batch_size numChars h featMult) where
     sample LstmEncoderSpec {..} = do
-        in_model  :: LSTMWithInit maxChar h NumLayers Dir 'ConstantInitialization 'D.Float device <- A.sample spec
-        out_model :: LSTMWithInit maxChar h NumLayers Dir 'ConstantInitialization 'D.Float device <- A.sample spec
+        in_model  :: LSTMWithInit numChars h NumLayers Dir 'ConstantInitialization 'D.Float device <- A.sample spec
+        out_model :: LSTMWithInit numChars h NumLayers Dir 'ConstantInitialization 'D.Float device <- A.sample spec
         return $ LstmEncoder charMap in_model out_model
             -- TODO: consider LearnedInitialization
-            where spec :: LSTMWithInitSpec maxChar h NumLayers Dir 'ConstantInitialization 'D.Float device = LSTMWithZerosInitSpec lstmSpec
+            where spec :: LSTMWithInitSpec numChars h NumLayers Dir 'ConstantInitialization 'D.Float device = LSTMWithZerosInitSpec lstmSpec
 
--- instance (KnownDevice device, KnownNat batch_size, KnownNat n', KnownNat maxStringLength, KnownNat maxChar, KnownNat h, shape ~ '[n', maxStringLength * (2 * featMult * Dirs * h)])
---     => HasForward (LstmEncoder device maxStringLength batch_size maxChar h featMult) [(Expr, Either String Expr)] (Tensor device 'D.Float shape) where
+-- instance (KnownDevice device, KnownNat batch_size, KnownNat n', KnownNat maxStringLength, KnownNat numChars, KnownNat h, shape ~ '[n', maxStringLength * (2 * featMult * Dirs * h)])
+--     => HasForward (LstmEncoder device maxStringLength batch_size numChars h featMult) [(Expr, Either String Expr)] (Tensor device 'D.Float shape) where
 --         forward      = lstmEncoder
 --         -- forwardStoch = lstmEncoder
 
 lstmBatch
-    :: forall batch_size maxStringLength maxChar device h featMult
-     . (KnownNat batch_size, KnownNat maxStringLength, KnownNat maxChar, KnownNat h, KnownNat featMult)
-    => LstmEncoder device maxStringLength batch_size maxChar h featMult
-    -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, maxChar]
-    -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, maxChar]
+    :: forall batch_size maxStringLength numChars device h featMult
+     . (KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult)
+    => LstmEncoder device maxStringLength batch_size numChars h featMult
+    -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]
+    -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]
     -> Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]
 lstmBatch LstmEncoder{..} in_vec out_vec = feat_vec where
     lstm' = \model -> fstOf3 . lstmForwardWithDropout @'BatchFirst model
@@ -114,9 +114,9 @@ lstmBatch LstmEncoder{..} in_vec out_vec = feat_vec where
 
 -- | NSPS paper's Baseline LSTM encoder
 lstmEncoder
-    :: forall batch_size maxStringLength maxChar n' device h featTnsr featMult
-     . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat maxChar, KnownNat h, KnownNat featMult, featTnsr ~ Tensor device 'D.Float '[maxStringLength, maxChar])
-    => LstmEncoder device maxStringLength batch_size maxChar h featMult
+    :: forall batch_size maxStringLength numChars n' device h featTnsr featMult
+     . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult, featTnsr ~ Tensor device 'D.Float '[maxStringLength, numChars])
+    => LstmEncoder device maxStringLength batch_size numChars h featMult
     -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
     -> IO (Tensor device 'D.Float '[n', maxStringLength * (2 * featMult * Dirs * h)])
 lstmEncoder encoder tp_io_pairs = do
@@ -124,7 +124,7 @@ lstmEncoder encoder tp_io_pairs = do
     let LstmEncoder{..} = encoder
     let maxStringLength_ :: Int = natValI @maxStringLength
     let batch_size_ :: Int = natValI @batch_size
-    let max_char :: Int = natValI @maxChar
+    let max_char :: Int = natValI @numChars
 
     -- TODO: use tree encoding (R3NN) also for expressions instead of just converting to string
     let str_map :: HashMap (Tpl2 String) [(Tpl2 String)] =
@@ -140,7 +140,7 @@ lstmEncoder encoder tp_io_pairs = do
             \(tp, vecs) -> let sample_vec = stack' 0 (toDynamic <$> vecs) in if useTypes then F.cat (F.Dim 1) [sample_vec, repeatDim 0 (length vecs) (toDynamic tp)] else sample_vec
     let tp_ios :: [(Tpl2 featTnsr, [Tpl2 featTnsr])] = (bimap both2t $ fmap both2t) <$> toList str_map
     let vec_pairs :: [(D.Tensor, D.Tensor)] = (\((in_tp, out_tp), ios) -> let (ins, outs) = unzip ios in addTypes `mapBoth` ((in_tp, ins), (out_tp, outs))) <$> tp_ios
-    let (in_vecs, out_vecs) :: (Tpl2 [Tensor device 'D.Float '[batch_size, featMult * maxStringLength, maxChar]]) =
+    let (in_vecs, out_vecs) :: (Tpl2 [Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]]) =
             mapBoth (fmap UnsafeMkTensor . batchTensor batch_size_ . F.cat (F.Dim 0)) . unzip $ vec_pairs
     let feat_vecs :: [Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]] =
             uncurry (lstmBatch encoder) <$> zip in_vecs out_vecs

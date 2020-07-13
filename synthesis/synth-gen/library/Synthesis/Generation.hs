@@ -245,4 +245,4 @@ mkCharMap tps_ios = indexChars $ exprStrs <> tpStrs
     tpStrs   :: [String] = (\(i,o) -> pp i <> pp  o) <$> (join        $ keys  <$> tps_ios)
 
 indexChars :: [String] -> HashMap Char Int
-indexChars = indexList . sort . Set.toList . flip (foldr Set.insert) "\\\"()" . Set.fromList . join
+indexChars = indexList . Set.toList . flip (foldr Set.insert) "\\\"()" . Set.fromList . join

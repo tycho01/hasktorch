@@ -96,3 +96,6 @@ util = parallel $ do
                 , h = hDef
                 }
         combineConfig optCfg hparComb `shouldBe` synthCfg
+
+    it "indexList" $ do
+        indexList "012" `shouldBe` fromList [('0',0),('1',1),('2',2)]
