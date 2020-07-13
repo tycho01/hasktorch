@@ -515,12 +515,6 @@ cartesianProduct5 = liftA5 (,,,,)
 uncurry5 :: (a -> b -> c -> d -> e -> f') -> (a, b, c, d, e) -> f'
 uncurry5 f ~(a, b, c, d, e) = f a b c d e
 
-knownNat :: forall n. KnownNat n => Integer
-knownNat = natVal $ Proxy @n
-
-knownNats :: forall n. KnownNat n => [Integer]
-knownNats = knownNat @n : knownNats @(n + 1)
-
 writeCsv :: Csv.ToNamedRecord a => FilePath -> Csv.Header -> [a] -> IO ()
 writeCsv filePath header =
     BS.writeFile filePath . BS.packChars . BL.unpackChars . Csv.encodeByName header
