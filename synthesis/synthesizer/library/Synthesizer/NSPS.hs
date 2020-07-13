@@ -95,7 +95,7 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
     -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, maxStringLength * (2 * featMult * Dirs * h)]
     encode mdl gen io_pairs = sampleTensorWithoutReplacement @0 @r3nnBatch gen (length io_pairs) . toDynamic $ lstmEncoder @encoderBatch @maxStringLength @encoderChars @r3nnBatch @device @h (encoder mdl) io_pairs
 
-    rule_encode :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch typeEncoderChars h featMult
+    rule_encode :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
                 -> [Tp]
                 -> IO (Tensor device 'D.Float '[rules, ruleFeats])
     rule_encode mdl types = typeEncoder @rules (rule_encoder mdl) types
@@ -121,9 +121,9 @@ nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
     charMap = if useTypes then bothCharMap else exprCharMap
     encoder_spec :: LstmEncoderSpec device maxStringLength encoderBatch encoderChars h featMult =
         LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-    type_encoder_spec :: TypeEncoderSpec device maxStringLength encoderChars m =
+    type_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
         TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropoutRate
-    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h encoderChars featMult =
+    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult =
         initR3nn variants r3nnBatch dropoutRate ruleCharMap
     spec :: NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult =
         NSPSSpec encoder_spec type_encoder_spec r3nn_spec
