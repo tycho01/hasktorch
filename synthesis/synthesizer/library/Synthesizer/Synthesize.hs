@@ -70,14 +70,14 @@ getRules cfg taskFnDataset = let
         useTypes = natValI @featMult > 1
         charMap = if useTypes then bothCharMap else exprCharMap
     in (:)
-        ((!! (size charMap + 1)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset)
+        ((!! (size charMap + 2)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset)
         $ getRules @device @featMult @(rules + 1) cfg taskFnDataset
 
 getEncoderChars :: forall device featMult rules encoderChars . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat featMult, KnownNat rules, KnownNat encoderChars) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getEncoderChars cfg taskFnDataset = let
     TaskFnDataset{..} = taskFnDataset
     in (:)
-        ((!! (size ruleCharMap)) $ getTypeEncoderChars @device @featMult @rules @encoderChars @0 cfg taskFnDataset)
+        ((!! (size ruleCharMap + 2)) $ getTypeEncoderChars @device @featMult @rules @encoderChars @0 cfg taskFnDataset)
         $ getEncoderChars @device @featMult @rules @(encoderChars + 1) cfg taskFnDataset
 
 getTypeEncoderChars :: forall device featMult rules encoderChars typeEncoderChars . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
