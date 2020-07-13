@@ -139,7 +139,7 @@ getEncoderChars cfg taskFnDataset hparCombs = let
         $ getEncoderChars @device @featMult @rules @(encoderChars + 1) cfg taskFnDataset hparCombs
 
 getTypeEncoderChars :: forall device featMult rules encoderChars typeEncoderChars . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
-getEncoderChars cfg taskFnDataset hparCombs = (:)
+getTypeEncoderChars cfg taskFnDataset hparCombs = (:)
         ((!! (size (dsl taskFnDataset) + natValI @LhsSymbols)) $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @0 cfg taskFnDataset hparCombs)
         $ getTypeEncoderChars @device @featMult @rules @encoderChars @(typeEncoderChars + 1) cfg taskFnDataset hparCombs
 
