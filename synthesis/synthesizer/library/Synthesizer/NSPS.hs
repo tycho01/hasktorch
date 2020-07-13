@@ -22,6 +22,7 @@ import           System.Random                 (StdGen, mkStdGen)
 import           System.Timeout                (timeout)
 import           System.Directory              (createDirectoryIfMissing)
 import           System.CPUTime
+import           Text.Printf
 import           Data.Foldable                 (foldrM)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
@@ -149,7 +150,20 @@ instance ( KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLengt
 
 instance ( KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult )
   => A.Randomizable (NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult) (NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult) where
-    sample NSPSSpec {..} = NSPS
+    sample NSPSSpec {..} = do
+        debug_ $ printf
+                "NSPS device m=%03d symbols=%03d rules=%03d maxStringLength=%04d encoderBatch=%03d r3nnBatch=%03d encoderChars=%03d typeEncoderChars=%03d h=%03d featMult=%03d\n"
+                (natValI @m)
+                (natValI @symbols)
+                (natValI @rules)
+                (natValI @maxStringLength)
+                (natValI @encoderBatch)
+                (natValI @r3nnBatch)
+                (natValI @encoderChars)
+                (natValI @typeEncoderChars)
+                (natValI @h)
+                (natValI @featMult)
+        return NSPS
             <$> A.sample encoderSpec
             <*> A.sample typeEncoderSpec
             <*> A.sample r3nnSpec
