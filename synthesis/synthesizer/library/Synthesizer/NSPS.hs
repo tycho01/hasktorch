@@ -156,6 +156,6 @@ instance ( KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat m, Kno
                 (natValI @typeEncoderChars)
                 (natValI @h)
                 (natValI @featMult)
-        return NSPS
+        NSPS
             <$> A.sample encoderSpec
             <*> A.sample r3nnSpec
