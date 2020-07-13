@@ -202,9 +202,9 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     let charMap = if useTypes then bothCharMap else exprCharMap
     let encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
             LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-    let r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h encoderChars featMult =
+    let r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
             initR3nn variants r3nnBatch dropoutRate charMap
-    let rule_encoder_spec :: TypeEncoderSpec device maxStringLength encoderChars m =
+    let rule_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
             TypeEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult <-
             liftIO $ A.sample $ NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
