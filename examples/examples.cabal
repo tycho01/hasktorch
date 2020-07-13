@@ -87,9 +87,6 @@ executable static-mnist-mlp
                      , random >= 1.1
                      , safe-exceptions
                      , static-mnist
-                     , pipes
-                     , pipes-safe
-                     , cassava
 
 executable typed-transformer
   import:              config
@@ -257,18 +254,17 @@ executable distill
                      , safe-exceptions
                      , static-mnist
 
-executable regularization
+executable csv-test
   import:              config
-  hs-source-dirs:      distill
-  main-is:             Regularization.hs
-  other-modules:       Distill, Dataset, Model, Plot
+  hs-source-dirs:      csv-test
+  main-is:             Main.hs
   ghc-options:         -fno-warn-partial-type-signatures
   build-depends:       libtorch-ffi
                      , bytestring >= 0.10.8
-                     , hvega
-                     , mtl 
-                     , process
+                     , mtl
                      , random >= 1.1
                      , safe-exceptions
                      , static-mnist
-                     , text
+                     , cassava
+                     , pipes
+                     , pipes-safe
