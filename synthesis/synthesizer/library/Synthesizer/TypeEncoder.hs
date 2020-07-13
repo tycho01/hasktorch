@@ -53,47 +53,47 @@ import Synthesizer.Encoder
 data TypeEncoderSpec
     (device :: (D.DeviceType, Nat))
     (maxStringLength :: Nat)
-    (maxChar :: Nat)
+    (numChars :: Nat)
     (m :: Nat)
  where TypeEncoderSpec :: {
         charMap :: HashMap Char Int,
-        lstmSpec :: LSTMSpec maxChar (Div m Dirs) NumLayers Dir 'D.Float device
-    } -> TypeEncoderSpec device maxStringLength maxChar m
+        lstmSpec :: LSTMSpec numChars (Div m Dirs) NumLayers Dir 'D.Float device
+    } -> TypeEncoderSpec device maxStringLength numChars m
  deriving (Show)
 
 data TypeEncoder
     (device :: (D.DeviceType, Nat))
     (maxStringLength :: Nat)
-    (maxChar :: Nat)
+    (numChars :: Nat)
     (m :: Nat)
  where TypeEncoder :: {
     charMap :: HashMap Char Int,
-    ruleModel :: LSTMWithInit maxChar (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
-    } -> TypeEncoder device maxStringLength maxChar m
+    ruleModel :: LSTMWithInit numChars (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
+    } -> TypeEncoder device maxStringLength numChars m
  deriving (Show, Generic)
 
-instance A.Parameterized (TypeEncoder device maxStringLength maxChar m)
+instance A.Parameterized (TypeEncoder device maxStringLength numChars m)
 
-instance (KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat maxChar, KnownNat m) => A.Randomizable (TypeEncoderSpec device maxStringLength maxChar m) (TypeEncoder device maxStringLength maxChar m) where
+instance (KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat numChars, KnownNat m) => A.Randomizable (TypeEncoderSpec device maxStringLength numChars m) (TypeEncoder device maxStringLength numChars m) where
     sample TypeEncoderSpec {..} = do
-        rule_model  :: LSTMWithInit maxChar (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device <- A.sample spec
+        rule_model  :: LSTMWithInit numChars (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device <- A.sample spec
         return $ TypeEncoder charMap rule_model
-            where spec :: LSTMWithInitSpec maxChar (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device = LSTMWithZerosInitSpec lstmSpec
+            where spec :: LSTMWithInitSpec numChars (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device = LSTMWithZerosInitSpec lstmSpec
 
 typeEncoder
-    :: forall batch_size maxStringLength maxChar device m featTnsr
-     . (KnownDevice device, KnownNat maxStringLength, KnownNat maxChar, KnownNat m, featTnsr ~ Tensor device 'D.Float '[1, maxStringLength, maxChar])
-    => TypeEncoder device maxStringLength maxChar m
+    :: forall batch_size maxStringLength numChars device m featTnsr
+     . (KnownDevice device, KnownNat maxStringLength, KnownNat numChars, KnownNat m, featTnsr ~ Tensor device 'D.Float '[1, maxStringLength, numChars])
+    => TypeEncoder device maxStringLength numChars m
     -> [Tp]
     -> Tensor device 'D.Float '[batch_size, maxStringLength * m]
 typeEncoder TypeEncoder{..} types = feat_vec where
     maxStringLength_ :: Int = natValI @maxStringLength
-    max_char :: Int = natValI @maxChar
+    max_char :: Int = natValI @numChars
     strs :: [String] = pp <$> types
     str2tensor :: Int -> String -> featTnsr =
         \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . flip I.one_hot max_char . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
     vecs :: [featTnsr] = str2tensor maxStringLength_ <$> strs
-    mdl_vec :: Tensor device 'D.Float '[batch_size, maxStringLength, maxChar] =
+    mdl_vec :: Tensor device 'D.Float '[batch_size, maxStringLength, numChars] =
             UnsafeMkTensor . stack' 0 $ toDynamic <$> vecs
     emb_mdl :: Tensor device 'D.Float '[batch_size, maxStringLength, m] =
         -- asUntyped to type-check m*2/2

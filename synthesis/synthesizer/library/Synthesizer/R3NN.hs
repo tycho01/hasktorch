@@ -62,18 +62,18 @@ data R3NNSpec
     (maxStringLength :: Nat)
     (batch_size :: Nat)
     (h :: Nat)
-    (maxChar :: Nat)
+    (numChars :: Nat)
     (featMult :: Nat)
  where
-    R3NNSpec :: forall device m symbols rules maxStringLength batch_size h maxChar featMult
+    R3NNSpec :: forall device m symbols rules maxStringLength batch_size h numChars featMult
         -- symbolIdxs :: HashMap String Int
         -- ppt :: Expr
       . { variant_sizes :: HashMap String Int
         , conditionSpec :: LSTMSpec (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'D.Float device
         , scoreSpec     :: LSTMSpec  m                                                             (Div m Dirs) NumLayers Dir 'D.Float device
-        , holeEncoderSpec :: TypeEncoderSpec device maxStringLength maxChar m
+        , holeEncoderSpec :: TypeEncoderSpec device maxStringLength numChars m
         }
-        -> R3NNSpec device m symbols rules maxStringLength batch_size h maxChar featMult
+        -> R3NNSpec device m symbols rules maxStringLength batch_size h numChars featMult
  deriving (Show)
 
 data R3NN
@@ -84,11 +84,11 @@ data R3NN
     (maxStringLength :: Nat)
     (batch_size :: Nat)
     (h          :: Nat)
-    (maxChar    :: Nat)
+    (numChars    :: Nat)
     (featMult   :: Nat)
     -- I imagine NSPS fixed their batch to the sample size, but I have those for each type instantiation, making this harder for me to fix. as a work-around, I'm sampling instead.
  where
-    R3NN :: forall m symbols rules maxStringLength batch_size device h maxChar featMult
+    R3NN :: forall m symbols rules maxStringLength batch_size device h numChars featMult
       . { condition_model :: LSTMWithInit (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
         , score_model     :: LSTMWithInit  m                                    (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
         -- NSPS: for each production rule r∈R, a nnet f_r from x∈R^(Q⋅M) to y∈R^M,
@@ -100,9 +100,9 @@ data R3NN
         , symbol_emb :: Parameter device 'D.Float '[symbols, m]
         -- for each production rule r∈R, an M−dimensional representation: ω(r)∈R^M.
         , rule_emb   :: Parameter device 'D.Float '[rules  , m]
-        , holeEncoder :: TypeEncoder device maxStringLength maxChar m
+        , holeEncoder :: TypeEncoder device maxStringLength numChars m
         }
-        -> R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
+        -> R3NN device m symbols rules maxStringLength batch_size h numChars featMult
  deriving (Show, Generic)
 
 -- cannot use static Parameterized, as the contents of left_nnets / right_nnets are not statically known in its current HashMap type
@@ -112,9 +112,9 @@ instance ( KnownNat m
          , KnownNat maxStringLength
          , KnownNat batch_size
          , KnownNat h
-         , KnownNat maxChar
+         , KnownNat numChars
          )
-  => A.Parameterized (R3NN device m symbols rules maxStringLength batch_size h maxChar featMult)
+  => A.Parameterized (R3NN device m symbols rules maxStringLength batch_size h numChars featMult)
 
 instance ( KnownDevice device
          , RandDTypeIsValid device 'D.Float
@@ -124,11 +124,11 @@ instance ( KnownDevice device
          , KnownNat maxStringLength
          , KnownNat batch_size
          , KnownNat h
-         , KnownNat maxChar
+         , KnownNat numChars
          , KnownNat featMult
          )
-  => A.Randomizable (R3NNSpec device m symbols rules maxStringLength batch_size h maxChar featMult)
-                    (R3NN     device m symbols rules maxStringLength batch_size h maxChar featMult)
+  => A.Randomizable (R3NNSpec device m symbols rules maxStringLength batch_size h numChars featMult)
+                    (R3NN     device m symbols rules maxStringLength batch_size h numChars featMult)
  where
     sample R3NNSpec {..} = do
         join . return $ R3NN
@@ -153,19 +153,19 @@ instance ( KnownDevice device
                 rules = natValI @rules
 
 -- instance ( KnownNat symbols, KnownNat m, KnownNat maxStringLength, KnownNat h, KnownNat rules, KnownNat batch_size, KnownDevice device, MatMulDTypeIsValid device 'D.Float, shape ~ '[batch_size, maxStringLength * (2 * featMult * Dirs * h)] )
---     => HasForward (R3NN device m symbols rules maxStringLength batch_size h maxChar featMult) (Tensor device 'D.Float shape) (Tensor device 'D.Float '[num_holes, rules]) where
+--     => HasForward (R3NN device m symbols rules maxStringLength batch_size h numChars featMult) (Tensor device 'D.Float shape) (Tensor device 'D.Float '[num_holes, rules]) where
 --         forward      = runR3nn
 --         -- forwardStoch = runR3nn
 
 -- | initialize R3NN spec
-initR3nn :: forall m symbols rules maxStringLength batch_size h device maxChar featMult
+initR3nn :: forall m symbols rules maxStringLength batch_size h device numChars featMult
          . (KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat batch_size, KnownNat h, KnownNat featMult)
          => [(String, Expr)]
          -> Int
          -> Double
          -> HashMap Char Int
-         -> (R3NNSpec device m symbols rules maxStringLength batch_size h maxChar featMult)
-initR3nn variants batch_size dropoutRate charMap = R3NNSpec @device @m @symbols @rules @maxStringLength @batch_size @h @maxChar @featMult
+         -> (R3NNSpec device m symbols rules maxStringLength batch_size h numChars featMult)
+initR3nn variants batch_size dropoutRate charMap = R3NNSpec @device @m @symbols @rules @maxStringLength @batch_size @h @numChars @featMult
         variant_sizes
         -- condition
         (LSTMSpec $ DropoutSpec dropoutRate)
@@ -184,9 +184,9 @@ initR3nn variants batch_size dropoutRate charMap = R3NNSpec @device @m @symbols 
 
 -- | Recursive Reverse-Recursive Neural Network (R3NN) (Parisotto et al.)
 runR3nn
-    :: forall symbols m maxStringLength h rules batch_size num_holes device maxChar featMult
-    . ( KnownNat symbols, KnownNat m, KnownNat maxStringLength, KnownNat h, KnownNat rules, KnownNat batch_size, KnownNat maxChar, KnownNat featMult, KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float )
-    => R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
+    :: forall symbols m maxStringLength h rules batch_size num_holes device numChars featMult
+    . ( KnownNat symbols, KnownNat m, KnownNat maxStringLength, KnownNat h, KnownNat rules, KnownNat batch_size, KnownNat numChars, KnownNat featMult, KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float )
+    => R3NN device m symbols rules maxStringLength batch_size h numChars featMult
     -> HashMap String Int
     -> Expr
     -> Tensor device 'D.Float '[rules, maxStringLength * m]
@@ -222,7 +222,7 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
     -- TODO: propagate constraints through to the hole types
     holeTypes :: [Tp] = holeType . (\gtr -> gtr ppt) <$> getters
     holeTypeEmb :: Tensor device 'D.Float '[num_holes, maxStringLength * m] =
-        typeEncoder @num_holes @maxStringLength @maxChar @device @m holeEncoder holeTypes
+        typeEncoder @num_holes @maxStringLength @numChars @device @m holeEncoder holeTypes
     -- | expansion score z_e=ϕ′(e.l)⋅ω(e.r), for expansion e, expansion type e.r (for rule r∈R), leaf node e.l
     useTypes = natValI @featMult > 1
     scores :: Tensor device 'D.Float '[num_holes, rules] =
@@ -244,7 +244,7 @@ variantInt :: Expr -> (String, Int)
 variantInt = (appRule &&& length) . fnAppNodes
 
 -- | Torch gets sad not all nnets get used in the loss 😢 so let's give it a hug... 🤗🙄
-patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h maxChar featMult . (KnownNat m, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h maxChar featMult -> HashMap String Int -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
+patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numChars featMult . (KnownNat m, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h numChars featMult -> HashMap String Int -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
 patchR3nnLoss r3nn_model variant_sizes = let
         m :: Int = natValI @m
         left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
@@ -253,8 +253,8 @@ patchR3nnLoss r3nn_model variant_sizes = let
 
 -- | perform a recursive pass going up in the tree to assign a global tree representation to the root.
 forwardPass
-    :: forall m symbols maxStringLength rules batch_size device h maxChar featMult
-     . R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
+    :: forall m symbols maxStringLength rules batch_size device h numChars featMult
+     . R3NN device m symbols rules maxStringLength batch_size h numChars featMult
     -> HashMap String Int
     -> Tensor device 'D.Float '[symbols, m]
     -> Expr
@@ -283,9 +283,9 @@ forwardPass r3nn symbolIdxs conditioned' expr = let
 -- | This produces a representation ϕ′(c) for each RHS node c of R(root).
 -- note: order here *must* follow `findHolesExpr`!
 reversePass
-    :: forall m symbols maxStringLength rules batch_size device h maxChar featMult
+    :: forall m symbols maxStringLength rules batch_size device h numChars featMult
     . ( KnownNat m )
-    => R3NN device m symbols rules maxStringLength batch_size h maxChar featMult
+    => R3NN device m symbols rules maxStringLength batch_size h numChars featMult
     -> Tensor device 'D.Float '[1, m]
     -> Expr
     -> [Tensor device 'D.Float '[1, m]]
