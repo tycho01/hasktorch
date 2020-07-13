@@ -115,9 +115,9 @@ nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
     charMap = if useTypes then bothCharMap else exprCharMap
     encoder_spec :: LstmEncoderSpec device maxStringLength encoderBatch encoderChars h featMult =
         LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-    type_encoder_spec :: TypeEncoderSpec device maxStringLength encoderChars m =
+    type_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
         TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropoutRate
-    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h encoderChars featMult =
+    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult =
         initR3nn variants r3nnBatch dropoutRate ruleCharMap
     spec :: NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult =
         NSPSSpec encoder_spec type_encoder_spec r3nn_spec
