@@ -109,7 +109,7 @@ predictHole :: forall num_holes rules device . Bool -> [(String, Expr)] -> Expr 
 predictHole randomHole variants ppt used hole_expansion_probs = do
     debug_ "predictHole"
     [hole_idx, rule_idx] :: [Int] <- if randomHole then
-            return . sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
+            sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
         else do
             let hole_idx :: Int = 0
             let holeScores :: Tensor device 'D.Float '[rules] = select @0 @0 hole_expansion_probs
