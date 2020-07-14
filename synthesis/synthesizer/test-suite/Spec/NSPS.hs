@@ -91,6 +91,7 @@ nsps = parallel $ let
         type_encoder_spec :: TypeEncoderSpec Device MaxStringLength MaxChar M =
                 TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropOut
         gen :: StdGen = mkStdGen seedDef
+        randomHole :: Bool = False
     in do
 
     it "LstmEncoder" $ do
@@ -135,14 +136,14 @@ nsps = parallel $ let
         r3nn_model :: R3NN Device M Symbols Rules MaxStringLength R3nnBatch' H MaxChar FeatMultWithTypes <- A.sample $ initR3nn variants r3nnBatch' dropOut ruleCharMap
         let symbolIdxs :: HashMap String Int = indexList $ "undefined" : keys dsl
         let hole_expansion_probs :: Tensor Device 'D.Float '[NumHoles, Rules] = runR3nn r3nn_model symbolIdxs ppt sampled_feats
-        (ppt', _used') <- predictHole variants ppt (Set.singleton "not") hole_expansion_probs
+        (ppt', _used') <- predictHole randomHole variants ppt (Set.singleton "not") hole_expansion_probs
         pp ppt' `shouldNotBe` pp ppt
 
     it "superviseHole" $ do
         let variantMap :: HashMap String Expr = fromList variants
         let task_fn :: Expr = parseExpr "not (not (true))"
         let ppt :: Expr = parseExpr "not (not (undefined :: Bool))"
-        ppt' :: Expr <- superviseHole @Device variantMap numHoles task_fn ppt
+        ppt' :: Expr <- superviseHole randomHole @Device variantMap numHoles task_fn ppt
         pp ppt' `shouldBe` pp task_fn
 
     it "fillHoleTrain" $ do
@@ -156,7 +157,7 @@ nsps = parallel $ let
         r3nn_model :: R3NN Device M Symbols Rules MaxStringLength R3nnBatch' H MaxChar FeatMultWithTypes <- A.sample $ initR3nn variants r3nnBatch' dropOut ruleCharMap
         let symbolIdxs :: HashMap String Int = indexList $ "undefined" : keys dsl
         let hole_expansion_probs :: Tensor Device 'D.Float '[NumHoles, Rules] = runR3nn r3nn_model symbolIdxs ppt sampled_feats
-        (task_fn', gold) :: (Expr, Tensor Device 'D.Float '[NumHoles]) <- fillHoleTrain variantMap ruleIdxs task_fn ppt hole_expansion_probs
+        (task_fn', gold) :: (Expr, Tensor Device 'D.Float '[NumHoles]) <- fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt hole_expansion_probs
         pp task_fn' `shouldBe` pp task_fn
         D.shape (toDynamic gold) `shouldBe` [numHoles]
 
@@ -191,11 +192,11 @@ nsps = parallel $ let
 
         let maskBad = False
 
-        loss :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules dsl task_fn taskType symbolIdxs model sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants
+        loss :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules randomHole dsl task_fn taskType symbolIdxs model sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants
         toFloat loss > 0.0 `shouldBe` True
 
         let optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
         (newParam, optim') <- D.runStep model optim (toDynamic loss) lr
         let model' :: NSPS Device M Symbols Rules MaxStringLength EncoderBatch' R3nnBatch' MaxChar H FeatMultWithTypes = A.replaceParameters model newParam
-        loss' :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules dsl task_fn taskType symbolIdxs model' sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants
+        loss' :: Tensor Device 'D.Float '[] <- interpretUnsafe $ calcLoss @Rules randomHole dsl task_fn taskType symbolIdxs model' sampled_feats variantMap ruleIdxs variant_sizes synth_max_holes maskBad variants
         toBool (loss' <. loss) `shouldBe` True
