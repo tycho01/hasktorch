@@ -111,6 +111,7 @@ predictHole randomHole variants ppt used hole_expansion_probs = do
     [hole_idx, rule_idx] :: [Int] <- if randomHole then do
             return . sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
         else do
+            let hole_idx :: Int = 0
             let holeScores :: Tensor device 'D.Float '[rules] = select @0 @0 hole_expansion_probs
             let holeProbs  :: Tensor device 'D.Float '[rules] = softmax @0 holeScores
             [rule_idx] :: [Int] <- Distribution.sample (Categorical.fromProbs holeProbs) [1]
