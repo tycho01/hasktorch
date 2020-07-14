@@ -29,10 +29,11 @@ import           Data.Foldable                 (foldrM)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
 import qualified Data.Set
+import           Data.Bifunctor                (second)
 import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Internal      as BS
 import qualified Data.ByteString.Lazy.Internal as BL
-import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey)
+import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey, fromListWith)
 import qualified Data.Csv as Csv
 import           Data.Text.Prettyprint.Doc (pretty)
 import           Text.Printf
