@@ -111,6 +111,7 @@ predictHole randomHole variants ppt used hole_expansion_probs = do
     [hole_idx, rule_idx] :: [Int] <- if randomHole then do
             return . sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
         else do
+            let hole_idx :: Int = 0
             let holeScores :: Tensor device 'D.Float '[rules] = select @0 @0 hole_expansion_probs
             let holeProbs  :: Tensor device 'D.Float '[rules] = softmax @0 holeScores
             [rule_idx] :: [Int] <- Distribution.sample (Categorical.fromProbs holeProbs) [1]
@@ -156,7 +157,7 @@ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt hole_expansion_probs = 
     let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
     let [num_holes, _rules] :: [Int] = shape' hole_expansion_probs
     debug_ $ "num_holes: " <> show num_holes
-    ppt' :: Expr <- superviseHole randomHole @device variantMap num_holes task_fn ppt
+    ppt' :: Expr <- superviseHole @device randomHole variantMap num_holes task_fn ppt
     debug_ $ "ppt': " <> pp ppt'
     -- iterate over holes to get their intended expansion 'probabilities', used in calculating the loss
     let gold_rule_probs :: Tensor device 'D.Float '[num_holes] = UnsafeMkTensor . D.toDevice (deviceVal @device) . D.asTensor $ getGold . fst <$> findHolesExpr ppt
