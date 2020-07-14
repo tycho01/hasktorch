@@ -68,6 +68,8 @@ import           Torch.Typed.Optim
 import           Torch.Typed.Functional
 import           Torch.Typed.Autograd
 import           Torch.Typed.Serialize
+import qualified Torch.Distributions.Distribution as Distribution
+import qualified Torch.Distributions.Categorical as Categorical
 
 import           Synthesis.Orphanage ()
 import           Synthesis.Data hiding (GridSearchConfig(..), EvolutionaryConfig(..))
