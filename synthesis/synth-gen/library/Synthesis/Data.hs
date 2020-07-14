@@ -92,6 +92,7 @@ data SynthesizerConfig = SynthesizerConfig
     , h :: Int
     , synthesizer :: String
     , maskBad :: Bool
+    , randomHole :: Bool
     , useTypes :: Bool
     } deriving (Eq, Show, Generic)
 
@@ -112,6 +113,7 @@ data GridSearchConfig = GridSearchConfig
     , verbosity :: String
     , evalRounds :: Int
     , maskBad :: Bool
+    , randomHole :: Bool
     , useTypes :: Bool
     } deriving (Eq, Show, Generic)
 
@@ -135,6 +137,7 @@ data EvolutionaryConfig = EvolutionaryConfig
     , verbosity :: String
     -- , evalRounds :: Int
     , maskBad :: Bool
+    , randomHole :: Bool
     , useTypes :: Bool
     } deriving (Eq, Show, Generic)
 
@@ -155,6 +158,7 @@ data OptimizationConfig = OptimizationConfig
     , verbosity :: String
     -- , evalRounds :: Int
     , maskBad :: Bool
+    , randomHole :: Bool
     , useTypes :: Bool
     } deriving (Eq, Show, Generic)
 
@@ -223,6 +227,7 @@ combineConfig optCfg hparComb = cfg
                 , h                    = h
                 , synthesizer          = "nsps"
                 , maskBad              = maskBad
+                , randomHole           = randomHole
                 , useTypes             = useTypes
                 }
 
