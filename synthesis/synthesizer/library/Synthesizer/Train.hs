@@ -156,7 +156,7 @@ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt hole_expansion_probs = 
     let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
     let [num_holes, _rules] :: [Int] = shape' hole_expansion_probs
     debug_ $ "num_holes: " <> show num_holes
-    ppt' :: Expr <- superviseHole randomHole @device variantMap num_holes task_fn ppt
+    ppt' :: Expr <- superviseHole @device randomHole variantMap num_holes task_fn ppt
     debug_ $ "ppt': " <> pp ppt'
     -- iterate over holes to get their intended expansion 'probabilities', used in calculating the loss
     let gold_rule_probs :: Tensor device 'D.Float '[num_holes] = UnsafeMkTensor . D.toDevice (deviceVal @device) . D.asTensor $ getGold . fst <$> findHolesExpr ppt
