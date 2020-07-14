@@ -105,14 +105,15 @@ import           Synthesizer.Params
 --     rule_idx :: Int = D.asValue $ D.select (toDynamic rule_idx_by_hole) 0 hole_idx
 
 -- | fill a non-terminal leaf node in a PPT given hole/rule expansion probabilities
-predictHole :: forall num_holes rules device . (StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes)) => Bool -> [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
+predictHole :: forall num_holes rules device . (StandardFloatingPointDTypeValidation device 'D.Float) => Bool -> [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
 predictHole randomHole variants ppt used hole_expansion_probs = do
     debug_ "predictHole"
+    let (holes_dim, _rules_dim) :: (Int, Int) = (0, 1)
     [hole_idx, rule_idx] :: [Int] <- if randomHole then
             sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
         else do
             let hole_idx :: Int = 0
-            let holeScores :: Tensor device 'D.Float '[rules] = select @0 @0 hole_expansion_probs
+            let holeScores :: Tensor device 'D.Float '[rules] = UnsafeMkTensor $ D.select (toDynamic hole_expansion_probs) holes_dim hole_idx
             let holeProbs  :: Tensor device 'D.Float '[rules] = softmax @0 holeScores
             [rule_idx] :: [Int] <- D.asValue <$> Distribution.sample (Categorical.fromProbs . toDynamic $ holeProbs) [1]
             return [hole_idx, rule_idx]
@@ -333,7 +334,7 @@ train synthesizerConfig taskFnDataset init_model = do
     return eval_results'
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
-          . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
+          . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
          => StdGen -> TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [Expr] -> Interpreter (Tensor device 'D.Float '[], Tensor device 'D.Float '[], StdGen)
 evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model dataset = do
     debug "evaluate"
