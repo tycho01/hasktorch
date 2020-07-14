@@ -293,9 +293,9 @@ batchTensor batch_size tensor = let
 --   FromJust (Just a) = a
 -- --   FromJust Nothing = Nothing
 
-type family FromMaybe (default :: a) (maybe :: Maybe a) :: a where
-  FromMaybe _default (Just a) = a
-  FromMaybe default Nothing = default
+type family FromMaybe (def :: a) (maybe :: Maybe a) :: a where
+  FromMaybe _def (Just a) = a
+  FromMaybe def Nothing = def
 
 -- -- | deprecated, not in use
 -- toMaybe :: Bool -> a -> Maybe a
