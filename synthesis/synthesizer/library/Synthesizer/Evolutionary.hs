@@ -35,6 +35,7 @@ import           Torch.Internal.Managed.Type.Context (manual_seed_L)
 import           Torch.Typed.Tensor
 import           Torch.Typed.Functional hiding (sqrt, round)
 import           Torch.Typed.Factories
+import           Torch.Typed.Aux
 import qualified Torch.Tensor                  as D
 import qualified Torch.DType                   as D
 import qualified Torch.Autograd                as D
@@ -151,7 +152,7 @@ main = if False -- hasCuda
         then evolutionary @Gpu
         else evolutionary @Cpu
 
-evolutionary :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64) => IO ()
+evolutionary :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float) => IO ()
 evolutionary = do
     EvolutionaryConfig{..} <- parseEvolutionaryConfig
     let cfg = OptimizationConfig{..}
