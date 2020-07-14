@@ -108,9 +108,7 @@ import           Synthesizer.Params
 predictHole :: forall num_holes rules device . Bool -> [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
 predictHole randomHole variants ppt used hole_expansion_probs = do
     debug_ "predictHole"
-    [hole_idx, rule_idx] :: [Int] <- if randomHole then do
-            return . sampleIdxs . softmaxAll . toDynamic $ hole_expansion_probs
-        else do
+    [hole_idx, rule_idx] :: [Int] <- do
             let holeScores :: Tensor device 'D.Float '[rules] = select @0 @0 hole_expansion_probs
             let holeProbs  :: Tensor device 'D.Float '[rules] = softmax @0 holeScores
             [rule_idx] :: [Int] <- Distribution.sample (Categorical.fromProbs holeProbs) [1]
@@ -133,13 +131,7 @@ predictHole randomHole variants ppt used hole_expansion_probs = do
 superviseHole :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Int64) => Bool -> HashMap String Expr -> Int -> Expr -> Expr -> IO Expr
 superviseHole randomHole variantMap num_holes task_fn ppt = do
     debug_ "superviseHole"
-    hole_idx :: Int <- if randomHole then do
-            -- randomly pick a hole -- probably a good way to uniformly cover all scenarios...?
-            -- technically holes closer to the root may go thru more rounds tho, creating more opportunities to randomly get picked
-            hole_idx' :: Tensor device 'D.Int64 '[] <- randint 0 num_holes
-            return $ toInt hole_idx'
-        -- otherwise deterministically use the first hole
-        else pure 0
+    hole_idx :: Int <- pure 0
     debug_ $ "hole_idx: " <> show hole_idx
     let (hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
