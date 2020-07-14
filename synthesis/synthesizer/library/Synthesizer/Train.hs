@@ -242,12 +242,15 @@ train synthesizerConfig taskFnDataset init_model = do
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     safeIndexHM fnTypeIOs task_fn
             info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+            let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
+                    second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @(FromMaybe 0 (ExtractDim BatchDim shape))) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+            info $ "target_tp_io_pairs': " <> pp_ target_tp_io_pairs'
             let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                     rule_encode @device @shape @rules @ruleFeats model variantTypes
             debug $ "rule_tp_emb: " <> show (shape' rule_tp_emb)
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
-            let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
+            let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen' target_tp_io_pairs'
             debug $ "io_feats: " <> show (shape' io_feats)
             loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
             debug $ "loss: " <> show (shape' loss)
@@ -329,9 +332,12 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
         let type_ins :: HashMap (Tp, Tp) [Expr] = safeIndexHM task_type_ins task_fn
         debug $ "type_ins: " <> pp_ type_ins
         let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = safeIndexHM fnTypeIOs task_fn
+        let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
+                second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @(FromMaybe 0 (ExtractDim BatchDim shape))) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+        -- debug $ "target_tp_io_pairs': " <> pp_ target_tp_io_pairs'
         let target_outputs :: [Either String Expr] = safeIndexHM task_outputs task_fn
 
-        let (gen', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
+        let (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) = encode @device @shape @rules @ruleFeats model gen' target_tp_io_pairs'
         loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
 
         -- sample for best of 100 predictions
@@ -373,7 +379,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
 
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
-        return (gen', (best_works, loss) : eval_stats)
+        return (gen'', (best_works, loss) : eval_stats)
 
     let acc  :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . F.toDType D.Float . D.asTensor $ fst <$> eval_stats
     let loss :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ toDynamic           . snd <$> eval_stats

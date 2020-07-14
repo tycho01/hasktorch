@@ -262,41 +262,45 @@ batchTensor batch_size tensor = let
         in D.indexSelect tensor' nDim . D.toDevice (D.device tensor) . D.asTensor $ asLong <$> idxs
     in f <$> [0 .. numBatches-1]
 
--- | statically typed version of batchTensor
--- | deprecated, not in use
-batchTensor'
-    :: forall batchSize dim device dtype shape shape'
-     . ( KnownNat batchSize
-       , KnownShape shape
-       , TensorOptions shape dtype device
-       , dim ~ 0
-       , shape' ~ FromMaybe (ReplaceDim dim shape batchSize)
-       )
-    => Tensor device dtype shape
-    -> [Tensor device dtype shape']
-batchTensor' tensor = let
-    batch_size = natValI @batchSize
-    nDim = natValI @dim
-    n :: Int = D.size (toDynamic tensor) nDim
-    numBatches :: Int = ((n-1) `div` batch_size) + 1
-    diff :: Int = numBatches * batch_size - n
-    paddings :: [Int] = replicate (2 * Torch.Typed.Tensor.dim tensor - 1) 0 <> [diff]
-    tensor' :: D.Tensor = F.constantPadNd1d paddings 0.0 $ toDynamic tensor
-    f :: Int -> Tensor device dtype shape' = \i -> let
-            from :: Int = i * batch_size
-            to   :: Int = (i+1) * batch_size - 1
-            idxs :: [Int] = [from .. to]
-        in UnsafeMkTensor $ D.indexSelect tensor' nDim . D.toDevice (D.device $ toDynamic tensor) . D.asTensor $ asLong <$> idxs
-    in f <$> [0 .. numBatches-1]
+-- -- | statically typed version of batchTensor
+-- -- | deprecated, not in use
+-- batchTensor'
+--     :: forall batchSize dim device dtype shape shape'
+--      . ( KnownNat batchSize
+--        , KnownShape shape
+--        , TensorOptions shape dtype device
+--        , dim ~ 0
+--        , shape' ~ FromJust (ReplaceDim dim shape batchSize)
+--        )
+--     => Tensor device dtype shape
+--     -> [Tensor device dtype shape']
+-- batchTensor' tensor = let
+--     batch_size = natValI @batchSize
+--     nDim = natValI @dim
+--     n :: Int = D.size (toDynamic tensor) nDim
+--     numBatches :: Int = ((n-1) `div` batch_size) + 1
+--     diff :: Int = numBatches * batch_size - n
+--     paddings :: [Int] = replicate (2 * Torch.Typed.Tensor.dim tensor - 1) 0 <> [diff]
+--     tensor' :: D.Tensor = F.constantPadNd1d paddings 0.0 $ toDynamic tensor
+--     f :: Int -> Tensor device dtype shape' = \i -> let
+--             from :: Int = i * batch_size
+--             to   :: Int = (i+1) * batch_size - 1
+--             idxs :: [Int] = [from .. to]
+--         in UnsafeMkTensor $ D.indexSelect tensor' nDim . D.toDevice (D.device $ toDynamic tensor) . D.asTensor $ asLong <$> idxs
+--     in f <$> [0 .. numBatches-1]
 
-type family FromMaybe (maybe :: Maybe a) :: a where
-  FromMaybe (Just a) = a
---   FromMaybe Nothing = Nothing
+-- type family FromJust (maybe :: Maybe a) :: a where
+--   FromJust (Just a) = a
+-- --   FromJust Nothing = Nothing
 
--- | deprecated, not in use
-toMaybe :: Bool -> a -> Maybe a
-toMaybe False _ = Nothing
-toMaybe True  x = Just x
+type family FromMaybe (default :: a) (maybe :: Maybe a) :: a where
+  FromMaybe _default (Just a) = a
+  FromMaybe default Nothing = default
+
+-- -- | deprecated, not in use
+-- toMaybe :: Bool -> a -> Maybe a
+-- toMaybe False _ = Nothing
+-- toMaybe True  x = Just x
 
 whenOr :: a -> Bool -> a -> a
 -- whenOr def cond x = fromMaybe def $ toMaybe cond x
@@ -480,13 +484,19 @@ sampleTensorWithReplacement n tensor = do
     sampled_idxs :: D.Tensor <- D.toDevice (D.device tensor) . F.toDType D.Int64 <$> D.randintIO' 0 n [natValI @size]
     return . UnsafeMkTensor $ D.indexSelect tensor (natValI @dim) sampled_idxs
 
--- | sample (without replacement) from a tensor in a given dimension
+-- | sample (without replacement, with pool resetting) from a tensor in a given dimension
 sampleTensorWithoutReplacement :: forall dim size device dtype shape' . (KnownNat dim, KnownNat size, TensorOptions shape' dtype device, KnownShape shape') => StdGen -> Int -> D.Tensor -> (StdGen, Tensor device dtype shape')
 sampleTensorWithoutReplacement gen n tensor = (gen', t) where
     (idxs', gen') = fisherYates gen $ [0 .. n - 1]
     idxs :: [Int] = take (natValI @size) . cycle $ idxs'
     sampled_idxs :: D.Tensor = D.toDevice (D.device tensor) . F.toDType D.Int64 . D.asTensor $ idxs
     t = UnsafeMkTensor $ D.indexSelect tensor (natValI @dim) sampled_idxs
+
+-- | sample (without replacement, with pool resetting) from a list
+sampleWithoutReplacement :: StdGen -> Int -> [a] -> (StdGen, [a])
+sampleWithoutReplacement gen n xs = (gen', xs'') where
+    (xs', gen') = fisherYates gen xs
+    xs'' :: [a] = take n . cycle $ xs'
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String

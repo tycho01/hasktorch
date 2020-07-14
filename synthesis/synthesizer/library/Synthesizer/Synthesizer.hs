@@ -105,3 +105,8 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 -> Tensor device 'D.Float '[]
                 -> IO ([A.Parameter], optimizer)
     doStep model optim loss lr = D.runStep model optim (toDynamic loss) $ toDynamic lr
+
+-- | fixing which dimension of `shape` indicates the used number of i/o samples
+-- | for prediction purposes lets us sample before encoding, saving on compute.
+-- | (in the event of '[] shape as for random synthesizer, we'll presume none.)
+type BatchDim = 0
