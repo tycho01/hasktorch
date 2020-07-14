@@ -47,7 +47,7 @@ main = if False -- hasCuda
         then synthesize @Gpu
         else synthesize @Cpu
 
-synthesize :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float) => IO ()
+synthesize :: forall device num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, 0] 0 0 (CmpNat 0 num_holes)) => IO ()
 synthesize = do
     cfg :: SynthesizerConfig <- parseSynthesizerConfig
     say_ $ show cfg
@@ -60,11 +60,11 @@ synthesize = do
     (!! length exprBlocks) $
         -- featMult
         if useTypes then
-            getRules @device @2 @0 cfg taskFnDataset
+            getRules @device @2 @0 @num_holes cfg taskFnDataset
         else
-            getRules @device @1 @0 cfg taskFnDataset
+            getRules @device @1 @0 @num_holes cfg taskFnDataset
 
-getRules :: forall device featMult rules num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
+getRules :: forall device featMult rules num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), InRangeCheck '[num_holes, rules + 1] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getRules cfg taskFnDataset = let
         TaskFnDataset{..} = taskFnDataset
         useTypes = natValI @featMult > 1
@@ -132,4 +132,4 @@ getM cfg taskFnDataset = let
                 spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
                     NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
             _ -> error "synthesizer not recognized")
-        $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset
+        $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h @num_holes cfg taskFnDataset
