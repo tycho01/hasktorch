@@ -14,6 +14,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 module Synthesizer.Train (module Synthesizer.Train) where
@@ -28,10 +30,11 @@ import           Data.Foldable                 (foldrM)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
 import qualified Data.Set
+import           Data.Bifunctor                (second)
 import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Internal      as BS
 import qualified Data.ByteString.Lazy.Internal as BL
-import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey)
+import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey, fromListWith)
 import qualified Data.Csv as Csv
 import           Data.Text.Prettyprint.Doc (pretty)
 import           Text.Printf
@@ -203,7 +206,7 @@ prep_dsl TaskFnDataset{..} =
 foldrM_ x xs f = foldrM f x xs
 
 -- | train a NSPS model and return results
-train :: forall device rules shape ruleFeats synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
+train :: forall device rules shape ruleFeats synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape))) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
     debug "train"
     let SynthesizerConfig{..} = synthesizerConfig
@@ -242,12 +245,15 @@ train synthesizerConfig taskFnDataset init_model = do
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     safeIndexHM fnTypeIOs task_fn
             info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+            let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
+                    second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @(FromMaybe 0 (ExtractDim BatchDim shape))) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+            info $ "target_tp_io_pairs': " <> pp_ target_tp_io_pairs'
             rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] <-
                     liftIO $ rule_encode @device @shape @rules @ruleFeats model variantTypes
             debug $ "rule_tp_emb: " <> show (shape' rule_tp_emb)
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
-            (gen'', io_feats) :: (StdGen, Tensor device 'D.Float shape) <- liftIO $ encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
+            io_feats :: Tensor device 'D.Float shape <- liftIO $ encode @device @shape @rules @ruleFeats model target_tp_io_pairs
             debug $ "io_feats: " <> show (shape' io_feats)
             loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
             debug $ "loss: " <> show (shape' loss)
@@ -256,7 +262,7 @@ train synthesizerConfig taskFnDataset init_model = do
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
             let model' :: synthesizer = A.replaceParameters model newParam
             liftIO $ incProgress pb 1
-            return (toDynamic loss : train_losses, model', optim', gen'')
+            return (toDynamic loss : train_losses, model', optim', gen')
 
         debug "finished epoch training"
         -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
@@ -315,7 +321,7 @@ train synthesizerConfig taskFnDataset init_model = do
     return eval_results'
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
-          . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer)
+          . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
          => StdGen -> TaskFnDataset -> PreppedDSL -> Int -> Bool -> synthesizer -> [Expr] -> Interpreter (Tensor device 'D.Float '[], Tensor device 'D.Float '[], StdGen)
 evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
     debug "evaluate"
@@ -329,9 +335,12 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad model dataset = do
         let type_ins :: HashMap (Tp, Tp) [Expr] = safeIndexHM task_type_ins task_fn
         debug $ "type_ins: " <> pp_ type_ins
         let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = safeIndexHM fnTypeIOs task_fn
+        let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
+                second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @(FromMaybe 0 (ExtractDim BatchDim shape))) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+        -- debug $ "target_tp_io_pairs': " <> pp_ target_tp_io_pairs'
         let target_outputs :: [Either String Expr] = safeIndexHM task_outputs task_fn
 
-        (gen', io_feats) :: (StdGen, Tensor device 'D.Float shape) <- liftIO $ encode @device @shape @rules @ruleFeats model gen_ target_tp_io_pairs
+        io_feats :: Tensor device 'D.Float shape <- liftIO $ encode @device @shape @rules @ruleFeats model target_tp_io_pairs'
         loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
 
         -- sample for best of 100 predictions

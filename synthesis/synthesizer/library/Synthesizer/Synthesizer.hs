@@ -80,9 +80,8 @@ import           Synthesizer.Params
 
 class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules ruleFeats synthesizer where
     encode    :: synthesizer
-                -> StdGen
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-                -> IO (StdGen, Tensor device 'D.Float shape)
+                -> IO (Tensor device 'D.Float shape)
     rule_encode :: synthesizer
                 -> [Tp]
                 -> IO (Tensor device 'D.Float '[rules, ruleFeats])
@@ -105,3 +104,8 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 -> Tensor device 'D.Float '[]
                 -> IO ([A.Parameter], optimizer)
     doStep model optim loss lr = D.runStep model optim (toDynamic loss) $ toDynamic lr
+
+-- | fixing which dimension of `shape` indicates the used number of i/o samples
+-- | for prediction purposes lets us sample before encoding, saving on compute.
+-- | (in the event of '[] shape as for random synthesizer, we'll presume none.)
+type BatchDim = 0
