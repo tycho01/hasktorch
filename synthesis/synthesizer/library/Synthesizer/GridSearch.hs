@@ -91,7 +91,7 @@ main = if False -- hasCuda
         then gridSearch @Gpu
         else gridSearch @Cpu
 
-gridSearch :: forall device num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, 0] 0 0 (CmpNat 0 num_holes)) => IO ()
+gridSearch :: forall device . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float) => IO ()
 gridSearch = do
     gridCfg :: GridSearchConfig <- parseGridSearchConfig
     let GridSearchConfig{..} = gridCfg
@@ -106,9 +106,9 @@ gridSearch = do
             fmap (second (`finally` incProgress pb 1)) $ join . join $ (!! length exprBlocks) $
             -- featMult
             if useTypes then
-                getRules @device @2 @0 @num_holes cfg taskFnDataset hparCombs
+                getRules @device @2 @0 cfg taskFnDataset hparCombs
             else
-                getRules @device @1 @0 @num_holes cfg taskFnDataset hparCombs
+                getRules @device @1 @0 cfg taskFnDataset hparCombs
     let (hparCombs'', _gen') = fisherYates stdGen hparCombs'    -- shuffle
     hparResults :: [(HparComb, (EvalResult, IO ()))] <- sequence $ traverseSnd <$> take evalRounds hparCombs''
 
@@ -122,7 +122,7 @@ gridSearch = do
 
 -- bending over backward to get the compiler to accept my dynamically calculated values as static
 
-getRules :: forall device featMult rules num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), InRangeCheck '[num_holes, rules + 1] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
+getRules :: forall device featMult rules num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
 getRules cfg taskFnDataset hparCombs = let
     TaskFnDataset{..} = taskFnDataset
     useTypes = natValI @featMult > 1
