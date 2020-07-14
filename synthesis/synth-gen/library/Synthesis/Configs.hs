@@ -57,6 +57,7 @@ synthesizerConfig = SynthesizerConfig
     <*> hOpt
     <*> synthesizerOpt
     <*> maskBadOpt
+    <*> randomHoleOpt
     <*> useTypesOpt
 
 parseSynthesizerConfig :: IO SynthesizerConfig
@@ -86,6 +87,7 @@ gridSearchConfig = GridSearchConfig
     <*> verbosityOpt
     <*> evalRoundsOpt
     <*> maskBadOpt
+    <*> randomHoleOpt
     <*> useTypesOpt
 
 parseGridSearchConfig :: IO GridSearchConfig
@@ -115,6 +117,7 @@ evolutionaryConfig = EvolutionaryConfig
     <*> verbosityOpt
     -- <*> evalRoundsOpt
     <*> maskBadOpt
+    <*> randomHoleOpt
     <*> useTypesOpt
 
 parseEvolutionaryConfig :: IO EvolutionaryConfig
@@ -399,6 +402,11 @@ maskBadOpt = switch
     ( long "maskBad"
     <> short 'm'
     <> help "when specified, compile any possible hole fill to mask out any predictions for non-compiling expressions (present implementation for this is slow but this could be improved)." )
+
+randomHoleOpt = switch
+    ( long "randomHole"
+    <> short 'm'
+    <> help "when specified, a random hole is chosen to fill for training, while any holes are considered during prediction (based on the likelihood scores of their respective expansions). otherwise, we always fill the first hole found in a partial program tree (depth-first)." )
 
 useTypesOpt = switch
     ( long "useTypes"

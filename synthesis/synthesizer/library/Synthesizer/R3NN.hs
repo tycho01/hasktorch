@@ -286,6 +286,8 @@ forwardPass r3nn symbolIdxs conditioned' expr = let
 -- | perform a reverse-recursive pass starting from the root to assign a global tree representation to each node in the tree.
 -- | This produces a representation ϕ′(c) for each RHS node c of R(root).
 -- note: order here *must* follow `findHolesExpr`!
+-- TODO: if deterministically pick first hole only bother calculating that one?
+-- or would haskell to skip the unnecessary stuff automatically?
 reversePass
     :: forall m symbols maxStringLength rules batch_size device h numChars featMult
     . ( KnownNat m )
