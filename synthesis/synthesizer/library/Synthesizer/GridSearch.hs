@@ -39,7 +39,7 @@ import           Torch.Typed.Functional
 import           Torch.Typed.Factories
 import           Torch.Typed.NN
 import           Torch.Typed.NN.Recurrent.LSTM
-import           Torch.Typed.Aux (natValI)
+import           Torch.Typed.Aux
 import qualified Torch.Tensor                  as D
 import qualified Torch.DType                   as D
 import qualified Torch.Autograd                as D
