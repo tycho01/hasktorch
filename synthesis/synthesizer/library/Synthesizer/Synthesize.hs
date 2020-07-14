@@ -70,38 +70,38 @@ getRules cfg taskFnDataset = let
         useTypes = natValI @featMult > 1
         charMap = if useTypes then bothCharMap else exprCharMap
     in (:)
-        ((!! (size charMap + 2)) $ getEncoderChars @device @featMult @rules @0 @num_holes cfg taskFnDataset)
-        $ getRules @device @featMult @(rules + 1) @num_holes cfg taskFnDataset
+        ((!! (size charMap + 2)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset)
+        $ getRules @device @featMult @(rules + 1) cfg taskFnDataset
 
 getEncoderChars :: forall device featMult rules encoderChars num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules, KnownNat encoderChars) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getEncoderChars cfg taskFnDataset = let
     TaskFnDataset{..} = taskFnDataset
     in (:)
-        ((!! (size ruleCharMap + 2)) $ getTypeEncoderChars @device @featMult @rules @encoderChars @0 @num_holes cfg taskFnDataset)
-        $ getEncoderChars @device @featMult @rules @(encoderChars + 1) @num_holes cfg taskFnDataset
+        ((!! (size ruleCharMap + 2)) $ getTypeEncoderChars @device @featMult @rules @encoderChars @0 cfg taskFnDataset)
+        $ getEncoderChars @device @featMult @rules @(encoderChars + 1) cfg taskFnDataset
 
 getTypeEncoderChars :: forall device featMult rules encoderChars typeEncoderChars num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getTypeEncoderChars cfg taskFnDataset = (:)
-        ((!! (size (dsl taskFnDataset) + natValI @LhsSymbols)) $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @0 @num_holes cfg taskFnDataset)
-        $ getTypeEncoderChars @device @featMult @rules @encoderChars @(typeEncoderChars + 1) @num_holes cfg taskFnDataset
+        ((!! (size (dsl taskFnDataset) + natValI @LhsSymbols)) $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @0 cfg taskFnDataset)
+        $ getTypeEncoderChars @device @featMult @rules @encoderChars @(typeEncoderChars + 1) cfg taskFnDataset
 
 getSymbols :: forall device featMult rules encoderChars typeEncoderChars symbols num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat symbols) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getSymbols cfg taskFnDataset = let
         useTypes = natValI @featMult > 1
         longest = if useTypes then longestString else longestExprString
     in (:)
-        ((!! longest taskFnDataset) $ getMaxStringLength @device @featMult @rules @encoderChars @typeEncoderChars @symbols @0 @num_holes cfg taskFnDataset)
-        $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @(symbols + 1) @num_holes cfg taskFnDataset
+        ((!! longest taskFnDataset) $ getMaxStringLength @device @featMult @rules @encoderChars @typeEncoderChars @symbols @0 cfg taskFnDataset)
+        $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @(symbols + 1) cfg taskFnDataset
 
 getMaxStringLength :: forall device featMult rules encoderChars typeEncoderChars symbols maxStringLength num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat symbols, KnownNat maxStringLength) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getMaxStringLength cfg taskFnDataset = let SynthesizerConfig{..} = cfg in (:)
-        ((!! h) $ getH @device @featMult @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @0 @num_holes cfg taskFnDataset)
-        $ getMaxStringLength @device @featMult @rules @encoderChars @typeEncoderChars @symbols @(maxStringLength + 1) @num_holes cfg taskFnDataset
+        ((!! h) $ getH @device @featMult @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @0 cfg taskFnDataset)
+        $ getMaxStringLength @device @featMult @rules @encoderChars @typeEncoderChars @symbols @(maxStringLength + 1) cfg taskFnDataset
 
 getH :: forall device featMult rules encoderChars typeEncoderChars symbols maxStringLength h num_holes . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, InRangeCheck '[num_holes, rules] 0 0 (CmpNat 0 num_holes), KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat symbols, KnownNat maxStringLength, KnownNat h) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getH cfg taskFnDataset = let SynthesizerConfig{..} = cfg in (:)
-        ((!! m) $ getM @device @featMult @0 @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h @num_holes cfg taskFnDataset)
-        $ getH @device @featMult @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @(h + 1) @num_holes cfg taskFnDataset
+        ((!! m) $ getM @device @featMult @0 @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset)
+        $ getH @device @featMult @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @(h + 1) cfg taskFnDataset
 
 --  shape synthesizer
 -- , KnownShape shape, Synthesizer device shape rules synthesizer
@@ -115,10 +115,10 @@ getM cfg taskFnDataset = let
         (case synthesizer of
             "random" -> do
                 model <- A.sample RandomSynthesizerSpec
-                void . interpretUnsafe $ train @device @rules @'[] @0 @RandomSynthesizer @num_holes cfg taskFnDataset model
+                void . interpretUnsafe $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
             "nsps" -> do
                 model <- A.sample spec
-                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) @num_holes cfg taskFnDataset model
+                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
                 where
                 variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
                 useTypes = natValI @featMult > 1
