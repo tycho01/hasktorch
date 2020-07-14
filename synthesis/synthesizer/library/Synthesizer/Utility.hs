@@ -496,7 +496,7 @@ sampleTensorWithoutReplacement gen n tensor = (gen', t) where
 sampleWithoutReplacement :: StdGen -> Int -> [a] -> (StdGen, [a])
 sampleWithoutReplacement gen n xs = (gen', xs'') where
     (xs', gen') = fisherYates gen xs
-    xs'' :: [a] = take n . cycle $ xs'
+    xs'' = take n . cycle $ xs'
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String
