@@ -112,7 +112,7 @@ predictHole randomHole variants ppt used hole_expansion_probs = do
             let hole_idx :: Int = 0
             let holeScores :: Tensor device 'D.Float '[rules] = select @0 @0 hole_expansion_probs
             let holeProbs  :: Tensor device 'D.Float '[rules] = softmax @0 holeScores
-            [rule_idx] :: [Int] <- Distribution.sample (Categorical.fromProbs . toDynamic $ holeProbs) [1]
+            [rule_idx] :: [Int] <- D.asValue <$> Distribution.sample (Categorical.fromProbs . toDynamic $ holeProbs) [1]
             return [hole_idx, rule_idx]
     -- order of rules: comes from `rule_emb`, which is just randomly assigned,
     -- so we can just arbitrarily associate this with any deterministic order e.g. that of `variants`
