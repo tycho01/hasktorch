@@ -351,6 +351,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
         -- sample for best of 100 predictions
         -- TODO: dedupe samples before eval to save evals?
         -- TODO: consider A* / branch-and-bound / beam search instead
+        pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
         sample_matches :: [Bool] <- replicateM bestOf $ do
             -- TODO: split io_feats and taskType based on param type instance combo 
             (program, used, _filled) :: (Expr, Set String, Int) <- let
@@ -363,7 +364,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                             return (ppt', used', filled + 1)
                     in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
             debug $ pp program
-            if hasHoles program then pure False else do
+            let ok :: Bool <- if hasHoles program then pure False else do
                 let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                 let program' :: Expr = if null defs then program else letIn defs program
 
@@ -384,6 +385,8 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                                 output_matches :: [Bool] = uncurry (==) . mapBoth pp_ <$> target_outputs `zip` prediction_outputs
                                 in and output_matches
                 return outputs_match
+            liftIO $ incProgress pb 1
+            return ok
 
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
