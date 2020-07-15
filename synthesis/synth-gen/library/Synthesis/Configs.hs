@@ -295,7 +295,7 @@ numEpochsOpt = option auto
 
 bestOfOpt = option auto
     ( long "bestOf"
-    <> value (100 :: Int)
+    <> value (20 :: Int)
     <> showDefault
     <> help "Number of functions to sample from the model for each latent function and set of input/output examples that we test on, determining success based on the best from this sample." )
 
@@ -320,7 +320,7 @@ dropoutRateOpt = option auto
 
 evalFreqOpt = option auto
     ( long "evalFreq"
-    <> value (5 :: Int)
+    <> value (3 :: Int)
     <> showDefault
     <> help "the number of epochs for which to run on train set before evaluating on the validation set again" )
 
