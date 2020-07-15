@@ -358,7 +358,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                             return (ppt', used', filled + 1)
                     in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
             debug $ pp program
-            let ok :: Bool <- if hasHoles program then pure False else do
+            ok :: Bool <- if hasHoles program then pure False else do
                 let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                 let program' :: Expr = if null defs then program else letIn defs program
 
