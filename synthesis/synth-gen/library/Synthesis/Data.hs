@@ -75,7 +75,6 @@ data GenerationConfig = GenerationConfig
 data SynthesizerConfig = SynthesizerConfig
     { taskPath :: String
     , seed :: Int
-    , numEpochs :: Int
     -- , encoderBatch :: Int
     -- , r3nnBatch :: Int
     , bestOf :: Int
@@ -99,7 +98,6 @@ data SynthesizerConfig = SynthesizerConfig
 data GridSearchConfig = GridSearchConfig
     { taskPath :: String
     , seed :: Int
-    , numEpochs :: Int
     , bestOf :: Int
     -- , dropoutRate :: Double
     , evalFreq :: Int
@@ -123,7 +121,6 @@ data GridSearchConfig = GridSearchConfig
 data EvolutionaryConfig = EvolutionaryConfig
     { taskPath :: String
     , seed :: Int
-    , numEpochs :: Int
     , bestOf :: Int
     -- , dropoutRate :: Double
     , evalFreq :: Int
@@ -144,7 +141,6 @@ data EvolutionaryConfig = EvolutionaryConfig
 data OptimizationConfig = OptimizationConfig
     { taskPath :: String
     , seed :: Int
-    , numEpochs :: Int
     , bestOf :: Int
     -- , dropoutRate :: Double
     , evalFreq :: Int
@@ -212,7 +208,6 @@ combineConfig optCfg hparComb = cfg
         cfg = SynthesizerConfig
                 { taskPath             = taskPath
                 , seed                 = seed
-                , numEpochs            = numEpochs
                 , bestOf               = bestOf
                 , dropoutRate          = dropoutRate
                 , evalFreq             = evalFreq

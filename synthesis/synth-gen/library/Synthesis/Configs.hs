@@ -40,7 +40,6 @@ synthesizerConfig :: Parser SynthesizerConfig
 synthesizerConfig = SynthesizerConfig
     <$> taskPathOpt
     <*> seedOpt
-    <*> numEpochsOpt
     -- <*> encoderBatchOpt
     -- <*> r3nnBatchOpt
     <*> bestOfOpt
@@ -72,7 +71,6 @@ gridSearchConfig :: Parser GridSearchConfig
 gridSearchConfig = GridSearchConfig
     <$> taskPathOpt
     <*> seedOpt
-    <*> numEpochsOpt
     -- <*> encoderBatchOpt
     -- <*> r3nnBatchOpt
     <*> bestOfOpt
@@ -102,7 +100,6 @@ evolutionaryConfig :: Parser EvolutionaryConfig
 evolutionaryConfig = EvolutionaryConfig
     <$> taskPathOpt
     <*> seedOpt
-    <*> numEpochsOpt
     -- <*> encoderBatchOpt
     -- <*> r3nnBatchOpt
     <*> bestOfOpt
@@ -286,12 +283,6 @@ maxHolesOpt = option auto
     <> value (3 :: Int)
     <> showDefault
     <> help "the maximum number of holes to allow in a generated expression" )
-
-numEpochsOpt = option auto
-    ( long "numEpochs"
-    <> value (1001 :: Int)
-    <> showDefault
-    <> help "the maximum number of epochs to train for. since we eval from epoch 1 to end on an eval this should be a multiple of evalFreq, plus one." )
 
 bestOfOpt = option auto
     ( long "bestOf"
