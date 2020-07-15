@@ -208,7 +208,7 @@ dedupeFunctions task_fns fn_type_ios = kept_fns
   -- generate any ('ascending') (Expr, Expr) pairs contained in any of those [Expr]; dedupe pairs
   behaviorOverlapping :: [(Expr, Expr)] = nubBy (equating pp_) . join . elems $ ((=<<) createGroups . elems <$> programsByBehavior)
   -- ditch removed expr for any remaining pairs, then continue going over the rest
-  kept_fns :: [Expr] = Set.toList . flip (foldr checkExprPair) behaviorOverlapping . Set.fromList $ task_fns
+  kept_fns :: [Expr] = Set.toList . flip (foldr' checkExprPair) behaviorOverlapping . Set.fromList $ task_fns
   -- for each pair: ditch the least general or longest or just either
   checkExprPair :: (Expr, Expr) -> Set Expr -> Set Expr =
       \ (e1,e2) exprSet -> if notMember e1 exprSet || notMember e1 exprSet then exprSet else
@@ -245,4 +245,4 @@ mkCharMap tps_ios = indexChars $ exprStrs <> tpStrs
     tpStrs   :: [String] = (\(i,o) -> pp i <> pp  o) <$> (join        $ keys  <$> tps_ios)
 
 indexChars :: [String] -> HashMap Char Int
-indexChars = indexList . Set.toList . flip (foldr Set.insert) "\\\"()" . Set.fromList . join
+indexChars = indexList . Set.toList . flip (foldr' Set.insert) "\\\"()" . Set.fromList . join
