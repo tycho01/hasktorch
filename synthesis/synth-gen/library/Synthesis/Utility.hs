@@ -125,7 +125,7 @@ fisherYatesStep (m, gen) (i, x) = ((Map.insert j x . Map.insert i (m Map.! j)) m
 fisherYates :: RandomGen g => g -> [a] -> ([a], g)
 fisherYates gen [] = ([], gen)
 fisherYates gen l = 
-  toElems $ foldl fisherYatesStep (initial (head l) gen) (numerate (tail l))
+  toElems $ foldl' fisherYatesStep (initial (head l) gen) (numerate (tail l))
   where
     toElems (x, y) = (Map.elems x, y)
     numerate = zip [1..]
@@ -135,7 +135,7 @@ fisherYates gen l =
 splitPlaces :: RandomGen g => g -> [Int] -> [e] -> ([[e]], g)
 splitPlaces gen ns xs = (zs_, gen')
   where (zs, gen') = fisherYates gen xs
-        zs_ = fst $ foldl (\ (splits, xs_) n -> (splits ++ [take n xs_], drop n xs_)) ([], zs) ns
+        zs_ = fst $ foldl' (\ (splits, xs_) n -> (splits ++ [take n xs_], drop n xs_)) ([], zs) ns
 
 -- | randomly split a dataset into subsets based on the indicated split ratio
 randomSplit :: RandomGen g => g -> (Double, Double, Double) -> [a] -> ([a], [a], [a])
@@ -176,7 +176,7 @@ replace from to = intercalate to . splitOn from
 
 -- | perform multiple sub-list replacements
 replacements :: Eq a => [([a],[a])] -> [a] -> [a]
-replacements reps lst = foldl (\ x (from,to) -> replace from to x) lst reps
+replacements reps lst = foldl' (\ x (from,to) -> replace from to x) lst reps
 
 -- | conditionally transform a value
 -- | deprecated, not in use

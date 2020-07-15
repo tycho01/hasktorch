@@ -134,7 +134,7 @@ main = do
         notice_ $ pp_ in_type_instantiations
         -- for each function, for each type instantiation, for each param, the input type as string
         let fn_type_instantiations' :: HashMap Expr [([Tp], Tp)] = (type_instantiations !) <$> fn_types
-        let fn_type_instantiations :: HashMap Expr [([Tp], Tp)] = fromList . fst $ foldr (\ (fn, type_instantiations) (lst, g) -> first ((: lst) . (fn,) . take maxInstantiations) $ fisherYates g type_instantiations) (([] :: [(Expr, [([Tp], Tp)])]), gen) $ toList fn_type_instantiations'
+        let fn_type_instantiations :: HashMap Expr [([Tp], Tp)] = fromList . fst $ foldr' (\ (fn, type_instantiations) (lst, g) -> first ((: lst) . (fn,) . take maxInstantiations) $ fisherYates g type_instantiations) (([] :: [(Expr, [([Tp], Tp)])]), gen) $ toList fn_type_instantiations'
         say_ "\nfn_type_instantiations:"
         notice_ $ pp_ fn_type_instantiations
         -- do sample generation not for each function but for each function input type
