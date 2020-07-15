@@ -186,7 +186,7 @@ calcLoss randomHole dsl task_fn taskType symbolIdxs model io_feats variantMap ru
                     -- debug $ "predicted': " <> show (shape' predicted')
                     (ppt', gold) <- liftIO $ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt predicted'
                     debug $ "ppt': " <> pp ppt'
-                    return (ppt', toDynamic gold : golds, toDynamic predicted' : predictions, filled + 1)
+                    return (ppt', (:) (toDynamic gold) $! golds, (:) (toDynamic predicted') $! predictions, filled + 1)
             in while (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
     let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
     -- debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
@@ -273,7 +273,7 @@ train synthesizerConfig taskFnDataset init_model = do
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
             let model' :: synthesizer = A.replaceParameters model newParam
             liftIO $ incProgress pb 1
-            return (toDynamic loss : train_losses, model', optim', gen')
+            return ((:) (toDynamic loss) $! train_losses, model', optim', gen')
 
         debug "finished epoch training"
         -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
@@ -299,7 +299,7 @@ train synthesizerConfig taskFnDataset init_model = do
             liftIO $ D.save (D.toDependent <$> A.flattenParameters model') modelPath
 
             let eval_result = EvalResult epoch epochSeconds (toFloat loss_train) (toFloat loss_valid) (toFloat acc_valid)
-            let eval_results' = eval_result : eval_results
+            let eval_results' = (:) eval_result $! eval_results
             let earlyStop :: Bool = whenOr False (length eval_results' >= 2 * checkWindow) $ let
                     losses  :: [Float] = lossValid <$> eval_results'
                     losses' :: [Float] = take (2 * checkWindow) losses
@@ -395,7 +395,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
         liftIO $ incProgress pb 1
-        return (gen', (best_works, loss) : eval_stats)
+        return (gen', (:) (best_works, loss) $! eval_stats)
 
     let acc  :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . F.toDType D.Float . D.asTensor $ fst <$> eval_stats
     let loss :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ toDynamic           . snd <$> eval_stats
