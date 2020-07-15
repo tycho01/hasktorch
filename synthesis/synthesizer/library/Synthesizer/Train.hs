@@ -29,7 +29,6 @@ import           System.Directory              (createDirectoryIfMissing)
 import           System.CPUTime
 import           System.ProgressBar
 import           Data.Text.Internal.Lazy (Text)
-import           Data.Foldable                 (foldrM)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
 import qualified Data.Set
@@ -43,6 +42,7 @@ import           Data.Text.Prettyprint.Doc (pretty)
 import           Text.Printf
 import           Foreign.Marshal.Utils         (fromBool)
 import           Control.Monad                 (join, replicateM, forM, void, when)
+import           Control.Monad.Trans.Loop
 import           Language.Haskell.Exts.Syntax  ( Exp (..) )
 import           Prelude                        hiding (abs)
 import           Language.Haskell.Interpreter  ( Interpreter, liftIO, lift )
@@ -219,8 +219,6 @@ prep_dsl TaskFnDataset{..} =
     -- without this, blocks identical to their keys are seen as recursive, causing non-termination
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
-foldrM_ x xs f = foldrM f x xs
-
 -- | train a NSPS model and return results
 train :: forall device rules shape ruleFeats synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape))) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
@@ -246,15 +244,15 @@ train synthesizerConfig taskFnDataset init_model = do
 
     -- MODELS
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
-    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0)
+    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, 1)
 
-    (_, model, _, _, eval_results, _, _) <- foldLoop init_state numEpochs $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc) epoch -> if earlyStop then pure state else do
+    (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop then exitWith state else do
         notice $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 (length train_set') ("task-fns" :: Text))
         start <- liftIO $ getCPUTime
         -- TRAIN LOOP
-        (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn !(train_losses, model, optim, gen_) -> do
+        (train_losses, model', optim', gen'', _) :: ([D.Tensor], synthesizer, D.Adam, StdGen, [Expr]) <- iterateLoopT ([], model_, optim_, gen', train_set') $ \ !state@(train_losses, model, optim, gen_, task_fns) -> case task_fns of [] -> exitWith state; task_fn : task_fns' -> do
             info $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = safeIndexHM fnTypes task_fn
             info $ "taskType: " <> pp taskType
@@ -278,7 +276,7 @@ train synthesizerConfig taskFnDataset init_model = do
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
             let model' :: synthesizer = A.replaceParameters model newParam
             liftIO $ incProgress pb 1
-            return ((:) (toDynamic loss) $! train_losses, model', optim', gen')
+            return ((:) (toDynamic loss) $! train_losses, model', optim', gen', task_fns')
 
         debug "finished epoch training"
         -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
@@ -325,7 +323,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 return . divScalar learningDecay $ lr
             False -> pure lr
 
-        return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid)
+        return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
     -- write results to csv
     liftIO $ createDirectoryIfMissing True resultFolder
@@ -345,7 +343,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 (length dataset) ("eval-fn" :: Text))
-    (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \ task_fn !(gen_, eval_stats) -> do
+    (gen', eval_stats, _) :: (StdGen, [(Bool, Tensor device 'D.Float '[])], [Expr]) <- iterateLoopT (gen, [], dataset) $ \ !state@(gen_, eval_stats, task_fns) -> case task_fns of [] -> exitWith state; task_fn : task_fns' -> do
 
         let taskType :: Tp = safeIndexHM fnTypes task_fn
         debug $ "taskType: " <> pp taskType
@@ -403,7 +401,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
         liftIO $ incProgress pb 1
-        return (gen', (:) (best_works, loss) $! eval_stats)
+        return (gen', (:) (best_works, loss) $! eval_stats, task_fns')
 
     let acc  :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . F.toDType D.Float . D.asTensor $ fst <$> eval_stats
     let loss :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ toDynamic           . snd <$> eval_stats
