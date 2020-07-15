@@ -19,6 +19,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
+{-# OPTIONS_GHC -fno-full-laziness #-}
 
 module Synthesizer.Train (module Synthesizer.Train) where
 
