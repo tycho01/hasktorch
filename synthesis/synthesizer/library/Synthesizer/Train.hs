@@ -341,6 +341,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
+    pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 (length dataset) ("eval-fn" :: Text))
     (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \task_fn (gen_, eval_stats) -> do
 
         let taskType :: Tp = safeIndexHM fnTypes task_fn
@@ -359,7 +360,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
         -- sample for best of 100 predictions
         -- TODO: dedupe samples before eval to save evals?
         -- TODO: consider A* / branch-and-bound / beam search instead
-        pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
+        -- pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
         sample_matches :: [Bool] <- replicateM bestOf $ do
             -- TODO: split io_feats and taskType based on param type instance combo 
             (program, used, _filled) :: (Expr, Set String, Int) <- let
@@ -393,11 +394,12 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                                 output_matches :: [Bool] = uncurry (==) . mapBoth pp_ <$> target_outputs `zip` prediction_outputs
                                 in and output_matches
                 return outputs_match
-            liftIO $ incProgress pb 1
+            -- liftIO $ incProgress pb 1
             return ok
 
         let best_works :: Bool = or sample_matches
         -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
+        liftIO $ incProgress pb 1
         return (gen', (best_works, loss) : eval_stats)
 
     let acc  :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . F.toDType D.Float . D.asTensor $ fst <$> eval_stats
