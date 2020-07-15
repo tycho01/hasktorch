@@ -20,6 +20,7 @@ import           Data.Functor                 (void, (<&>))
 import           Data.Bifunctor               (first, second)
 import           Data.HashMap.Lazy            (HashMap, empty, insert, singleton, (!), keys, fromList)
 import qualified Data.Set
+import           Data.Foldable
 import           System.Random                (StdGen, mkStdGen)
 import           System.Timeout               (timeout)
 import           Language.Haskell.Interpreter (as, interpret, liftIO, typeChecks, typeChecksWithDetails)
