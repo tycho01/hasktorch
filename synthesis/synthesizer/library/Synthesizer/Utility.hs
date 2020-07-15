@@ -33,6 +33,7 @@ import Data.Monoid
 import Data.Hashable (Hashable)
 import Data.HashMap.Lazy (HashMap, fromList, lookup, filterWithKey)
 import Data.Proxy
+import Data.Foldable
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.Aeson as Aeson
