@@ -177,7 +177,8 @@ asLong = fromIntegral
 -- | `select` alternative that retains the dimension as a 1
 -- | I want this as a built-in, see https://github.com/pytorch/pytorch/issues/34788
 select' :: D.Tensor -> Int -> Int -> D.Tensor
-select' tensor dim idx = D.indexSelect tensor dim . D.toDevice (D.device tensor) . D.asTensor $ [asLong idx]
+select' tensor dim idx = D.indexSelect dim idxs tensor
+        where idxs = D.toDevice (D.device tensor) . D.asTensor $ [asLong idx]
 
 -- | point-free untyped select
 select'' :: Int -> Int -> D.Tensor -> D.Tensor
