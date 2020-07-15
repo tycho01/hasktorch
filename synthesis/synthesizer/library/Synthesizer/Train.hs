@@ -108,6 +108,7 @@ import           Synthesizer.Params
 predictHole :: forall num_holes rules device . (StandardFloatingPointDTypeValidation device 'D.Float) => Bool -> [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
 predictHole randomHole variants ppt used hole_expansion_probs = do
     debug_ "predictHole"
+    let (holes_dim, _rules_dim) :: (Int, Int) = (0, 1)
     [hole_idx, rule_idx] :: [Int] <- do
             let hole_idx :: Int = 0
             let holeScores :: Tensor device 'D.Float '[rules] = UnsafeMkTensor $ D.select (toDynamic hole_expansion_probs) holes_dim hole_idx
