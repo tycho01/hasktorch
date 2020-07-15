@@ -253,7 +253,9 @@ train synthesizerConfig taskFnDataset init_model = do
         pb <- lift . liftIO $ newProgressBar pgStyle 1 (Progress 0 (length train_set') ("task-fns" :: Text))
         start <- lift . liftIO $ getCPUTime
         -- TRAIN LOOP
-        (train_losses, model', optim', gen'', _) :: ([D.Tensor], synthesizer, D.Adam, StdGen, [Expr]) <- iterateLoopT ([], model_, optim_, gen', train_set') $ \ !state@(train_losses, model, optim, gen_, task_fns) -> case task_fns of [] -> exitWith state; task_fn : task_fns' -> do
+        (train_losses, model', optim', gen'', _) :: ([D.Tensor], synthesizer, D.Adam, StdGen, [Expr]) <- iterateLoopT ([], model_, optim_, gen', train_set') $ \ !state@(train_losses, model, optim, gen_, task_fns) -> case task_fns of
+            [] -> exitWith state
+            task_fn : task_fns' -> do
                 lift . info $ "task_fn: \n" <> pp task_fn
                 let taskType :: Tp = safeIndexHM fnTypes task_fn
                 lift . info $ "taskType: " <> pp taskType
