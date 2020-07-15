@@ -95,7 +95,7 @@ synth_util = parallel $ do
     it "sampleIdxs" $ do
         let t = D.asTensor [[0.0, 0.0], [1.0, 0.0 :: Float]]
         idxs <- sampleIdxs t
-        D.asValue (foldl (\ t' idx -> D.select 0 idx t') t idxs) `shouldBe` (1.0 :: Float)
+        D.asValue (foldl' (\ t' idx -> D.select 0 idx t') t idxs) `shouldBe` (1.0 :: Float)
 
     it "crossEntropy" $ do
         let rule_dim = 1
