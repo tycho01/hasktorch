@@ -24,7 +24,7 @@ import Data.List (minimumBy, partition, nubBy, sort)
 import Data.Ord (Ordering (..))
 import Data.Set (Set, insert, delete, notMember, isProperSubsetOf)
 import Data.Bifunctor (first)
-import Data.Foldable
+import Data.Foldable (foldr')
 import qualified Data.Set as Set
 import Language.Haskell.Exts.Parser (ParseResult, parse)
 import Language.Haskell.Exts.Syntax (Type (..))
