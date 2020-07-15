@@ -207,7 +207,7 @@ rotate r = res
 --         l :: Tensor device dtype '[n + (n - 1)] = constantPadNd1d @'(0, n-1) 0.0 r
 --         is :: [Int] = [0 .. n'-1]
 --         -- stack :: [Tensor] -> Int -> Tensor
---         res :: [[D.Tensor]] = (\i -> (\j -> D.select (toDynamic l) 0 (mod (j - i) n')) <$> is) <$> is
+--         res :: [[D.Tensor]] = (\i -> (\j -> D.select 0 (mod (j - i) n') $ toDynamic l) <$> is) <$> is
 --         -- stack @0 (t :. HNil)
 --         -- res = (\i -> (\j -> select @0 l @(GHC.TypeNats.Mod (j - i) (2 * n - 1)) l) <$> is) <$> is
 --     in res
@@ -250,7 +250,7 @@ dslVariants dsl = do
 batchTensor :: Int -> D.Tensor -> [D.Tensor]
 batchTensor batch_size tensor = let
     nDim :: Int = 0
-    n :: Int = D.size tensor nDim
+    n :: Int = D.size nDim tensor
     numBatches :: Int = ((n-1) `div` batch_size) + 1
     diff :: Int = numBatches * batch_size - n
     paddings :: [Int] = replicate (2 * D.dim tensor - 1) 0 <> [diff]
@@ -259,7 +259,8 @@ batchTensor batch_size tensor = let
             from :: Int = i * batch_size
             to   :: Int = (i+1) * batch_size - 1
             idxs :: [Int] = [from .. to]
-        in D.indexSelect tensor' nDim . D.toDevice (D.device tensor) . D.asTensor $ asLong <$> idxs
+            idxs' = D.toDevice (D.device tensor) . D.asTensor $ asLong <$> idxs
+        in D.indexSelect nDim idxs' tensor'
     in f <$> [0 .. numBatches-1]
 
 -- -- | statically typed version of batchTensor
@@ -277,7 +278,7 @@ batchTensor batch_size tensor = let
 -- batchTensor' tensor = let
 --     batch_size = natValI @batchSize
 --     nDim = natValI @dim
---     n :: Int = D.size (toDynamic tensor) nDim
+--     n :: Int = D.size nDim (toDynamic tensor)
 --     numBatches :: Int = ((n-1) `div` batch_size) + 1
 --     diff :: Int = numBatches * batch_size - n
 --     paddings :: [Int] = replicate (2 * Torch.Typed.Tensor.dim tensor - 1) 0 <> [diff]
@@ -286,7 +287,7 @@ batchTensor batch_size tensor = let
 --             from :: Int = i * batch_size
 --             to   :: Int = (i+1) * batch_size - 1
 --             idxs :: [Int] = [from .. to]
---         in UnsafeMkTensor $ D.indexSelect tensor' nDim . D.toDevice (D.device $ toDynamic tensor) . D.asTensor $ asLong <$> idxs
+--         in UnsafeMkTensor $ D.indexSelect nDim (D.toDevice (D.device $ toDynamic tensor) . D.asTensor $ asLong <$> idxs) tensor'
 --     in f <$> [0 .. numBatches-1]
 
 -- type family FromJust (maybe :: Maybe a) :: a where
@@ -314,10 +315,11 @@ whenOrM def cond x = if cond then x else pure def
 shuffle :: forall g . (RandomGen g) => g -> Int -> D.Tensor -> (g, D.Tensor)
 shuffle gen dim tensor = (gen', shuffled)
     where
-        n = D.size tensor dim
+        n = D.size dim tensor
         idxs = [0 .. n-1]
         (idxs', gen') = fisherYates gen idxs
-        shuffled = D.indexSelect tensor dim . D.toDevice (D.device tensor) . D.asTensor $ asLong <$> idxs'
+        idxs'' = D.toDevice (D.device tensor) . D.asTensor $ asLong <$> idxs'
+        shuffled = D.indexSelect dim idxs'' tensor
 
 -- | square a tensor, for use in mean-square-error loss
 square :: Tensor device 'D.Float shape -> Tensor device 'D.Float shape
@@ -454,7 +456,7 @@ lstmDynamicBatch dropoutOn (LSTMWithConstInit lstm@(LSTM _ (Dropout dropoutProb)
       . (\t -> F.expand t False [batchSize, natValI @(numLayers * NumberOfDirections directionality), natValI @hiddenSize])
       )
       $ hc
-  batchSize = D.size (toDynamic input) $ if rnnBatchFirst @shapeOrder then 0 else 1
+  batchSize = D.size (if rnnBatchFirst @shapeOrder then 0 else 1) $ toDynamic input
 
 d_mkAdam
   :: Int
@@ -482,7 +484,7 @@ instance A.Parameterized (Parameter device dtype shape) where
 sampleTensorWithReplacement :: forall dim size device dtype shape' . (KnownNat dim, KnownNat size, TensorOptions shape' dtype device, KnownShape shape') => Int -> D.Tensor -> IO (Tensor device dtype shape')
 sampleTensorWithReplacement n tensor = do
     sampled_idxs :: D.Tensor <- D.toDevice (D.device tensor) . F.toDType D.Int64 <$> D.randintIO' 0 n [natValI @size]
-    return . UnsafeMkTensor $ D.indexSelect tensor (natValI @dim) sampled_idxs
+    return . UnsafeMkTensor $ D.indexSelect (natValI @dim) sampled_idxs tensor
 
 -- | sample (without replacement, with pool resetting) from a tensor in a given dimension
 sampleTensorWithoutReplacement :: forall dim size device dtype shape' . (KnownNat dim, KnownNat size, TensorOptions shape' dtype device, KnownShape shape') => StdGen -> Int -> D.Tensor -> (StdGen, Tensor device dtype shape')
@@ -490,7 +492,7 @@ sampleTensorWithoutReplacement gen n tensor = (gen', t) where
     (idxs', gen') = fisherYates gen $ [0 .. n - 1]
     idxs :: [Int] = take (natValI @size) . cycle $ idxs'
     sampled_idxs :: D.Tensor = D.toDevice (D.device tensor) . F.toDType D.Int64 . D.asTensor $ idxs
-    t = UnsafeMkTensor $ D.indexSelect tensor (natValI @dim) sampled_idxs
+    t = UnsafeMkTensor $ D.indexSelect (natValI @dim) sampled_idxs tensor
 
 -- | sample (without replacement, with pool resetting) from a list
 sampleWithoutReplacement :: StdGen -> Int -> [a] -> (StdGen, [a])
