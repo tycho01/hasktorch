@@ -102,7 +102,7 @@ import           Synthesizer.Params
 --                 (toDynamic $ unsqueeze @1 rule_idx_by_hole)
 --                 False
 --     hole_idx :: Int = D.asValue $ F.argmax (F.Dim 0) F.RemoveDim $ toDynamic best_prob_by_hole
---     rule_idx :: Int = D.asValue $ D.select (toDynamic rule_idx_by_hole) 0 hole_idx
+--     rule_idx :: Int = D.asValue $ D.select 0 hole_idx $ toDynamic rule_idx_by_hole
 
 -- | fill a non-terminal leaf node in a PPT given hole/rule expansion probabilities
 predictHole :: forall num_holes rules device . (StandardFloatingPointDTypeValidation device 'D.Float) => Bool -> [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
@@ -111,7 +111,7 @@ predictHole randomHole variants ppt used hole_expansion_probs = do
     let (holes_dim, _rules_dim) :: (Int, Int) = (0, 1)
     [hole_idx, rule_idx] :: [Int] <- do
             let hole_idx :: Int = 0
-            let holeScores :: Tensor device 'D.Float '[rules] = UnsafeMkTensor $ D.select (toDynamic hole_expansion_probs) holes_dim hole_idx
+            let holeScores :: Tensor device 'D.Float '[rules] = UnsafeMkTensor $ D.select holes_dim hole_idx $ toDynamic hole_expansion_probs
             let holeProbs  :: Tensor device 'D.Float '[rules] = softmax @0 holeScores
             [rule_idx] :: [Int] <- D.asValue <$> Distribution.sample (Categorical.fromProbs . toDynamic $ holeProbs) [1]
             return [hole_idx, rule_idx]
