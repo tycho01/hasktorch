@@ -14,7 +14,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Hashable (Hashable)
 import Data.Maybe (fromJust, isJust)
-import Data.Foldable
+import Data.Foldable (foldl')
 import qualified Data.Text.Prettyprint.Doc as PP
 import GHC.Exts (groupWith)
 import Language.Haskell.Exts.Pretty (Pretty, prettyPrint)
