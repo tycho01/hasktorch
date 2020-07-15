@@ -4,6 +4,7 @@
 module Synthesis.Ast (module Synthesis.Ast) where
 
 import Data.HashMap.Lazy (HashMap, empty, mapWithKey)
+import Data.Foldable
 import Language.Haskell.Exts.Syntax (Exp (..), Type (..))
 import System.Random (RandomGen, randoms, randomRs)
 import Synthesis.FindHoles
