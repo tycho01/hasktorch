@@ -11,7 +11,7 @@ import System.ProgressBar
 import System.Directory (doesFileExist, removeFile)
 import Control.Exception (finally)
 import Control.Monad (join, filterM, forM_)
-import Data.Foldable
+import Data.Foldable (foldr')
 import Data.Text (Text)
 import qualified Data.ByteString as BS
 import Data.ByteString.Char8 (pack)
