@@ -346,65 +346,66 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 (length dataset) ("eval-fn" :: Text))
-    (gen', eval_stats, _) :: (StdGen, [(Bool, Tensor device 'D.Float '[])], [Expr]) <- iterateLoopT (gen, [], dataset) $ \ !state@(gen_, eval_stats, task_fns) -> case task_fns of [] -> exitWith state; task_fn : task_fns' -> do
+    (gen', eval_stats, _) :: (StdGen, [(Bool, Tensor device 'D.Float '[])], [Expr]) <- iterateLoopT (gen, [], dataset) $ \ !state@(gen_, eval_stats, task_fns) -> case task_fns of
+        [] -> exitWith state
+        task_fn : task_fns' -> do
+            let taskType :: Tp = safeIndexHM fnTypes task_fn
+            lift . debug $ "taskType: " <> pp taskType
+            let type_ins :: HashMap (Tp, Tp) [Expr] = safeIndexHM task_type_ins task_fn
+            lift . debug $ "type_ins: " <> pp_ type_ins
+            let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = safeIndexHM fnTypeIOs task_fn
+            let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
+                    second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @(FromMaybe 0 (ExtractDim BatchDim shape))) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+            -- debug $ "target_tp_io_pairs': " <> pp_ target_tp_io_pairs'
+            let target_outputs :: [Either String Expr] = safeIndexHM task_outputs task_fn
 
-        let taskType :: Tp = safeIndexHM fnTypes task_fn
-        lift . debug $ "taskType: " <> pp taskType
-        let type_ins :: HashMap (Tp, Tp) [Expr] = safeIndexHM task_type_ins task_fn
-        lift . debug $ "type_ins: " <> pp_ type_ins
-        let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] = safeIndexHM fnTypeIOs task_fn
-        let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
-                second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @(FromMaybe 0 (ExtractDim BatchDim shape))) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
-        -- debug $ "target_tp_io_pairs': " <> pp_ target_tp_io_pairs'
-        let target_outputs :: [Either String Expr] = safeIndexHM task_outputs task_fn
+            let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs'
+            loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
 
-        let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs'
-        loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
+            -- sample for best of 100 predictions
+            -- TODO: dedupe samples before eval to save evals?
+            -- TODO: consider A* / branch-and-bound / beam search instead
+            -- pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
+            sample_matches :: [Bool] <- lift $ replicateM bestOf $ do
+                -- TODO: split io_feats and taskType based on param type instance combo 
+                (program, used, _filled) :: (Expr, Set String, Int) <- let
+                        --  :: (Int, Expr) -> IO (Int, Expr)
+                        fill = \(ppt, used, filled) -> do
+                                --  :: Tensor device 'D.Float '[num_holes, rules]
+                                let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
+                                debug $ "predicted: " <> show predicted
+                                (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
+                                return (ppt', used', filled + 1)
+                        in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
+                debug $ pp program
+                ok :: Bool <- if hasHoles program then pure False else do
+                    let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
+                    let program' :: Expr = if null defs then program else letIn defs program
 
-        -- sample for best of 100 predictions
-        -- TODO: dedupe samples before eval to save evals?
-        -- TODO: consider A* / branch-and-bound / beam search instead
-        -- pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
-        sample_matches :: [Bool] <- lift $ replicateM bestOf $ do
-            -- TODO: split io_feats and taskType based on param type instance combo 
-            (program, used, _filled) :: (Expr, Set String, Int) <- let
-                    --  :: (Int, Expr) -> IO (Int, Expr)
-                    fill = \(ppt, used, filled) -> do
-                            --  :: Tensor device 'D.Float '[num_holes, rules]
-                            let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
-                            debug $ "predicted: " <> show predicted
-                            (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
-                            return (ppt', used', filled + 1)
-                    in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
-            debug $ pp program
-            ok :: Bool <- if hasHoles program then pure False else do
-                let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
-                let program' :: Expr = if null defs then program else letIn defs program
+                    debug $ "type_ins: " <> pp_ type_ins
+                    prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
+                            compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
+                                    n :: Int = length $ unTuple' $ ins !! 0
+                                    -- crash_on_error=False is slower but lets me check if it compiles.
+                                    in fnIoPairs False n program' tp_instantiation $ list ins
+                            in sequence $ compileInput `mapWithKey` type_ins
+                    debug $ "prediction_type_ios: " <> pp_ prediction_type_ios
+                    let prediction_io_pairs :: [(Expr, Either String Expr)] =
+                            join . elems $ prediction_type_ios
+                    let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
+                            False -> False
+                            True -> let
+                                    prediction_outputs :: [Either String Expr] = snd <$> prediction_io_pairs
+                                    output_matches :: [Bool] = uncurry (==) . mapBoth pp_ <$> target_outputs `zip` prediction_outputs
+                                    in and output_matches
+                    return outputs_match
+                -- liftIO $ incProgress pb 1
+                return ok
 
-                debug $ "type_ins: " <> pp_ type_ins
-                prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
-                        compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
-                                n :: Int = length $ unTuple' $ ins !! 0
-                                -- crash_on_error=False is slower but lets me check if it compiles.
-                                in fnIoPairs False n program' tp_instantiation $ list ins
-                        in sequence $ compileInput `mapWithKey` type_ins
-                debug $ "prediction_type_ios: " <> pp_ prediction_type_ios
-                let prediction_io_pairs :: [(Expr, Either String Expr)] =
-                        join . elems $ prediction_type_ios
-                let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
-                        False -> False
-                        True -> let
-                                prediction_outputs :: [Either String Expr] = snd <$> prediction_io_pairs
-                                output_matches :: [Bool] = uncurry (==) . mapBoth pp_ <$> target_outputs `zip` prediction_outputs
-                                in and output_matches
-                return outputs_match
-            -- liftIO $ incProgress pb 1
-            return ok
-
-        let best_works :: Bool = or sample_matches
-        -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
-        lift $ incProgress pb 1
-        return (gen', (:) (best_works, loss) $! eval_stats, task_fns')
+            let best_works :: Bool = or sample_matches
+            -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
+            lift $ incProgress pb 1
+            return (gen', (:) (best_works, loss) $! eval_stats, task_fns')
 
     let acc  :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . F.toDType D.Float . D.asTensor $ fst <$> eval_stats
     let loss :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . stack' 0 $ toDynamic           . snd <$> eval_stats
