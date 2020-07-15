@@ -333,7 +333,7 @@ learningRateOpt = option auto
 
 checkWindowOpt = option auto
     ( long "checkWindow"
-    <> value (1 :: Int)
+    <> value (2 :: Int)
     <> showDefault
     <> help "the window of evaluations to check over to verify convergence" )
 
