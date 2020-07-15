@@ -190,7 +190,7 @@ calcLoss randomHole dsl task_fn taskType symbolIdxs model io_feats variantMap ru
                     (ppt', gold) <- liftIO $ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt predicted'
                     debug $ "ppt': " <> pp ppt'
                     return (ppt', (:) (toDynamic gold) $! golds, (:) (toDynamic predicted') $! predictions, filled + 1)
-            in while (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
+            in while_ (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
     let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
     debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
     let hole_expansion_probs :: D.Tensor = F.cat (F.Dim 0) predictions
@@ -376,7 +376,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                                 debug $ "predicted: " <> show predicted
                                 (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
                                 return (ppt', used', filled + 1)
-                        in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
+                        in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
                 debug $ pp program
                 ok :: Bool <- if hasHoles program then pure False else do
                     let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
