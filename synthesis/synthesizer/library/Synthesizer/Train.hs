@@ -16,6 +16,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE BangPatterns #-}
 {-# OPTIONS_GHC -fplugin GHC.TypeLits.KnownNat.Solver #-}
 
 module Synthesizer.Train (module Synthesizer.Train) where
