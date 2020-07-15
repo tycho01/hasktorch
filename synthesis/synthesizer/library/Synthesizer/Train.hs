@@ -245,13 +245,13 @@ train synthesizerConfig taskFnDataset init_model = do
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0)
 
-    (_, model, _, _, eval_results, _, _) <- foldLoop init_state numEpochs $ \ state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc) epoch -> if earlyStop then pure state else do
+    (_, model, _, _, eval_results, _, _) <- foldLoop init_state numEpochs $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc) epoch -> if earlyStop then pure state else do
         notice $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 (length train_set') ("task-fns" :: Text))
         start <- liftIO $ getCPUTime
         -- TRAIN LOOP
-        (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn (train_losses, model, optim, gen_) -> do
+        (train_losses, model', optim', gen'') :: ([D.Tensor], synthesizer, D.Adam, StdGen) <- foldrM_ ([], model_, optim_, gen') train_set' $ \ task_fn !(train_losses, model, optim, gen_) -> do
             info $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = safeIndexHM fnTypes task_fn
             info $ "taskType: " <> pp taskType
@@ -342,7 +342,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                 liftIO $ rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 (length dataset) ("eval-fn" :: Text))
-    (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \task_fn (gen_, eval_stats) -> do
+    (gen', eval_stats) :: (StdGen, [(Bool, Tensor device 'D.Float '[])]) <- foldrM_ (gen, []) dataset $ \ task_fn !(gen_, eval_stats) -> do
 
         let taskType :: Tp = safeIndexHM fnTypes task_fn
         debug $ "taskType: " <> pp taskType
