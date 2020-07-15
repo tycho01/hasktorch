@@ -328,7 +328,7 @@ square = pow (2 :: Int)
 
 -- | cumulative fold
 scan :: (Foldable t) => a -> (a -> a -> a) -> t a -> [a]
-scan acc f = tail . foldl (\ as a -> as <> [f a (last as)]) [acc]
+scan acc f = tail . foldl' (\ as a -> as <> [f a (last as)]) [acc]
 
 -- | get cumulative probabilities
 cumulative :: (Num a, Foldable t) => t a -> [a]
@@ -366,7 +366,7 @@ foldLoop x count block = foldM block x ([1 .. count] :: [a])
 
 -- | like np.unravel_idx, unravel a flat index (from e.g. argmax_t) to the dimensions of a tensor
 unravelIdx :: D.Tensor -> Int -> [Int]
-unravelIdx t idx = snd . foldr (\ dim_ (idx_, idxs) -> (idx_ `Prelude.div` dim_, idx_ `Prelude.mod` dim_ : idxs)) (idx, []) $ D.shape t
+unravelIdx t idx = snd . foldr' (\ dim_ (idx_, idxs) -> (idx_ `Prelude.div` dim_, idx_ `Prelude.mod` dim_ : idxs)) (idx, []) $ D.shape t
 
 -- TODO: replace with built-in
 -- TODO: strip device moving off once nllLoss' patch gets in
