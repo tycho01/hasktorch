@@ -57,8 +57,8 @@ blockAstsCategoryTheory =
     $ insert "fromEnum" "fromEnum"
     -- Foldable
     $ insert "foldMap" "foldMap"
-    -- $ insert "foldr" "foldr"
-    -- $ insert "foldr1" "foldr1"
+    -- $ insert "foldr'" "foldr'"
+    -- $ insert "foldr1'" "foldr1'"
     $ insert "elem" "elem"
     -- Traversable
     -- $ insert "traverse" "traverse"
