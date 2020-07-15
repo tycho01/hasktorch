@@ -59,7 +59,7 @@ hasHoles = not . null . findHolesExpr
 
 -- | number of AST nodes in an Expr
 numAstNodes :: Expr -> Int
-numAstNodes = foldr (\_node acc -> acc + 1) 0
+numAstNodes = foldr' (\_node acc -> acc + 1) 0
 
 -- | hole `_` as an AST Expr
 holeExpr :: Expr
@@ -74,7 +74,7 @@ skeleton = expTypeSig holeExpr
 -- | generate an expression for an n-ary uncurry function, e.g. for n=2: `\ fn (a, b) -> fn a b`
 genUncurry :: Int -> Expr
 genUncurry 1 = var "id"
-genUncurry n = lambda [pvar fn, ptuple $ pvar <$> letters] $ foldl app (var fn) $ var <$> letters
+genUncurry n = lambda [pvar fn, ptuple $ pvar <$> letters] $ foldl' app (var fn) $ var <$> letters
   where
     fn = "fn"
     letters :: [String] = pure <$> ['a' .. nTimes (n -1) succ 'a']
