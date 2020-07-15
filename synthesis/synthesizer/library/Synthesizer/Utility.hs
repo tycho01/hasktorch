@@ -28,12 +28,11 @@ import Debug.Trace (trace)
 import Data.Int (Int64)
 import Data.Maybe (fromJust)
 import Data.List (findIndex, cycle)
-import Data.Foldable (toList)
+import Data.Foldable (toList, foldl', foldr')
 import Data.Monoid
 import Data.Hashable (Hashable)
 import Data.HashMap.Lazy (HashMap, fromList, lookup, filterWithKey)
 import Data.Proxy
-import Data.Foldable
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 import qualified Data.Aeson as Aeson
