@@ -29,145 +29,145 @@ type Tpl2 a = (a,a)
 
 -- | things I wanna transfer between generation and synthesis sessions
 data TaskFnDataset = TaskFnDataset
-    { generationCfg :: GenerationConfig
-    , dsl :: HashMap String Expr
-    , generatedTypes :: HashMap Int [String]  -- i.e. typesByArity
-    , fnTypes :: HashMap Expr Tp
-    , fnTypeIOs :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)])
-    , datasets :: ([Expr], [Expr], [Expr])
-    , exprBlocks :: [(String, Expr)]
-    , variantTypes :: [Tp]
-    , longestExprString :: Int
-    , longestString :: Int
-    , exprCharMap :: HashMap Char Int
-    , bothCharMap :: HashMap Char Int
-    , ruleCharMap :: HashMap Char Int
+    { generationCfg :: !GenerationConfig
+    , dsl :: !HashMap String Expr
+    , generatedTypes :: !HashMap Int [String]  -- i.e. typesByArity
+    , fnTypes :: !HashMap Expr Tp
+    , fnTypeIOs :: !HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)])
+    , datasets :: !([Expr], [Expr], [Expr])
+    , exprBlocks :: ![(String, Expr)]
+    , variantTypes :: ![Tp]
+    , longestExprString :: !Int
+    , longestString :: !Int
+    , exprCharMap :: !HashMap Char Int
+    , bothCharMap :: !HashMap Char Int
+    , ruleCharMap :: !HashMap Char Int
     } deriving (Show, Generic)
 
 data GenerationConfig = GenerationConfig
-    { taskPath :: String
-    , jsonLinesPath :: String
-    , crashOnError :: Bool
-    , seed :: Int
+    { taskPath :: !String
+    , jsonLinesPath :: !String
+    , crashOnError :: !Bool
+    , seed :: !Int
     -- type generation
-    , nestLimit :: Int
-    , maxInstances :: Int
+    , nestLimit :: !Int
+    , maxInstances :: !Int
     -- function generation
-    , maxHoles :: Int
+    , maxHoles :: !Int
     -- sample generation
-    , numInputs :: Int
-    , numMin :: Integer
-    , numMax :: Integer
-    , charMin :: Char
-    , charMax :: Char
-    , listMin :: Int
-    , listMax :: Int
+    , numInputs :: !Int
+    , numMin :: !Integer
+    , numMax :: !Integer
+    , charMin :: !Char
+    , charMax :: !Char
+    , listMin :: !Int
+    , listMax :: !Int
     -- dataset generation
-    , maxInstantiations :: Int
-    , training :: Double
-    , validation :: Double
-    , test :: Double
-    , maxDataset :: Int
-    , maxParams :: Int
-    , verbosity :: String
+    , maxInstantiations :: !Int
+    , training :: !Double
+    , validation :: !Double
+    , test :: !Double
+    , maxDataset :: !Int
+    , maxParams :: !Int
+    , verbosity :: !String
     } deriving (Eq, Show, Generic)
 
 data SynthesizerConfig = SynthesizerConfig
-    { taskPath :: String
-    , seed :: Int
-    -- , encoderBatch :: Int
-    -- , r3nnBatch :: Int
-    , bestOf :: Int
-    , dropoutRate :: Double
-    , evalFreq :: Int
-    , learningRate :: Float
-    , checkWindow :: Int
-    , convergenceThreshold :: Float
-    , resultFolder :: String
-    , learningDecay :: Int
-    , regularization :: Float  -- TODO: use this
-    , verbosity :: String
-    , m :: Int
-    , h :: Int
-    , synthesizer :: String
-    , maskBad :: Bool
-    , randomHole :: Bool
-    , useTypes :: Bool
+    { taskPath :: !String
+    , seed :: !Int
+    -- , encoderBatch :: !Int
+    -- , r3nnBatch :: !Int
+    , bestOf :: !Int
+    , dropoutRate :: !Double
+    , evalFreq :: !Int
+    , learningRate :: !Float
+    , checkWindow :: !Int
+    , convergenceThreshold :: !Float
+    , resultFolder :: !String
+    , learningDecay :: !Int
+    , regularization :: !Float  -- TODO: use this
+    , verbosity :: !String
+    , m :: !Int
+    , h :: !Int
+    , synthesizer :: !String
+    , maskBad :: !Bool
+    , randomHole :: !Bool
+    , useTypes :: !Bool
     } deriving (Eq, Show, Generic)
 
 data GridSearchConfig = GridSearchConfig
-    { taskPath :: String
-    , seed :: Int
-    , bestOf :: Int
-    -- , dropoutRate :: Double
-    , evalFreq :: Int
-    -- , learningRate :: Float
-    , checkWindow :: Int
-    , convergenceThreshold :: Float
-    -- , maxHoles :: Int
-    , resultFolder :: String
-    , learningDecay :: Int
-    -- , regularization :: Float
-    , verbosity :: String
-    , evalRounds :: Int
-    , maskBad :: Bool
-    , randomHole :: Bool
-    , useTypes :: Bool
+    { taskPath :: !String
+    , seed :: !Int
+    , bestOf :: !Int
+    -- , dropoutRate :: !Double
+    , evalFreq :: !Int
+    -- , learningRate :: !Float
+    , checkWindow :: !Int
+    , convergenceThreshold :: !Float
+    -- , maxHoles :: !Int
+    , resultFolder :: !String
+    , learningDecay :: !Int
+    -- , regularization :: !Float
+    , verbosity :: !String
+    , evalRounds :: !Int
+    , maskBad :: !Bool
+    , randomHole :: !Bool
+    , useTypes :: !Bool
     } deriving (Eq, Show, Generic)
 
 -- I should probably include the actual GA config here,
 -- but without a refactor I can't make their defaults
 -- in evolutionaryConfig depend on hparCombs...
 data EvolutionaryConfig = EvolutionaryConfig
-    { taskPath :: String
-    , seed :: Int
-    , bestOf :: Int
-    -- , dropoutRate :: Double
-    , evalFreq :: Int
-    -- , learningRate :: Float
-    , checkWindow :: Int
-    , convergenceThreshold :: Float
-    -- , maxHoles :: Int
-    , resultFolder :: String
-    , learningDecay :: Int
-    -- , regularization :: Float
-    , verbosity :: String
-    -- , evalRounds :: Int
-    , maskBad :: Bool
-    , randomHole :: Bool
-    , useTypes :: Bool
+    { taskPath :: !String
+    , seed :: !Int
+    , bestOf :: !Int
+    -- , dropoutRate :: !Double
+    , evalFreq :: !Int
+    -- , learningRate :: !Float
+    , checkWindow :: !Int
+    , convergenceThreshold :: !Float
+    -- , maxHoles :: !Int
+    , resultFolder :: !String
+    , learningDecay :: !Int
+    -- , regularization :: !Float
+    , verbosity :: !String
+    -- , evalRounds :: !Int
+    , maskBad :: !Bool
+    , randomHole :: !Bool
+    , useTypes :: !Bool
     } deriving (Eq, Show, Generic)
 
 data OptimizationConfig = OptimizationConfig
-    { taskPath :: String
-    , seed :: Int
-    , bestOf :: Int
-    -- , dropoutRate :: Double
-    , evalFreq :: Int
-    -- , learningRate :: Float
-    , checkWindow :: Int
-    , convergenceThreshold :: Float
-    -- , maxHoles :: Int
-    , resultFolder :: String
-    , learningDecay :: Int
-    -- , regularization :: Float
-    , verbosity :: String
-    -- , evalRounds :: Int
-    , maskBad :: Bool
-    , randomHole :: Bool
-    , useTypes :: Bool
+    { taskPath :: !String
+    , seed :: !Int
+    , bestOf :: !Int
+    -- , dropoutRate :: !Double
+    , evalFreq :: !Int
+    -- , learningRate :: !Float
+    , checkWindow :: !Int
+    , convergenceThreshold :: !Float
+    -- , maxHoles :: !Int
+    , resultFolder :: !String
+    , learningDecay :: !Int
+    -- , regularization :: !Float
+    , verbosity :: !String
+    -- , evalRounds :: !Int
+    , maskBad :: !Bool
+    , randomHole :: !Bool
+    , useTypes :: !Bool
     } deriving (Eq, Show, Generic)
 
 data HparComb = HparComb
-    { learningRate :: Float
-    , dropoutRate :: Double
-    , regularization :: Float
-    , m :: Int
-    , h :: Int
+    { learningRate :: !Float
+    , dropoutRate :: !Double
+    , regularization :: !Float
+    , m :: !Int
+    , h :: !Int
     } deriving (Eq, Show, Generic, Ord, Read)
 
 data ViewDatasetConfig = ViewDatasetConfig
-    { taskPath :: String
+    { taskPath :: !String
     } deriving (Eq, Show, Generic)
 
 -- I don't actually know what the exclamation mark does, but Aeson used that in their examples
@@ -227,14 +227,14 @@ combineConfig optCfg hparComb = cfg
                 }
 
 data PreppedDSL = PreppedDSL
-    { variants :: [(String, Expr)]
-    , variant_sizes :: HashMap String Int
-    , task_type_ins :: HashMap Expr (HashMap (Tp, Tp) [Expr])
-    , task_io_map :: HashMap Expr [(Expr, Either String Expr)]
-    , task_outputs :: HashMap Expr [Either String Expr]
-    , symbolIdxs :: HashMap String Int
-    , ruleIdxs :: HashMap String Int
-    , variantMap :: HashMap String Expr
-    , max_holes :: Int
-    , dsl' :: HashMap String Expr
+    { variants :: ![(String, Expr)]
+    , variant_sizes :: !HashMap String Int
+    , task_type_ins :: !HashMap Expr (HashMap (Tp, Tp) [Expr])
+    , task_io_map :: !HashMap Expr [(Expr, Either String Expr)]
+    , task_outputs :: !HashMap Expr [Either String Expr]
+    , symbolIdxs :: !HashMap String Int
+    , ruleIdxs :: !HashMap String Int
+    , variantMap :: !HashMap String Expr
+    , max_holes :: !Int
+    , dsl' :: !HashMap String Expr
     }
