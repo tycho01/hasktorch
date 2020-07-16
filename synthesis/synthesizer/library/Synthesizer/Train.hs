@@ -255,7 +255,7 @@ train synthesizerConfig taskFnDataset init_model = do
         start <- lift . liftIO $ getCPUTime
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
-                task_fn :: Expr = train_set' !! task_fn_id
+                let task_fn :: Expr = train_set' !! task_fn_id
                 lift . info $ "task_fn: \n" <> pp task_fn
                 let taskType :: Tp = safeIndexHM fnTypes task_fn
                 lift . info $ "taskType: " <> pp taskType
