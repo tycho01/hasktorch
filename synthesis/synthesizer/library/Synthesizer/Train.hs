@@ -279,7 +279,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
                 let model' :: synthesizer = A.replaceParameters model newParam
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
-                let train_loss' :: Float = train_loss + toFloat loss / n
+                let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
                 lift . liftIO $ incProgress pb 1
                 return (train_loss', model', optim', gen', task_fn_id + 1)
 
@@ -404,8 +404,8 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
 
             let best_works :: Bool = or sample_matches
             -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
-            let acc'  :: Float = acc  + fromBool best_works / n
-            let loss' :: Float = loss + fromBool loss_      / n
+            let acc'  :: Float = acc  + fromBool best_works / fromIntegral n
+            let loss' :: Float = loss + fromBool loss_      / fromIntegral n
             lift . liftIO $ incProgress pb 1
             return (gen', acc', loss', task_fn_id + 1)
 
