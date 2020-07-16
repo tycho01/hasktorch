@@ -405,7 +405,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
             let best_works :: Bool = or sample_matches
             -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
             let acc'  :: Float = acc  + fromBool best_works / fromIntegral n
-            let loss' :: Float = loss + fromBool loss_      / fromIntegral n
+            let loss' :: Float = loss + toFloat loss_      / fromIntegral n
             lift . liftIO $ incProgress pb 1
             return (gen', acc', loss', task_fn_id + 1)
 
