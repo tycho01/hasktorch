@@ -30,18 +30,18 @@ type Tpl2 a = (a,a)
 -- | things I wanna transfer between generation and synthesis sessions
 data TaskFnDataset = TaskFnDataset
     { generationCfg :: !GenerationConfig
-    , dsl :: !HashMap String Expr
-    , generatedTypes :: !HashMap Int [String]  -- i.e. typesByArity
-    , fnTypes :: !HashMap Expr Tp
-    , fnTypeIOs :: !HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)])
-    , datasets :: !([Expr], [Expr], [Expr])
-    , exprBlocks :: ![(String, Expr)]
-    , variantTypes :: ![Tp]
+    , dsl :: !(HashMap String Expr)
+    , generatedTypes :: !(HashMap Int [String])  -- i.e. typesByArity
+    , fnTypes :: !(HashMap Expr Tp)
+    , fnTypeIOs :: !(HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]))
+    , datasets :: !(([Expr], [Expr], [Expr]))
+    , exprBlocks :: !([(String, Expr)])
+    , variantTypes :: !([Tp])
     , longestExprString :: !Int
     , longestString :: !Int
-    , exprCharMap :: !HashMap Char Int
-    , bothCharMap :: !HashMap Char Int
-    , ruleCharMap :: !HashMap Char Int
+    , exprCharMap :: !(HashMap Char Int)
+    , bothCharMap :: !(HashMap Char Int)
+    , ruleCharMap :: !(HashMap Char Int)
     } deriving (Show, Generic)
 
 data GenerationConfig = GenerationConfig
@@ -227,14 +227,14 @@ combineConfig optCfg hparComb = cfg
                 }
 
 data PreppedDSL = PreppedDSL
-    { variants :: ![(String, Expr)]
-    , variant_sizes :: !HashMap String Int
-    , task_type_ins :: !HashMap Expr (HashMap (Tp, Tp) [Expr])
-    , task_io_map :: !HashMap Expr [(Expr, Either String Expr)]
-    , task_outputs :: !HashMap Expr [Either String Expr]
-    , symbolIdxs :: !HashMap String Int
-    , ruleIdxs :: !HashMap String Int
-    , variantMap :: !HashMap String Expr
+    { variants :: !([(String, Expr)])
+    , variant_sizes :: !(HashMap String Int)
+    , task_type_ins :: !(HashMap Expr (HashMap (Tp, Tp) [Expr]))
+    , task_io_map :: !(HashMap Expr [(Expr, Either String Expr)])
+    , task_outputs :: !(HashMap Expr [Either String Expr])
+    , symbolIdxs :: !(HashMap String Int)
+    , ruleIdxs :: !(HashMap String Int)
+    , variantMap :: !(HashMap String Expr)
     , max_holes :: !Int
-    , dsl' :: !HashMap String Expr
+    , dsl' :: !(HashMap String Expr)
     }
