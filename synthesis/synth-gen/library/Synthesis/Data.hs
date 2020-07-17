@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DataKinds #-}
 
 -- | self-defined types
 module Synthesis.Data (module Synthesis.Data) where
@@ -238,3 +239,6 @@ data PreppedDSL = PreppedDSL
     , max_holes :: !Int
     , dsl' :: !(HashMap String Expr)
     }
+
+-- shared between generator and synthesizer yet had to be static
+type R3nnBatch = 8

@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TypeApplications #-}
 
 -- | generator logic
 module Synthesis.Generator (module Synthesis.Generator) where
@@ -10,8 +11,8 @@ import System.Log.Logger
 import System.ProgressBar
 import System.Directory (doesFileExist, removeFile)
 import Control.Exception (finally)
-import Control.Monad (join, filterM, forM_)
-import Data.Foldable (foldr')
+import Control.Monad (join, filterM, forM_, void)
+import Data.Foldable (foldr', foldrM)
 import Data.Text (Text)
 import qualified Data.ByteString as BS
 import Data.ByteString.Char8 (pack)
@@ -29,6 +30,7 @@ import Data.HashMap.Lazy
     union,
     size,
     lookupDefault,
+    fromListWith,
   )
 import qualified Data.HashMap.Lazy as HM
 import Data.List (partition, maximum)
@@ -36,7 +38,9 @@ import Data.Maybe (catMaybes, fromJust)
 import qualified Data.Set as Set
 import qualified Data.Aeson as Aeson
 import Data.Yaml
+import Data.Proxy
 import System.Random (StdGen, mkStdGen, setStdGen)
+import GHC.TypeNats (natVal)
 import Language.Haskell.Interpreter (Interpreter)
 import Synthesis.Blocks
 import Synthesis.Generation
@@ -45,7 +49,7 @@ import Synthesis.Ast
 import Synthesis.Orphanage ()
 import Synthesis.Types
 import Synthesis.TypeGen
-import Synthesis.Data (Expr, Tp, TaskFnDataset (..), GenerationConfig (..))
+import Synthesis.Data (Expr, Tp, TaskFnDataset (..), GenerationConfig (..), R3nnBatch)
 import Synthesis.Configs
 import Synthesis.Utility
 import Util (secondM)
@@ -155,9 +159,17 @@ main = do
         notice_ $ pp_ both_instantiation_inputs
         pb <- newProgressBar pgStyle 1 (Progress 0 (size fn_type_instantiations) "generator")
         writeFile jsonLinesPath ""
-        forM_ (toList fn_type_instantiations) $ \(fn, type_instantiations) -> do
-            notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
-            (`finally` incProgress pb 1) . join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) <.> interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
+        let foldIOs = \ (fn, type_instantiations) gen_ -> do
+                    notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
+                    target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
+                            interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
+                    let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
+                            -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
+                            second (fromListWith (<>)) . sampleWithoutReplacement gen_ (fromIntegral $ natVal $ Proxy @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+                    BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
+                    incProgress pb 1
+                    return gen'
+        void $ foldrM foldIOs gen (toList fn_type_instantiations)
 
     fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList . fmap (fromJust . Aeson.decode . fromStrict . pack) . init . lines <$> readFile jsonLinesPath
     say_ "\nfn_type_ios:"
