@@ -11,7 +11,7 @@ import System.Log.Logger
 import System.ProgressBar
 import System.Directory (doesFileExist, removeFile)
 import Control.Exception (finally)
-import Control.Monad (join, filterM, forM_)
+import Control.Monad (join, filterM, forM_, void)
 import Data.Foldable (foldr', foldrM)
 import Data.Text (Text)
 import qualified Data.ByteString as BS
@@ -169,7 +169,7 @@ main = do
                     join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
                     incProgress pb 1
                     return gen'
-        foldrM foldIOs gen (toList fn_type_instantiations)
+        void $ foldrM foldIOs gen (toList fn_type_instantiations)
 
     fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList . fmap (fromJust . Aeson.decode . fromStrict . pack) . init . lines <$> readFile jsonLinesPath
     say_ "\nfn_type_ios:"
