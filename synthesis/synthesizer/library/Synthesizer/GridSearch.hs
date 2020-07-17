@@ -212,6 +212,5 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     let modelPath :: String = printf "%s/%s/%04d.pt" resultFolder (ppCfg synthCfg) epoch
     params :: [D.Tensor] <- D.load modelPath
     let model' = A.replaceParameters model $ D.IndependentTensor <$> params
-    let gen :: StdGen = mkStdGen seed
-    (acc_test, loss_test, _gen') <- interpretUnsafe $ evaluate @device @rules @shape @ruleFeats gen taskFnDataset prepped_dsl bestOf maskBad randomHole model' test_set
+    (acc_test, loss_test) <- interpretUnsafe $ evaluate @device @rules @shape @ruleFeats taskFnDataset prepped_dsl bestOf maskBad randomHole model' test_set
     printf "Test loss: %.4f. Test accuracy: %.4f.\n" loss_test acc_test
