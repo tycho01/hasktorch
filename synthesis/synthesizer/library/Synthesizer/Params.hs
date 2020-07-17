@@ -17,7 +17,7 @@ type LhsSymbols = 1
 type EncoderBatch = 8
 encoderBatch :: Int
 encoderBatch = natValI @EncoderBatch
-type R3nnBatch = 8
+-- type R3nnBatch = 8  -- moved to generator
 r3nnBatch :: Int
 r3nnBatch = natValI @R3nnBatch
 
