@@ -204,7 +204,7 @@ nsps = parallel $ let
         let variantMap :: HashMap String Expr = fromList variants
         let task_fn :: Expr = parseExpr "not (not (true))"
         let ppt :: Expr = parseExpr "not (not (undefined :: Bool))"
-        ppt' :: Expr <- superviseHole randomHole @Device variantMap numHoles task_fn ppt
+        ppt' :: Expr <- superviseHole @Device randomHole variantMap numHoles task_fn ppt
         pp ppt' `shouldBe` pp task_fn
 
     it "fillHoleTrain" $ do
