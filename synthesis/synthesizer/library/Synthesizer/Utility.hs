@@ -360,10 +360,6 @@ assertEq = assertEqBy id
 softmaxAll :: D.Tensor -> D.Tensor
 softmaxAll t = D.reshape (D.shape t) $ F.softmax (F.Dim 0) $ F.flattenAll t
 
--- | loop n times, retaining state
-foldLoop :: forall a b m . (Num a, Enum a, Monad m) => b -> a -> (b -> a -> m b) -> m b
-foldLoop x count block = foldM block x ([1 .. count] :: [a])
-
 -- | like np.unravel_idx, unravel a flat index (from e.g. argmax_t) to the dimensions of a tensor
 unravelIdx :: D.Tensor -> Int -> [Int]
 unravelIdx t idx = snd . foldr' (\ dim_ (idx_, idxs) -> (idx_ `Prelude.div` dim_, idx_ `Prelude.mod` dim_ : idxs)) (idx, []) $ D.shape t
@@ -503,7 +499,7 @@ sampleWithoutReplacement gen n xs = (gen', xs'') where
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String
-ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder","numEpochs"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
+ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
 
 -- https://hackage.haskell.org/package/relude-0.6.0.0/docs/Relude-Extra-Tuple.html#v:traverseToSnd
 traverseToSnd :: Functor t => (a -> t b) -> a -> t (a, b)
