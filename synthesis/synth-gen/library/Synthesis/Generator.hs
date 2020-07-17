@@ -156,15 +156,15 @@ main = do
         pb <- newProgressBar pgStyle 1 (Progress 0 (size fn_type_instantiations) "generator")
         writeFile jsonLinesPath ""
         foldrM fn gen (toList fn_type_instantiations) where fn = \ (fn, type_instantiations) gen_ -> do
-            notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
-            target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
-                    interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
-            (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) <-
-                -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
-                second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
-            join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
-            incProgress pb 1
-            return gen'
+                notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
+                target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
+                        interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
+                (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) <-
+                    -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
+                    second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+                join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
+                incProgress pb 1
+                return gen'
 
     fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList . fmap (fromJust . Aeson.decode . fromStrict . pack) . init . lines <$> readFile jsonLinesPath
     say_ "\nfn_type_ios:"
