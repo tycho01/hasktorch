@@ -214,4 +214,4 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     let model' = A.replaceParameters model $ D.IndependentTensor <$> params
     let gen :: StdGen = mkStdGen seed
     (acc_test, loss_test, _gen') <- interpretUnsafe $ evaluate @device @rules @shape @ruleFeats gen taskFnDataset prepped_dsl bestOf maskBad randomHole model' test_set
-    printf "Test loss: %.4f. Test accuracy: %.4f.\n" (toFloat loss_test) (toFloat acc_test)
+    printf "Test loss: %.4f. Test accuracy: %.4f.\n" loss_test acc_test
