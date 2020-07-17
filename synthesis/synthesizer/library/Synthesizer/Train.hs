@@ -169,7 +169,7 @@ calcLoss randomHole dsl task_fn taskType symbolIdxs model io_feats variantMap ru
             fill = \(ppt, golds, predictions, filled) -> do
                     --  :: Tensor device 'D.Float '[num_holes, rules]
                     let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt io_feats
-                    debug $ "predicted: " <> show (shape' predicted)
+                    -- debug $ "predicted: " <> show (shape' predicted)
                     predicted' <- if not maskBad then pure predicted else do
                         --  :: Tensor device 'D.Float '[num_holes, rules]
                         mask <-
@@ -177,17 +177,17 @@ calcLoss randomHole dsl task_fn taskType symbolIdxs model io_feats variantMap ru
                             (\(hole_getter, hole_setter) -> mapM (fitExpr . hole_setter ppt . snd) variants)
                             `mapM` findHolesExpr ppt
                         return . Torch.Typed.Tensor.toDevice @device . asUntyped (F.mul $ toDynamic mask) $ predicted
-                    debug $ "predicted': " <> show (shape' predicted')
+                    -- debug $ "predicted': " <> show (shape' predicted')
                     (ppt', gold) <- liftIO $ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt predicted'
                     debug $ "ppt': " <> pp ppt'
                     return (ppt', (:) (toDynamic gold) $! golds, (:) (toDynamic predicted') $! predictions, filled + 1)
             in while (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
     let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
-    debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
+    -- debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
     let hole_expansion_probs :: D.Tensor = F.cat (F.Dim 0) predictions
-    debug $ "hole_expansion_probs: " <> show (D.shape hole_expansion_probs)
+    -- debug $ "hole_expansion_probs: " <> show (D.shape hole_expansion_probs)
     let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules @ruleFeats model variant_sizes $ UnsafeMkTensor $ crossEntropy gold_rule_probs rule_dim hole_expansion_probs
-    debug $ "loss: " <> show (shape' loss)
+    -- debug $ "loss: " <> show (shape' loss)
     return loss
 
 -- | pre-calculate DSL stuff
@@ -259,9 +259,9 @@ train synthesizerConfig taskFnDataset init_model = do
             --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
             -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
             let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs'
-            debug $ "io_feats: " <> show (shape' io_feats)
+            -- debug $ "io_feats: " <> show (shape' io_feats)
             loss :: Tensor device 'D.Float '[] <- calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
-            debug $ "loss: " <> show (shape' loss)
+            -- debug $ "loss: " <> show (shape' loss)
             -- TODO: do once for each mini-batch / fn?
             -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
             (newParam, optim') <- liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
@@ -357,7 +357,7 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
                     fill = \(ppt, used, filled) -> do
                             --  :: Tensor device 'D.Float '[num_holes, rules]
                             let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt io_feats
-                            debug $ "predicted: " <> show predicted
+                            -- debug $ "predicted: " <> show predicted
                             (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
                             return (ppt', used', filled + 1)
                     in while (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
