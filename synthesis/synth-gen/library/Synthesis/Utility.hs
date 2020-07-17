@@ -84,11 +84,11 @@ fromValsM fn vs = do
   return $ fromList $ zip ks vs
 
 -- | while a predicate holds, perform a monadic operation starting from an initial value
-while :: Monad m => (a -> Bool) -> (a -> m a) -> a -> m a
-while praed funktion x
+while_ :: Monad m => (a -> Bool) -> (a -> m a) -> a -> m a
+while_ praed funktion x
   | praed x = do
     y <- funktion x
-    while praed funktion y
+    while_ praed funktion y
   | otherwise = return x
 
 -- | shorthand for pretty-printing AST nodes, used for comparisons
