@@ -58,6 +58,8 @@ common synth
                     , ghc-typelits-natnormalise
                     , GA
                     , synth-gen
+                    , transformers
+                    , control-monad-loop
 
 library
   import: config, synth
