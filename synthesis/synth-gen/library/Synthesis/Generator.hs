@@ -155,7 +155,8 @@ main = do
         notice_ $ pp_ both_instantiation_inputs
         pb <- newProgressBar pgStyle 1 (Progress 0 (size fn_type_instantiations) "generator")
         writeFile jsonLinesPath ""
-        foldrM fn gen (toList fn_type_instantiations) where fn = \ (fn, type_instantiations) gen_ -> do
+        foldrM fn gen (toList fn_type_instantiations)
+            where fn = \ (fn, type_instantiations) gen_ -> do
                 notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
                 target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
                         interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
