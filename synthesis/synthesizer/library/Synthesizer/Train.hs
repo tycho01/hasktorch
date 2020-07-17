@@ -288,7 +288,7 @@ train synthesizerConfig taskFnDataset init_model = do
         (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
             debug "evaluating"
 
-            (acc_valid, loss_valid, gen_) <- evaluate @device @rules @shape @ruleFeats gen'' taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
+            (acc_valid, loss_valid) <- evaluate @device @rules @shape @ruleFeats taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
 
             say $ printf
                 "Epoch: %03d. Train loss: %.4f. Validation loss: %.4f. Validation accuracy: %.4f.\n"
@@ -312,7 +312,7 @@ train synthesizerConfig taskFnDataset init_model = do
                     in earlyStop
             when earlyStop $ debug "validation loss has converged, stopping early!"
 
-            return $ (earlyStop, eval_results', gen_)
+            return $ (earlyStop, eval_results', gen'')
 
         let acc_valid :: Float = accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
@@ -336,15 +336,15 @@ train synthesizerConfig taskFnDataset init_model = do
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
-         => StdGen -> TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [Expr] -> Interpreter (Float, Float, StdGen)
-evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model dataset = do
+         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [Expr] -> Interpreter (Float, Float, StdGen)
+evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model dataset = do
     debug "evaluate"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     let n :: Int = length dataset
     pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
-    (gen', acc, loss, _) :: (StdGen, Float, Float, Int) <- iterateLoopT (gen, 0.0, 0.0, 0) $ \ !state@(gen_, acc, loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+    (acc, loss, _) :: (Float, Float, Int) <- iterateLoopT (0.0, 0.0, 0) $ \ !state@(acc, loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let task_fn :: Expr = dataset !! task_fn_id
             let taskType :: Tp = safeIndexHM fnTypes task_fn
             lift . debug $ "taskType: " <> pp taskType
@@ -401,6 +401,6 @@ evaluate gen TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model da
             let acc'  :: Float = acc  + fromBool best_works / fromIntegral n
             let loss' :: Float = loss + toFloat loss_      / fromIntegral n
             lift . liftIO $ incProgress pb 1
-            return (gen', acc', loss', task_fn_id + 1)
+            return (acc', loss', task_fn_id + 1)
 
-    return (acc, loss, gen')
+    return (acc, loss)
