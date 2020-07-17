@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DataKinds #-}
 
 -- | self-defined types
 module Synthesis.Data (module Synthesis.Data) where
