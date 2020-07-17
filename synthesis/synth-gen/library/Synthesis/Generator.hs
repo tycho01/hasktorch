@@ -163,10 +163,10 @@ main = do
                     notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
                     target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
                             interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
-                    (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) <-
+                    let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
                         -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
                         second (fromListWith (<>)) . sampleWithoutReplacement gen_ (fromIntegral $ natVal $ Proxy @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
-                    join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
+                    BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
                     incProgress pb 1
                     return gen'
         void $ foldrM foldIOs gen (toList fn_type_instantiations)
