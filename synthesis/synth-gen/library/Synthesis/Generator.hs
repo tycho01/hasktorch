@@ -46,7 +46,7 @@ import Synthesis.Ast
 import Synthesis.Orphanage ()
 import Synthesis.Types
 import Synthesis.TypeGen
-import Synthesis.Data (Expr, Tp, TaskFnDataset (..), GenerationConfig (..))
+import Synthesis.Data (Expr, Tp, TaskFnDataset (..), GenerationConfig (..), R3nnBatch)
 import Synthesis.Configs
 import Synthesis.Utility
 import Util (secondM)
