@@ -336,7 +336,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
-         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [Expr] -> Interpreter (Float, Float, StdGen)
+         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [Expr] -> Interpreter (Float, Float)
 evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model dataset = do
     debug "evaluate"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
