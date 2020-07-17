@@ -230,3 +230,9 @@ pgStyle = defStyle {
             , stylePostfix = Label (\ pg _ -> progressCustom pg)
             , styleOnComplete = Clear
             }
+
+-- | sample (without replacement, with pool resetting) from a list
+sampleWithoutReplacement :: StdGen -> Int -> [a] -> (StdGen, [a])
+sampleWithoutReplacement gen n xs = (gen', xs'') where
+    (xs', gen') = fisherYates gen xs
+    xs'' = take n . cycle $ xs'

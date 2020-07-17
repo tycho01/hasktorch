@@ -12,7 +12,7 @@ import System.ProgressBar
 import System.Directory (doesFileExist, removeFile)
 import Control.Exception (finally)
 import Control.Monad (join, filterM, forM_)
-import Data.Foldable (foldr')
+import Data.Foldable (foldr', foldrM)
 import Data.Text (Text)
 import qualified Data.ByteString as BS
 import Data.ByteString.Char8 (pack)
@@ -30,6 +30,7 @@ import Data.HashMap.Lazy
     union,
     size,
     lookupDefault,
+    fromListWith,
   )
 import qualified Data.HashMap.Lazy as HM
 import Data.List (partition, maximum)
@@ -37,7 +38,9 @@ import Data.Maybe (catMaybes, fromJust)
 import qualified Data.Set as Set
 import qualified Data.Aeson as Aeson
 import Data.Yaml
+import Data.Proxy
 import System.Random (StdGen, mkStdGen, setStdGen)
+import GHC.TypeNats (natVal)
 import Language.Haskell.Interpreter (Interpreter)
 import Synthesis.Blocks
 import Synthesis.Generation
@@ -162,7 +165,7 @@ main = do
                             interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
                     (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) <-
                         -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
-                        second (fromListWith (<>)) . sampleWithoutReplacement gen_ (natValI @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+                        second (fromListWith (<>)) . sampleWithoutReplacement gen_ (fromIntegral $ natVal $ Proxy @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
                     join $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
                     incProgress pb 1
                     return gen'

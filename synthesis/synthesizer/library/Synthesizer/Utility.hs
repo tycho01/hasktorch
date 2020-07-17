@@ -491,12 +491,6 @@ sampleTensorWithoutReplacement gen n tensor = (gen', t) where
     sampled_idxs :: D.Tensor = D.toDevice (D.device tensor) . F.toDType D.Int64 . D.asTensor $ idxs
     t = UnsafeMkTensor $ D.indexSelect (natValI @dim) sampled_idxs tensor
 
--- | sample (without replacement, with pool resetting) from a list
-sampleWithoutReplacement :: StdGen -> Int -> [a] -> (StdGen, [a])
-sampleWithoutReplacement gen n xs = (gen', xs'') where
-    (xs', gen') = fisherYates gen xs
-    xs'' = take n . cycle $ xs'
-
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String
 ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
