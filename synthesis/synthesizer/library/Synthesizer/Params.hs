@@ -7,6 +7,7 @@ module Synthesizer.Params (module Synthesizer.Params) where
 
 import GHC.TypeNats (type (+))
 import Torch.Typed.Aux
+import Synthesis.Data
 
 -- TODO: consider which hyperparams have been / should be shared across networks
 
