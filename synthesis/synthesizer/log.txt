@@ -1,73 +1,0 @@
-Up to date
-GenerationConfig {taskPath = "./run-results/datasets-2.yml", jsonLinesPath = "./run-results/ios.jsonl", crashOnError = True, seed = 666, nestLimit = 1, maxInstances = 5, maxHoles = 2, numInputs = 10, numMin = -20, numMax = 20, charMin = '0', charMax = '9', listMin = 0, listMax = 3, maxInstantiations = 4, training = 0.35, validation = 0.35, test = 0.3, maxDataset = 1000, maxParams = 3, verbosity = "warning"}
-
-typesByArity:
-
-dsl:
-
-generating task functions:
-
-block_fn_types:
-
-unaliasedBlockTypes:
-
-unaliasedVariants:
-
-variantTypes:
-
-ruleCharMap:
-
-variants:
-
-programs:
-
-fn_types:
-
-task_types:
-
-fill_types:
-
-fn_input_types:
-
-input_types:
-
-param_fn_types:
-
-rest_type_instantiations:
-
-task_instantiations:
-
-type_fn_instantiations:
-
-type_instantiations:
-
-in_type_instantiations:
-
-fn_type_instantiations:
-
-rest_instantiation_inputs:
-
-instantiated_fn_options:
-
-both_instantiation_inputs:
- 0/49 [......................] generator 3/49 [=>....................] generator 4/49 [=>....................] generator 8/49 [===>..................] generator12/49 [=====>................] generator16/49 [=======>..............] generator20/49 [========>.............] generator23/49 [==========>...........] generator27/49 [============>.........] generator31/49 [=============>........] generator35/49 [===============>......] generator39/49 [=================>....] generator43/49 [===================>..] generator47/49 [=====================>] generator49/49 [======================] generator[K
-fn_type_ios:
-combining i/o lists across type instances
-filtering out programs without i/o samples
-
-kept_fns_:
-checking sets contain no fns w/ behavior identical to any in other sets to prevent cheating
-
-kept_fns':
-filtering out program type instances without i/o samples
-taking type instantiations of task fns as separate entries
-sampling task function type instances from any remaining programs
-
-kept_fns:
-train: 18
-validation: 19
-test: 18
-symbols: 19
-rules: 45
-max input/output string length: 76
-data written to ./run-results/datasets-2.yml
