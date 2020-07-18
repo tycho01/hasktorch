@@ -347,7 +347,7 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
             lift . debug $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     singleton tpInstPair $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
-            let type_ins :: HashMap (Tp, Tp) [Expr] = fst <$> target_tp_io_pairs
+            let type_ins :: HashMap (Tp, Tp) [Expr] = fmap fst <$> target_tp_io_pairs
             lift . debug $ "type_ins: " <> pp_ type_ins
             let target_outputs :: [Either String Expr] =
                     fmap snd $ join . elems $ target_tp_io_pairs
