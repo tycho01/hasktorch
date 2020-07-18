@@ -195,7 +195,7 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     printf "Best hyper-parameter combination: %s\nEvaluation results: %s\n" (show bestHparComb) (show bestEvalResult)
     -- finally re-evaluate the chosen hyperparameters on our test set
     manual_seed_L $ fromIntegral seed
-    let test_set :: [Expr] = thdOf3 datasets
+    let test_set :: [Expr] = (if cheat then fstOf3 else thdOf3) datasets
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
     let useTypes = natValI @featMult > 1
