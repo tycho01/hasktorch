@@ -137,14 +137,15 @@ main = do
         let in_type_instantiations :: [Tp] = nubPp . concat . fmap fst . concat . elems $ type_instantiations
         say_ "\nin_type_instantiations:"
         notice_ $ pp_ in_type_instantiations
-        -- for each function, for each type instantiation, for each param, the input type as string
+        -- for each function, for each param, the instantiated i/o types
         let fn_type_instantiations' :: HashMap Expr [([Tp], Tp)] = (type_instantiations !) <$> fn_types
-        let fn_type_instantiations :: HashMap Expr [([Tp], Tp)] = fromList . fst $ foldr' (\ (fn, type_instantiations) (lst, g) -> first ((: lst) . (fn,) . take maxInstantiations) $ fisherYates g type_instantiations) (([] :: [(Expr, [([Tp], Tp)])]), gen) $ toList fn_type_instantiations'
+        let (fn_type_instantiations, gen'') :: (HashMap Expr [([Tp], Tp)], StdGen) =
+                sampleHmLists gen maxInstantiations fn_type_instantiations'
         say_ "\nfn_type_instantiations:"
         notice_ $ pp_ fn_type_instantiations
         -- do sample generation not for each function but for each function input type
         -- for each non-function parameter combo type instantiation, a list of sample expressions
-        let rest_instantiation_inputs :: HashMap Tp [Expr] = fromKeys (genInputs gen (numMin, numMax) (charMin, charMax) (listMin, listMax) numInputs) rest_type_instantiations
+        let rest_instantiation_inputs :: HashMap Tp [Expr] = fromKeys (genInputs gen'' (numMin, numMax) (charMin, charMax) (listMin, listMax) numInputs) rest_type_instantiations
         say_ "\nrest_instantiation_inputs:"
         notice_ $ pp_ rest_instantiation_inputs
         -- map each instantiated function parameter type combination to a filtered map of generated programs matching its type
@@ -159,13 +160,15 @@ main = do
         notice_ $ pp_ both_instantiation_inputs
         pb <- newProgressBar pgStyle 1 (Progress 0 (size fn_type_instantiations) "generator")
         writeFile jsonLinesPath ""
+        -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
+        let samplesPerInstantiation :: Int = fromIntegral . natVal . Proxy @R3nnBatch
         let foldIOs = \ (fn, type_instantiations) gen_ -> do
                     notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
                     target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
                             interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn type_instantiations
-                    let (gen', target_tp_io_pairs') :: (StdGen, HashMap (Tp, Tp) [(Expr, Either String Expr)]) =
-                            -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
-                            second (fromListWith (<>)) . sampleWithoutReplacement gen_ (fromIntegral $ natVal $ Proxy @R3nnBatch) . (=<<) (\(tp_pair, ios) -> (tp_pair,) . pure <$> ios) . toList $ target_tp_io_pairs
+                    -- some fns' tp instances get many i/o samples so let's nip that in the bud, cutting down to just the number our R3NN can take (i.e. we'd always train an instance on those couple samples)
+                    let (target_tp_io_pairs', gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
+                            sampleHmLists gen_ samplesPerInstantiation target_tp_io_pairs
                     BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode . (fn,) $ target_tp_io_pairs'
                     incProgress pb 1
                     return gen'
@@ -174,28 +177,31 @@ main = do
     fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList . fmap (fromJust . Aeson.decode . fromStrict . pack) . init . lines <$> readFile jsonLinesPath
     say_ "\nfn_type_ios:"
     notice_ $ pp_ fn_type_ios
-    -- combine i/o lists across type instances
+    say_ "combining i/o lists across type instances"
     let task_io_pairs :: HashMap Expr [(Expr, Either String Expr)] =
             join . elems <$> fn_type_ios
     let task_io_pairs' :: HashMap String [(Expr, Either String Expr)] = mapKeys pp task_io_pairs
 
-    -- filter out programs without i/o samples
+    say_ "filtering out programs without i/o samples"
     let kept_fns_ :: [Expr] = (not . null . ((\k -> lookupDefault [] k task_io_pairs') . pp)) `filter` task_fns
     say_ "\nkept_fns_:"
     notice_ $ pp_ kept_fns_
-    -- ensure sets contain no fns w/ behavior identical to any in other sets to prevent cheating
+    say_ "checking sets contain no fns w/ behavior identical to any in other sets to prevent cheating"
     let kept_fns' :: [Expr] = dedupeFunctions kept_fns_ fn_type_ios
     say_ "\nkept_fns':"
     notice_ $ pp_ kept_fns'
-    -- sample task functions from any remaining programs
-    let (shuffled, _gen) = fisherYates gen $ kept_fns'
-    let kept_fns = take maxDataset shuffled
+    say_ "filtering out program type instances without i/o samples"
+    let fn_type_ios_ = HM.filter (not . null) <$> pickKeysByPp kept_fns fn_type_ios
+    say_ "taking type instantiations of task fns as separate entries"
+    let tp_instances :: [(Expr, (Tp, Tp))] = lists2pairs $ keys <$> fn_type_ios_
+    say_ "sampling task function type instances from any remaining programs"
+    let kept_instances :: [(Expr, (Tp, Tp))] = take maxDataset . fst . fisherYates gen $ tp_instances
+    let kept_fns :: [Expr] = keys $ pairs2lists kept_instances
     say_ "\nkept_fns:"
     notice_ $ pp_ kept_fns
     let fn_types_ = pickKeysByPp kept_fns fn_types
-    let fn_type_ios_ = HM.filter (not . null) <$> pickKeysByPp kept_fns fn_type_ios
 
-    let tp_pairs :: [(Tp, Tp)] = join . elems $ keys <$> fn_type_ios
+    let tp_pairs :: [(Tp, Tp)] = join . elems $ keys <$> fn_type_ios_
     let longest_tp_string :: Int =
             maximum $ length <$> fmap (pp . fst) tp_pairs <> fmap (pp . snd) tp_pairs
     let ios :: [(Expr, Either String Expr)] =
@@ -208,7 +214,7 @@ main = do
 
     let longest_string :: Int = max longest_expr_string longest_tp_string
     let bothCharMap :: HashMap Char Int = mkCharMap $ elems fn_type_ios_
-    let datasets :: ([Expr], [Expr], [Expr]) = randomSplit gen split kept_fns
+    let datasets :: Tple3 (HashMap Expr [(Tp, Tp)]) = mapTuple3 pairs2lists . randomSplit gen split $ kept_instances
 
     -- save task function data
     encodeFile taskPath $ TaskFnDataset
