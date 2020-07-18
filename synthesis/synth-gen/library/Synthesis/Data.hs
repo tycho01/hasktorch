@@ -27,6 +27,7 @@ type Tp = Type L
 type Expr = Exp L
 
 type Tpl2 a = (a,a)
+type Tpl3 a = (a,a,a)
 
 -- | things I wanna transfer between generation and synthesis sessions
 data TaskFnDataset = TaskFnDataset
@@ -35,7 +36,7 @@ data TaskFnDataset = TaskFnDataset
     , generatedTypes :: !(HashMap Int [String])  -- i.e. typesByArity
     , fnTypes :: !(HashMap Expr Tp)
     , fnTypeIOs :: !(HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]))
-    , datasets :: !(([Expr], [Expr], [Expr]))
+    , datasets :: !(Tple3 (HashMap Expr [(Tp, Tp)]))
     , exprBlocks :: !([(String, Expr)])
     , variantTypes :: !([Tp])
     , longestExprString :: !Int
@@ -235,9 +236,6 @@ combineConfig optCfg hparComb = cfg
 data PreppedDSL = PreppedDSL
     { variants :: !([(String, Expr)])
     , variant_sizes :: !(HashMap String Int)
-    , task_type_ins :: !(HashMap Expr (HashMap (Tp, Tp) [Expr]))
-    , task_io_map :: !(HashMap Expr [(Expr, Either String Expr)])
-    , task_outputs :: !(HashMap Expr [Either String Expr])
     , symbolIdxs :: !(HashMap String Int)
     , ruleIdxs :: !(HashMap String Int)
     , variantMap :: !(HashMap String Expr)
