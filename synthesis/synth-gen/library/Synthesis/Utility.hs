@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 
 -- | utility functions
 module Synthesis.Utility (module Synthesis.Utility) where
@@ -7,14 +8,15 @@ import Control.Monad (filterM, join, foldM)
 import Data.Bifoldable (biList)
 import Data.List (replicate, intercalate, maximumBy, minimumBy)
 import Data.List.Split (splitOn)
-import Data.Bifunctor (Bifunctor, bimap, first)
-import Data.HashMap.Lazy ((!), HashMap, fromList, toList, member, elems)
+import Data.Bifunctor (Bifunctor, bimap, first, second)
+import Data.HashMap.Lazy ((!), HashMap, fromList, fromListWith, toList, member, elems)
 import qualified Data.HashMap.Lazy as HM
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Hashable (Hashable)
 import Data.Maybe (fromJust, isJust)
-import Data.Foldable (foldl')
+import Data.Foldable (foldl', foldr')
+import qualified Data.Foldable as Foldable
 import qualified Data.Text.Prettyprint.Doc as PP
 import GHC.Exts (groupWith)
 import Language.Haskell.Exts.Pretty (Pretty, prettyPrint)
@@ -231,8 +233,28 @@ pgStyle = defStyle {
             , styleOnComplete = Clear
             }
 
--- | sample (without replacement, with pool resetting) from a list
-sampleWithoutReplacement :: StdGen -> Int -> [a] -> (StdGen, [a])
-sampleWithoutReplacement gen n xs = (gen', xs'') where
-    (xs', gen') = fisherYates gen xs
-    xs'' = take n . cycle $ xs'
+-- | fix size by sampling without replacement if too much, by duplicating if not enough
+fixSize :: Int -> StdGen -> [a] -> ([a], StdGen)
+fixSize n g xs = first (take n . cycle) $ fisherYates g xs
+
+-- | sample (without replacement) from a list
+sampleWithoutReplacement :: Int -> StdGen -> [a] -> ([a], StdGen)
+sampleWithoutReplacement n g xs = first (take n) $ fisherYates g xs
+
+expandPair :: (a, [b]) -> [(a,b)]
+expandPair (k,vs) = (k,) <$> vs
+
+pairs2lists :: (Hashable k, Eq k) => [(k,v)] -> HashMap k [v]
+pairs2lists = fromListWith (<>) . fmap (second pure)
+
+lists2pairs :: (Hashable k, Eq k) => HashMap k [v] -> [(k,v)]
+lists2pairs = (=<<) expandPair . toList
+
+statefulMap :: (Functor f, Applicative f, Foldable f, Monoid (f b)) => StdGen -> (StdGen -> a -> (b, StdGen)) -> f a -> (f b, StdGen)
+statefulMap g fn xs = (ys', g') where
+    xs' = Foldable.toList xs
+    (ys, g') = foldr' (\ x (lst, g) -> first (: lst) $ fn g x) ([], g) xs'
+    ys' = mconcat $ pure <$> ys
+
+sampleHmLists :: (Hashable k, Eq k) => StdGen -> Int -> HashMap k [v] -> (HashMap k [v], StdGen)
+sampleHmLists g n hm = first (pairs2lists . join) . statefulMap g (sampleWithoutReplacement n) . fmap expandPair . toList $ hm
