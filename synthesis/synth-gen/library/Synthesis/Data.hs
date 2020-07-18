@@ -36,7 +36,7 @@ data TaskFnDataset = TaskFnDataset
     , generatedTypes :: !(HashMap Int [String])  -- i.e. typesByArity
     , fnTypes :: !(HashMap Expr Tp)
     , fnTypeIOs :: !(HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]))
-    , datasets :: !(Tple3 (HashMap Expr [(Tp, Tp)]))
+    , datasets :: !(Tpl3 (HashMap Expr [(Tp, Tp)]))
     , exprBlocks :: !([(String, Expr)])
     , variantTypes :: !([Tp])
     , longestExprString :: !Int

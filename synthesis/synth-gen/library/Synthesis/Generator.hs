@@ -49,7 +49,7 @@ import Synthesis.Ast
 import Synthesis.Orphanage ()
 import Synthesis.Types
 import Synthesis.TypeGen
-import Synthesis.Data (Expr, Tp, TaskFnDataset (..), GenerationConfig (..), R3nnBatch)
+import Synthesis.Data
 import Synthesis.Configs
 import Synthesis.Utility
 import Util (secondM)
@@ -161,7 +161,7 @@ main = do
         pb <- newProgressBar pgStyle 1 (Progress 0 (size fn_type_instantiations) "generator")
         writeFile jsonLinesPath ""
         -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
-        let samplesPerInstantiation :: Int = fromIntegral . natVal . Proxy @R3nnBatch
+        let samplesPerInstantiation :: Int = fromIntegral . natVal $ Proxy @R3nnBatch
         let foldIOs = \ (fn, type_instantiations) gen_ -> do
                     notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> type_instantiations)
                     target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
@@ -191,7 +191,7 @@ main = do
     say_ "\nkept_fns':"
     notice_ $ pp_ kept_fns'
     say_ "filtering out program type instances without i/o samples"
-    let fn_type_ios_ = HM.filter (not . null) <$> pickKeysByPp kept_fns fn_type_ios
+    let fn_type_ios_ = HM.filter (not . null) <$> pickKeysByPp kept_fns' fn_type_ios
     say_ "taking type instantiations of task fns as separate entries"
     let tp_instances :: [(Expr, (Tp, Tp))] = lists2pairs $ keys <$> fn_type_ios_
     say_ "sampling task function type instances from any remaining programs"
@@ -214,7 +214,7 @@ main = do
 
     let longest_string :: Int = max longest_expr_string longest_tp_string
     let bothCharMap :: HashMap Char Int = mkCharMap $ elems fn_type_ios_
-    let datasets :: Tple3 (HashMap Expr [(Tp, Tp)]) = mapTuple3 pairs2lists . randomSplit gen split $ kept_instances
+    let datasets :: Tpl3 (HashMap Expr [(Tp, Tp)]) = mapTuple3 pairs2lists . randomSplit gen split $ kept_instances
 
     -- save task function data
     encodeFile taskPath $ TaskFnDataset

@@ -15,7 +15,8 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Hashable (Hashable)
 import Data.Maybe (fromJust, isJust)
-import Data.Foldable (foldl')
+import Data.Foldable (foldl', foldr')
+import qualified Data.Foldable as Foldable
 import qualified Data.Text.Prettyprint.Doc as PP
 import GHC.Exts (groupWith)
 import Language.Haskell.Exts.Pretty (Pretty, prettyPrint)
@@ -234,11 +235,11 @@ pgStyle = defStyle {
 
 -- | fix size by sampling without replacement if too much, by duplicating if not enough
 fixSize :: Int -> StdGen -> [a] -> ([a], StdGen)
-fixSize n = first (take n . cycle) . fisherYates
+fixSize n g xs = first (take n . cycle) $ fisherYates g xs
 
 -- | sample (without replacement) from a list
 sampleWithoutReplacement :: Int -> StdGen -> [a] -> ([a], StdGen)
-sampleWithoutReplacement n = first (take n) . fisherYates
+sampleWithoutReplacement n g xs = first (take n) $ fisherYates g xs
 
 expandPair :: (a, [b]) -> [(a,b)]
 expandPair (k,vs) = (k,) <$> vs
@@ -249,11 +250,11 @@ pairs2lists = fromListWith (<>) . fmap (second pure)
 lists2pairs :: (Hashable k, Eq k) => HashMap k [v] -> [(k,v)]
 lists2pairs = (=<<) expandPair . toList
 
-statefulMap :: (Functor f, Foldable f, Monoid f) => StdGen -> (StdGen -> a -> (b, StdGen)) -> f a -> (f b, StdGen)
+statefulMap :: (Functor f, Applicative f, Foldable f, Monoid (f b)) => StdGen -> (StdGen -> a -> (b, StdGen)) -> f a -> (f b, StdGen)
 statefulMap g fn xs = (ys', g') where
-    xs' = foldr' (<>) [] xs
+    xs' = Foldable.toList xs
     (ys, g') = foldr' (\ x (lst, g) -> first (: lst) $ fn g x) ([], g) xs'
-    ys' = foldr' (<>) empty ys
+    ys' = mconcat $ pure <$> ys
 
 sampleHmLists :: (Hashable k, Eq k) => StdGen -> Int -> HashMap k [v] -> (HashMap k [v], StdGen)
-sampleHmLists g n hm = first fromList . statefulMap (sampleWithoutReplacement n) . fmap expandPair . toList $ hm
+sampleHmLists g n hm = first (pairs2lists . join) . statefulMap g (sampleWithoutReplacement n) . fmap expandPair . toList $ hm

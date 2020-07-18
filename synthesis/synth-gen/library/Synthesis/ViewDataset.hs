@@ -26,7 +26,7 @@ main = do
     let ViewDatasetConfig{..} = cfg
     taskFnDataset :: TaskFnDataset <- decodeFileThrow taskPath
     let TaskFnDataset{..} = taskFnDataset
-    let (train_set, validation_set, test_set) = datasets
+    let (train_set, _validation_set, _test_set) = datasets
     say_ $ show generationCfg
     -- say_ $ show taskFnDataset
     let set_list = untuple3 datasets
@@ -35,10 +35,10 @@ main = do
     printTaskFns taskFnDataset train_set
 
 -- | print info on task functions
-printTaskFns :: TaskFnDataset -> [Expr] -> IO ()
+printTaskFns :: TaskFnDataset -> HashMap Expr [(Tp, Tp)] -> IO ()
 printTaskFns TaskFnDataset{..} train_set = do
     say_ "\n\nenumerating function i/o examples:"
-    forM_ train_set $ \ast -> do
+    forM_ (keys train_set) $ \ast -> do
         let fn_type :: Tp = fnTypes ! ast
         say_ "================================================"
         say_ $ "\n" ++ pp_ (expTypeSig (letRes ast) fn_type)
