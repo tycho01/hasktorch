@@ -258,10 +258,10 @@ train synthesizerConfig taskFnDataset init_model = do
                 let taskType :: Tp = safeIndexHM fnTypes task_fn
                 lift . info $ "taskType: " <> pp taskType
                 let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
-                        first (singleton tpInstPair) . fixSize (natValI @r3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
+                        first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
                 lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
                 --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
-                -- sampled_feats :: Tensor device 'D.Float '[r3nnBatch, t * (2 * Dirs * h)]
+                -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs
                 lift . debug $ "io_feats: " <> show (shape' io_feats)
                 loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
