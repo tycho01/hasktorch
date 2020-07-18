@@ -32,11 +32,11 @@ import           Data.Text.Internal.Lazy (Text)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
 import qualified Data.Set
-import           Data.Bifunctor                (second)
+import           Data.Bifunctor                (first, second)
 import qualified Data.ByteString               as BS
 import qualified Data.ByteString.Internal      as BS
 import qualified Data.ByteString.Lazy.Internal as BL
-import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey, fromListWith)
+import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey, fromListWith, singleton)
 import qualified Data.Csv as Csv
 import           Data.Text.Prettyprint.Doc (pretty)
 import           Text.Printf
@@ -46,6 +46,7 @@ import           Control.Monad.Trans.Loop
 import           Control.Monad.Trans.Class
 import           Language.Haskell.Exts.Syntax  ( Exp (..) )
 import           Prelude                        hiding (abs)
+import           Util                          (fstOf3)
 import           Language.Haskell.Interpreter  ( Interpreter, liftIO, lift )
 import           GHC.Exts
 import           GHC.Generics                  (Generic)
@@ -249,7 +250,7 @@ train synthesizerConfig taskFnDataset init_model = do
         pb <- lift . liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
         start <- lift . liftIO $ getCPUTime
         -- TRAIN LOOP
-        (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen_, 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+        (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
                 let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
                 lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
                 let task_fn :: Expr = fst task_fn_tp
@@ -337,12 +338,11 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
     let n :: Int = length dataset
     pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
     (acc, loss, _) :: (Float, Float, Int) <- iterateLoopT (0.0, 0.0, 0) $ \ !state@(acc, loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
-            let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
+            let task_fn_tp :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             lift . debug $ "task_fn_tp: \n" <> pp_ task_fn_tp
             let task_fn :: Expr = fst task_fn_tp
             -- lift . debug $ "task_fn: \n" <> pp task_fn
             let tpInstPair :: (Tp, Tp) = snd task_fn_tp
-            let task_fn :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             let taskType :: Tp = safeIndexHM fnTypes task_fn
             lift . debug $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
