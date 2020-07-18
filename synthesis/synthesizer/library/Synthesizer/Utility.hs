@@ -493,7 +493,7 @@ sampleTensorWithoutReplacement gen n tensor = (gen', t) where
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String
-ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
+ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1"),("learningRate","lr"),("convergenceThreshold","threshold"),("learningDecay","lrDecay")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder","regularization"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
 
 -- https://hackage.haskell.org/package/relude-0.6.0.0/docs/Relude-Extra-Tuple.html#v:traverseToSnd
 traverseToSnd :: Functor t => (a -> t b) -> a -> t (a, b)
