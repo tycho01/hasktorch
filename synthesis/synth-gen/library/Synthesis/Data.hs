@@ -94,6 +94,7 @@ data SynthesizerConfig = SynthesizerConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , useTypes :: !Bool
+    , cheat :: !Bool
     } deriving (Eq, Show, Generic)
 
 data GridSearchConfig = GridSearchConfig
@@ -114,6 +115,7 @@ data GridSearchConfig = GridSearchConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , useTypes :: !Bool
+    , cheat :: !Bool
     } deriving (Eq, Show, Generic)
 
 -- I should probably include the actual GA config here,
@@ -137,6 +139,7 @@ data EvolutionaryConfig = EvolutionaryConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , useTypes :: !Bool
+    , cheat :: !Bool
     } deriving (Eq, Show, Generic)
 
 data OptimizationConfig = OptimizationConfig
@@ -157,6 +160,7 @@ data OptimizationConfig = OptimizationConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , useTypes :: !Bool
+    , cheat :: !Bool
     } deriving (Eq, Show, Generic)
 
 data HparComb = HparComb
@@ -225,6 +229,7 @@ combineConfig optCfg hparComb = cfg
                 , maskBad              = maskBad
                 , randomHole           = randomHole
                 , useTypes             = useTypes
+                , cheat                = cheat
                 }
 
 data PreppedDSL = PreppedDSL

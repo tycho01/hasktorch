@@ -58,6 +58,7 @@ synthesizerConfig = SynthesizerConfig
     <*> maskBadOpt
     <*> randomHoleOpt
     <*> useTypesOpt
+    <*> cheatOpt
 
 parseSynthesizerConfig :: IO SynthesizerConfig
 parseSynthesizerConfig = execParser opts
@@ -87,6 +88,7 @@ gridSearchConfig = GridSearchConfig
     <*> maskBadOpt
     <*> randomHoleOpt
     <*> useTypesOpt
+    <*> cheatOpt
 
 parseGridSearchConfig :: IO GridSearchConfig
 parseGridSearchConfig = execParser opts
@@ -116,6 +118,7 @@ evolutionaryConfig = EvolutionaryConfig
     <*> maskBadOpt
     <*> randomHoleOpt
     <*> useTypesOpt
+    <*> cheatOpt
 
 parseEvolutionaryConfig :: IO EvolutionaryConfig
 parseEvolutionaryConfig = execParser opts
@@ -403,3 +406,7 @@ useTypesOpt = switch
     ( long "useTypes"
     <> short 't'
     <> help "supervise synthesis using rule/hole types as additional features." )
+
+cheatOpt = switch
+    ( long "cheat"
+    <> help "evaluate on the training set to verify learning capability." )

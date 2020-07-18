@@ -229,7 +229,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
     -- GENERAL
 
-    let [train_set, validation_set, test_set] :: [[Expr]] = untuple3 datasets
+    let [train_set, validation_set, test_set] :: [[Expr]] = (if cheat then replicate 3 . fstOf3 else untuple3) datasets
     let stdGen :: StdGen = mkStdGen seed
     liftIO $ setStdGen stdGen
     let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
