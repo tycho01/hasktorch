@@ -1,0 +1,1353 @@
+generatedTypes:
+  '0':
+  - Int
+  - Char
+  '1':
+  - '[]'
+  - Maybe
+  '2':
+  - (,)
+  - Either
+longestExprString: 46
+exprBlocks:
+- - zip
+  - expr: zip
+- - zip
+  - expr: 'zip (undefined :: [a])'
+- - zip
+  - expr: 'zip (undefined :: [a]) (undefined :: [b])'
+- - unzip
+  - expr: unzip
+- - unzip
+  - expr: 'unzip (undefined :: [(a, b)])'
+- - elem
+  - expr: elem
+- - elem
+  - expr: 'elem (undefined :: (Foldable t, Eq a) => a)'
+- - elem
+  - expr: |-
+      elem (undefined :: (Foldable t, Eq a) => a)
+        (undefined :: (Foldable t, Eq a) => t a)
+- - conc
+  - expr: conc
+- - conc
+  - expr: 'conc (undefined :: Semigroup a => a)'
+- - conc
+  - expr: |-
+      conc (undefined :: Semigroup a => a)
+        (undefined :: Semigroup a => a)
+- - just
+  - expr: just
+- - just
+  - expr: 'just (undefined :: a)'
+- - mempty
+  - expr: mempty
+- - toEnum
+  - expr: toEnum
+- - toEnum
+  - expr: 'toEnum (undefined :: Enum a => Int)'
+- - length
+  - expr: length
+- - length
+  - expr: 'length (undefined :: Foldable t => t a)'
+- - compose
+  - expr: compose
+- - compose
+  - expr: 'compose (undefined :: (b -> c))'
+- - compose
+  - expr: 'compose (undefined :: (b -> c)) (undefined :: (a -> b))'
+- - compose
+  - expr: |-
+      compose (undefined :: (b -> c)) (undefined :: (a -> b))
+        (undefined :: a)
+- - sequence
+  - expr: sequence
+- - sequence
+  - expr: 'sequence (undefined :: (Traversable t, Monad m) => t (m a))'
+- - sequenceA
+  - expr: sequenceA
+- - sequenceA
+  - expr: 'sequenceA (undefined :: (Traversable t, Applicative f) => t (f a))'
+- - fromEnum
+  - expr: fromEnum
+- - fromEnum
+  - expr: 'fromEnum (undefined :: Enum a => a)'
+- - zero
+  - expr: zero
+- - prepend
+  - expr: prepend
+- - prepend
+  - expr: 'prepend (undefined :: a)'
+- - prepend
+  - expr: 'prepend (undefined :: a) (undefined :: [a])'
+- - foldMap
+  - expr: foldMap
+- - foldMap
+  - expr: 'foldMap (undefined :: (Foldable t, Monoid m) => (a -> m))'
+- - foldMap
+  - expr: |-
+      foldMap (undefined :: (Foldable t, Monoid m) => (a -> m))
+        (undefined :: (Foldable t, Monoid m) => t a)
+- - fmap
+  - expr: fmap
+- - fmap
+  - expr: 'fmap (undefined :: Functor f => (a -> b))'
+- - fmap
+  - expr: |-
+      fmap (undefined :: Functor f => (a -> b))
+        (undefined :: Functor f => f a)
+- - maybe
+  - expr: maybe
+- - maybe
+  - expr: 'maybe (undefined :: b)'
+- - maybe
+  - expr: 'maybe (undefined :: b) (undefined :: (a -> b))'
+- - maybe
+  - expr: |-
+      maybe (undefined :: b) (undefined :: (a -> b))
+        (undefined :: Maybe a)
+- - tpl
+  - expr: tpl
+- - tpl
+  - expr: 'tpl (undefined :: a)'
+- - tpl
+  - expr: 'tpl (undefined :: a) (undefined :: b)'
+longestString: 46
+fnTypeIOs:
+- - expr: sequenceA
+  - - - - type: Maybe (Maybe Int)
+        - type: Maybe (Maybe Int)
+      - - - expr: (Just (Just (-5)))
+          - Right:
+              expr: (Just (Just (-5)))
+        - - expr: (Nothing)
+          - Right:
+              expr: (Just Nothing)
+        - - expr: (Just (Just (-6)))
+          - Right:
+              expr: (Just (Just (-6)))
+    - - - type: Maybe ([] Int)
+        - type: '[] (Maybe Int)'
+      - - - expr: (Just [(-5)])
+          - Right:
+              expr: '[Just (-5)]'
+        - - expr: (Just [(-5), (-6), (-17)])
+          - Right:
+              expr: '[Just (-5), Just (-6), Just (-17)]'
+        - - expr: (Nothing)
+          - Right:
+              expr: '[Nothing]'
+    - - - type: '[] (Maybe Char)'
+        - type: Maybe ([] Char)
+      - - - expr: ([Just '5', Just '1', Nothing])
+          - Right:
+              expr: Nothing
+        - - expr: ([Just '5'])
+          - Right:
+              expr: (Just "5")
+        - - expr: ([])
+          - Right:
+              expr: (Just "")
+        - - expr: ([Just '5', Just '1'])
+          - Right:
+              expr: (Just "51")
+    - - - type: Maybe ([] Char)
+        - type: '[] (Maybe Char)'
+      - - - expr: (Just ['5', '1', '6'])
+          - Right:
+              expr: '[Just ''5'', Just ''1'', Just ''6'']'
+        - - expr: (Nothing)
+          - Right:
+              expr: '[Nothing]'
+        - - expr: (Just ['5'])
+          - Right:
+              expr: '[Just ''5'']'
+- - expr: length
+  - - - - type: Maybe Int
+        - type: Int
+      - - - expr: (Just (-2))
+          - Right:
+              expr: '1'
+        - - expr: (Just (-5))
+          - Right:
+              expr: '1'
+        - - expr: (Just (-6))
+          - Right:
+              expr: '1'
+        - - expr: (Nothing)
+          - Right:
+              expr: '0'
+    - - - type: '[] Int'
+        - type: Int
+      - - - expr: ([])
+          - Right:
+              expr: '0'
+        - - expr: ([(-5)])
+          - Right:
+              expr: '1'
+        - - expr: ([(-5), (-6)])
+          - Right:
+              expr: '2'
+        - - expr: ([(-5), (-6), (-17)])
+          - Right:
+              expr: '3'
+    - - - type: Maybe Char
+        - type: Int
+      - - - expr: (Nothing)
+          - Right:
+              expr: '0'
+        - - expr: (Just '9')
+          - Right:
+              expr: '1'
+        - - expr: (Just '1')
+          - Right:
+              expr: '1'
+        - - expr: (Just '5')
+          - Right:
+              expr: '1'
+    - - - type: '[] Char'
+        - type: Int
+      - - - expr: (['5'])
+          - Right:
+              expr: '1'
+        - - expr: (['5', '1', '6'])
+          - Right:
+              expr: '3'
+        - - expr: ([])
+          - Right:
+              expr: '0'
+        - - expr: (['5', '1'])
+          - Right:
+              expr: '2'
+- - expr: zip
+  - - - - type: ([Int], [Char])
+        - type: '[(Int, Char)]'
+      - - - expr: ([(-5)], ['5', '1', '6'])
+          - Right:
+              expr: '[(-5, ''5'')]'
+        - - expr: ([(-5), (-6)], ['5', '1', '6'])
+          - Right:
+              expr: '[(-5, ''5''), (-6, ''1'')]'
+        - - expr: ([(-5), (-6), (-17)], ['5', '1'])
+          - Right:
+              expr: '[(-5, ''5''), (-6, ''1'')]'
+        - - expr: ([(-5)], ['5'])
+          - Right:
+              expr: '[(-5, ''5'')]'
+        - - expr: ([], ['5'])
+          - Right:
+              expr: '[]'
+        - - expr: ([], ['5', '1'])
+          - Right:
+              expr: '[]'
+        - - expr: ([(-5)], [])
+          - Right:
+              expr: '[]'
+        - - expr: ([], [])
+          - Right:
+              expr: '[]'
+    - - - type: ([Int], [Int])
+        - type: '[(Int, Int)]'
+      - - - expr: ([(-5), (-6)], [(-5), (-6)])
+          - Right:
+              expr: '[(-5, -5), (-6, -6)]'
+        - - expr: ([], [(-5)])
+          - Right:
+              expr: '[]'
+        - - expr: ([], [])
+          - Right:
+              expr: '[]'
+        - - expr: ([(-5), (-6)], [])
+          - Right:
+              expr: '[]'
+        - - expr: ([(-5)], [(-5)])
+          - Right:
+              expr: '[(-5, -5)]'
+        - - expr: ([(-5), (-6), (-17)], [(-5), (-6), (-17)])
+          - Right:
+              expr: '[(-5, -5), (-6, -6), (-17, -17)]'
+        - - expr: ([(-5), (-6), (-17)], [])
+          - Right:
+              expr: '[]'
+        - - expr: ([], [(-5), (-6), (-17)])
+          - Right:
+              expr: '[]'
+    - - - type: ([Char], [Char])
+        - type: '[(Char, Char)]'
+      - - - expr: (['5', '1'], ['5', '1', '6'])
+          - Right:
+              expr: '[(''5'', ''5''), (''1'', ''1'')]'
+        - - expr: (['5', '1'], ['5'])
+          - Right:
+              expr: '[(''5'', ''5'')]'
+        - - expr: (['5', '1', '6'], ['5', '1'])
+          - Right:
+              expr: '[(''5'', ''5''), (''1'', ''1'')]'
+        - - expr: (['5', '1', '6'], ['5'])
+          - Right:
+              expr: '[(''5'', ''5'')]'
+        - - expr: (['5'], [])
+          - Right:
+              expr: '[]'
+        - - expr: (['5'], ['5'])
+          - Right:
+              expr: '[(''5'', ''5'')]'
+        - - expr: (['5', '1', '6'], [])
+          - Right:
+              expr: '[]'
+        - - expr: ([], ['5', '1'])
+          - Right:
+              expr: '[]'
+    - - - type: ([Char], [Int])
+        - type: '[(Char, Int)]'
+      - - - expr: (['5', '1'], [(-5)])
+          - Right:
+              expr: '[(''5'', -5)]'
+        - - expr: (['5', '1'], [])
+          - Right:
+              expr: '[]'
+        - - expr: (['5'], [(-5), (-6)])
+          - Right:
+              expr: '[(''5'', -5)]'
+        - - expr: ([], [(-5), (-6), (-17)])
+          - Right:
+              expr: '[]'
+        - - expr: (['5', '1', '6'], [])
+          - Right:
+              expr: '[]'
+        - - expr: (['5', '1', '6'], [(-5), (-6), (-17)])
+          - Right:
+              expr: '[(''5'', -5), (''1'', -6), (''6'', -17)]'
+        - - expr: (['5'], [(-5)])
+          - Right:
+              expr: '[(''5'', -5)]'
+        - - expr: ([], [(-5), (-6)])
+          - Right:
+              expr: '[]'
+- - expr: unzip
+  - - - - type: '[(Int, Char)]'
+        - type: ([Int], [Char])
+      - - - expr: ([((-5), '5'), ((-6), '1'), ((-17), '6')])
+          - Right:
+              expr: ([-5, -6, -17], "516")
+        - - expr: ([((-5), '5'), ((-6), '1')])
+          - Right:
+              expr: ([-5, -6], "51")
+        - - expr: ([((-5), '5')])
+          - Right:
+              expr: ([-5], "5")
+        - - expr: ([])
+          - Right:
+              expr: ([], "")
+    - - - type: '[(Char, Int)]'
+        - type: ([Char], [Int])
+      - - - expr: ([])
+          - Right:
+              expr: ("", [])
+        - - expr: ([('5', (-5))])
+          - Right:
+              expr: ("5", [-5])
+        - - expr: ([('5', (-5)), ('1', (-6)), ('6', (-17))])
+          - Right:
+              expr: ("516", [-5, -6, -17])
+        - - expr: ([('5', (-5)), ('1', (-6))])
+          - Right:
+              expr: ("51", [-5, -6])
+    - - - type: '[(Char, Char)]'
+        - type: ([Char], [Char])
+      - - - expr: ([('5', '5'), ('1', '1'), ('6', '6')])
+          - Right:
+              expr: ("516", "516")
+        - - expr: ([('5', '5')])
+          - Right:
+              expr: ("5", "5")
+        - - expr: ([])
+          - Right:
+              expr: ("", "")
+        - - expr: ([('5', '5'), ('1', '1')])
+          - Right:
+              expr: ("51", "51")
+    - - - type: '[(Int, Int)]'
+        - type: ([Int], [Int])
+      - - - expr: ([((-5), (-5)), ((-6), (-6))])
+          - Right:
+              expr: ([-5, -6], [-5, -6])
+        - - expr: ([])
+          - Right:
+              expr: ([], [])
+        - - expr: ([((-5), (-5))])
+          - Right:
+              expr: ([-5], [-5])
+        - - expr: ([((-5), (-5)), ((-6), (-6)), ((-17), (-17))])
+          - Right:
+              expr: ([-5, -6, -17], [-5, -6, -17])
+- - expr: let prepend = (:) in prepend
+  - - - - type: (Int, [Int])
+        - type: '[Int]'
+      - - - expr: ((-17), [(-5), (-6)])
+          - Right:
+              expr: '[-17, -5, -6]'
+        - - expr: ((-6), [(-5), (-6)])
+          - Right:
+              expr: '[-6, -5, -6]'
+        - - expr: ((-2), [(-5), (-6)])
+          - Right:
+              expr: '[-2, -5, -6]'
+        - - expr: ((-5), [(-5), (-6)])
+          - Right:
+              expr: '[-5, -5, -6]'
+        - - expr: ((-2), [(-5)])
+          - Right:
+              expr: '[-2, -5]'
+        - - expr: ((8), [(-5), (-6)])
+          - Right:
+              expr: '[8, -5, -6]'
+        - - expr: ((-18), [])
+          - Right:
+              expr: '[-18]'
+        - - expr: ((16), [(-5), (-6)])
+          - Right:
+              expr: '[16, -5, -6]'
+    - - - type: (Char, [Char])
+        - type: '[Char]'
+      - - - expr: ('3', ['5', '1', '6'])
+          - Right:
+              expr: '"3516"'
+        - - expr: ('9', ['5', '1', '6'])
+          - Right:
+              expr: '"9516"'
+        - - expr: ('8', [])
+          - Right:
+              expr: '"8"'
+        - - expr: ('8', ['5', '1', '6'])
+          - Right:
+              expr: '"8516"'
+        - - expr: ('6', ['5', '1', '6'])
+          - Right:
+              expr: '"6516"'
+        - - expr: ('2', ['5', '1', '6'])
+          - Right:
+              expr: '"2516"'
+        - - expr: ('3', ['5'])
+          - Right:
+              expr: '"35"'
+        - - expr: ('2', ['5', '1'])
+          - Right:
+              expr: '"251"'
+- - expr: let tpl = (,) in tpl
+  - - - - type: (Int, Int)
+        - type: (Int, Int)
+      - - - expr: ((6), (16))
+          - Right:
+              expr: (6, 16)
+        - - expr: ((-17), (-17))
+          - Right:
+              expr: (-17, -17)
+        - - expr: ((-2), (-2))
+          - Right:
+              expr: (-2, -2)
+        - - expr: ((6), (8))
+          - Right:
+              expr: (6, 8)
+        - - expr: ((-18), (-6))
+          - Right:
+              expr: (-18, -6)
+        - - expr: ((-5), (-2))
+          - Right:
+              expr: (-5, -2)
+        - - expr: ((-2), (16))
+          - Right:
+              expr: (-2, 16)
+        - - expr: ((-2), (6))
+          - Right:
+              expr: (-2, 6)
+    - - - type: (Char, Char)
+        - type: (Char, Char)
+      - - - expr: ('4', '8')
+          - Right:
+              expr: ('4', '8')
+        - - expr: ('1', '6')
+          - Right:
+              expr: ('1', '6')
+        - - expr: ('3', '2')
+          - Right:
+              expr: ('3', '2')
+        - - expr: ('3', '1')
+          - Right:
+              expr: ('3', '1')
+        - - expr: ('2', '5')
+          - Right:
+              expr: ('2', '5')
+        - - expr: ('4', '1')
+          - Right:
+              expr: ('4', '1')
+        - - expr: ('9', '6')
+          - Right:
+              expr: ('9', '6')
+        - - expr: ('4', '6')
+          - Right:
+              expr: ('4', '6')
+    - - - type: (Char, Int)
+        - type: (Char, Int)
+      - - - expr: ('4', (-2))
+          - Right:
+              expr: ('4', -2)
+        - - expr: ('1', (-5))
+          - Right:
+              expr: ('1', -5)
+        - - expr: ('5', (16))
+          - Right:
+              expr: ('5', 16)
+        - - expr: ('5', (-17))
+          - Right:
+              expr: ('5', -17)
+        - - expr: ('9', (6))
+          - Right:
+              expr: ('9', 6)
+        - - expr: ('6', (-6))
+          - Right:
+              expr: ('6', -6)
+        - - expr: ('9', (-5))
+          - Right:
+              expr: ('9', -5)
+        - - expr: ('4', (16))
+          - Right:
+              expr: ('4', 16)
+    - - - type: (Int, Char)
+        - type: (Int, Char)
+      - - - expr: ((-17), '6')
+          - Right:
+              expr: (-17, '6')
+        - - expr: ((-17), '1')
+          - Right:
+              expr: (-17, '1')
+        - - expr: ((16), '1')
+          - Right:
+              expr: (16, '1')
+        - - expr: ((-5), '3')
+          - Right:
+              expr: (-5, '3')
+        - - expr: ((6), '5')
+          - Right:
+              expr: (6, '5')
+        - - expr: ((-17), '9')
+          - Right:
+              expr: (-17, '9')
+        - - expr: ((-17), '8')
+          - Right:
+              expr: (-17, '8')
+        - - expr: ((8), '6')
+          - Right:
+              expr: (8, '6')
+- - expr: fmap
+  - - - - type: ((Int -> Int), [] Int)
+        - type: '[] Int'
+      - - - expr: (toEnum, [(-5), (-6)])
+          - Right:
+              expr: '[-5, -6]'
+        - - expr: (fromEnum, [(-5)])
+          - Right:
+              expr: '[-5]'
+        - - expr: (fromEnum, [(-5), (-6)])
+          - Right:
+              expr: '[-5, -6]'
+        - - expr: (toEnum, [])
+          - Right:
+              expr: '[]'
+        - - expr: (toEnum, [(-5), (-6), (-17)])
+          - Right:
+              expr: '[-5, -6, -17]'
+        - - expr: (toEnum, [(-5)])
+          - Right:
+              expr: '[-5]'
+        - - expr: (fromEnum, [])
+          - Right:
+              expr: '[]'
+        - - expr: (fromEnum, [(-5), (-6), (-17)])
+          - Right:
+              expr: '[-5, -6, -17]'
+    - - - type: ((Int -> Int), Maybe Int)
+        - type: Maybe Int
+      - - - expr: (fromEnum, Just (-6))
+          - Right:
+              expr: (Just (-6))
+        - - expr: (fromEnum, Nothing)
+          - Right:
+              expr: Nothing
+        - - expr: (fromEnum, Just (-2))
+          - Right:
+              expr: (Just (-2))
+        - - expr: (toEnum, Just (-2))
+          - Right:
+              expr: (Just (-2))
+        - - expr: (toEnum, Just (-5))
+          - Right:
+              expr: (Just (-5))
+        - - expr: (toEnum, Just (-6))
+          - Right:
+              expr: (Just (-6))
+        - - expr: (fromEnum, Just (-5))
+          - Right:
+              expr: (Just (-5))
+        - - expr: (toEnum, Nothing)
+          - Right:
+              expr: Nothing
+    - - - type: ((Char -> Int), [] Char)
+        - type: '[] Int'
+      - - - expr: (fromEnum, [])
+          - Right:
+              expr: '[]'
+        - - expr: (fromEnum, ['5', '1'])
+          - Right:
+              expr: '[53, 49]'
+        - - expr: (fromEnum, ['5'])
+          - Right:
+              expr: '[53]'
+        - - expr: (fromEnum, ['5', '1', '6'])
+          - Right:
+              expr: '[53, 49, 54]'
+    - - - type: ((Char -> Int), Maybe Char)
+        - type: Maybe Int
+      - - - expr: (fromEnum, Just '9')
+          - Right:
+              expr: (Just 57)
+        - - expr: (fromEnum, Nothing)
+          - Right:
+              expr: Nothing
+        - - expr: (fromEnum, Just '1')
+          - Right:
+              expr: (Just 49)
+        - - expr: (fromEnum, Just '5')
+          - Right:
+              expr: (Just 53)
+- - expr: maybe
+  - - - - type: (Int, (Int -> Int), Maybe Int)
+        - type: Int
+      - - - expr: ((-18), toEnum, Nothing)
+          - Right:
+              expr: (-18)
+        - - expr: ((-2), toEnum, Just (-6))
+          - Right:
+              expr: (-6)
+        - - expr: ((-6), fromEnum, Just (-2))
+          - Right:
+              expr: (-2)
+        - - expr: ((-18), fromEnum, Just (-2))
+          - Right:
+              expr: (-2)
+        - - expr: ((-2), fromEnum, Just (-2))
+          - Right:
+              expr: (-2)
+        - - expr: ((-17), toEnum, Just (-6))
+          - Right:
+              expr: (-6)
+        - - expr: ((-18), toEnum, Just (-2))
+          - Right:
+              expr: (-2)
+        - - expr: ((-5), toEnum, Just (-6))
+          - Right:
+              expr: (-6)
+    - - - type: (Int, (Char -> Int), Maybe Char)
+        - type: Int
+      - - - expr: ((-17), fromEnum, Nothing)
+          - Right:
+              expr: (-17)
+        - - expr: ((-17), fromEnum, Just '1')
+          - Right:
+              expr: '49'
+        - - expr: ((-6), fromEnum, Just '9')
+          - Right:
+              expr: '57'
+        - - expr: ((8), fromEnum, Just '1')
+          - Right:
+              expr: '49'
+        - - expr: ((8), fromEnum, Nothing)
+          - Right:
+              expr: '8'
+        - - expr: ((6), fromEnum, Just '1')
+          - Right:
+              expr: '49'
+        - - expr: ((-18), fromEnum, Just '9')
+          - Right:
+              expr: '57'
+        - - expr: ((-2), fromEnum, Just '9')
+          - Right:
+              expr: '57'
+    - - - type: (Char, (Int -> Char), Maybe Int)
+        - type: Char
+      - - - expr: ('4', toEnum, Just (-5))
+          - Left: '"Prelude.chr: bad argument: (-5)"'
+        - - expr: ('3', toEnum, Just (-6))
+          - Left: '"Prelude.chr: bad argument: (-6)"'
+        - - expr: ('9', toEnum, Just (-5))
+          - Left: '"Prelude.chr: bad argument: (-5)"'
+        - - expr: ('8', toEnum, Just (-6))
+          - Left: '"Prelude.chr: bad argument: (-6)"'
+        - - expr: ('4', toEnum, Just (-6))
+          - Left: '"Prelude.chr: bad argument: (-6)"'
+        - - expr: ('1', toEnum, Just (-5))
+          - Left: '"Prelude.chr: bad argument: (-5)"'
+        - - expr: ('9', toEnum, Nothing)
+          - Right:
+              expr: '''9'''
+        - - expr: ('8', toEnum, Just (-5))
+          - Left: '"Prelude.chr: bad argument: (-5)"'
+- - expr: fromEnum
+  - - - - type: Char
+        - type: Int
+      - - - expr: ('4')
+          - Right:
+              expr: '52'
+        - - expr: ('2')
+          - Right:
+              expr: '50'
+        - - expr: ('3')
+          - Right:
+              expr: '51'
+        - - expr: ('6')
+          - Right:
+              expr: '54'
+        - - expr: ('1')
+          - Right:
+              expr: '49'
+        - - expr: ('9')
+          - Right:
+              expr: '57'
+        - - expr: ('8')
+          - Right:
+              expr: '56'
+        - - expr: ('5')
+          - Right:
+              expr: '53'
+    - - - type: Int
+        - type: Int
+      - - - expr: ((-2))
+          - Right:
+              expr: (-2)
+        - - expr: ((16))
+          - Right:
+              expr: '16'
+        - - expr: ((8))
+          - Right:
+              expr: '8'
+        - - expr: ((-5))
+          - Right:
+              expr: (-5)
+        - - expr: ((-18))
+          - Right:
+              expr: (-18)
+        - - expr: ((-6))
+          - Right:
+              expr: (-6)
+        - - expr: ((-17))
+          - Right:
+              expr: (-17)
+        - - expr: ((6))
+          - Right:
+              expr: '6'
+- - expr: sequence
+  - - - - type: '[] ([] Int)'
+        - type: '[] ([] Int)'
+      - - - expr: ([[(-5)], [(-5), (-6), (-17)]])
+          - Right:
+              expr: '[[-5, -5], [-5, -6], [-5, -17]]'
+        - - expr: ([])
+          - Right:
+              expr: '[[]]'
+        - - expr: ([[(-5)], [(-5), (-6), (-17)], []])
+          - Right:
+              expr: '[]'
+        - - expr: ([[(-5)]])
+          - Right:
+              expr: '[[-5]]'
+    - - - type: '[] (Maybe Int)'
+        - type: Maybe ([] Int)
+      - - - expr: ([Just (-5)])
+          - Right:
+              expr: (Just [-5])
+        - - expr: ([Just (-5), Just (-6)])
+          - Right:
+              expr: (Just [-5, -6])
+        - - expr: ([Just (-5), Just (-6), Nothing])
+          - Right:
+              expr: Nothing
+        - - expr: ([])
+          - Right:
+              expr: (Just [])
+    - - - type: Maybe (Maybe Int)
+        - type: Maybe (Maybe Int)
+      - - - expr: (Just (Just (-6)))
+          - Right:
+              expr: (Just (Just (-6)))
+        - - expr: (Nothing)
+          - Right:
+              expr: (Just Nothing)
+        - - expr: (Just (Just (-5)))
+          - Right:
+              expr: (Just (Just (-5)))
+    - - - type: Maybe ([] Int)
+        - type: '[] (Maybe Int)'
+      - - - expr: (Just [(-5)])
+          - Right:
+              expr: '[Just (-5)]'
+        - - expr: (Just [(-5), (-6), (-17)])
+          - Right:
+              expr: '[Just (-5), Just (-6), Just (-17)]'
+        - - expr: (Nothing)
+          - Right:
+              expr: '[Nothing]'
+- - expr: let just = Just in just
+  - - - - type: Char
+        - type: Maybe Char
+      - - - expr: ('4')
+          - Right:
+              expr: (Just '4')
+        - - expr: ('9')
+          - Right:
+              expr: (Just '9')
+        - - expr: ('1')
+          - Right:
+              expr: (Just '1')
+        - - expr: ('2')
+          - Right:
+              expr: (Just '2')
+        - - expr: ('3')
+          - Right:
+              expr: (Just '3')
+        - - expr: ('6')
+          - Right:
+              expr: (Just '6')
+        - - expr: ('8')
+          - Right:
+              expr: (Just '8')
+        - - expr: ('5')
+          - Right:
+              expr: (Just '5')
+    - - - type: Int
+        - type: Maybe Int
+      - - - expr: ((6))
+          - Right:
+              expr: (Just 6)
+        - - expr: ((8))
+          - Right:
+              expr: (Just 8)
+        - - expr: ((-2))
+          - Right:
+              expr: (Just (-2))
+        - - expr: ((-17))
+          - Right:
+              expr: (Just (-17))
+        - - expr: ((-18))
+          - Right:
+              expr: (Just (-18))
+        - - expr: ((-5))
+          - Right:
+              expr: (Just (-5))
+        - - expr: ((-6))
+          - Right:
+              expr: (Just (-6))
+        - - expr: ((16))
+          - Right:
+              expr: (Just 16)
+- - expr: elem
+  - - - - type: (Int, [] Int)
+        - type: Bool
+      - - - expr: ((6), [(-5), (-6), (-17)])
+          - Right:
+              expr: 'False'
+        - - expr: ((16), [(-5), (-6), (-17)])
+          - Right:
+              expr: 'False'
+        - - expr: ((-2), [(-5), (-6), (-17)])
+          - Right:
+              expr: 'False'
+        - - expr: ((-17), [(-5)])
+          - Right:
+              expr: 'False'
+        - - expr: ((6), [])
+          - Right:
+              expr: 'False'
+        - - expr: ((-5), [(-5), (-6)])
+          - Right:
+              expr: 'True'
+        - - expr: ((-6), [(-5), (-6)])
+          - Right:
+              expr: 'True'
+        - - expr: ((8), [])
+          - Right:
+              expr: 'False'
+    - - - type: (Int, Maybe Int)
+        - type: Bool
+      - - - expr: ((-2), Just (-5))
+          - Right:
+              expr: 'False'
+        - - expr: ((-5), Just (-2))
+          - Right:
+              expr: 'False'
+        - - expr: ((8), Just (-5))
+          - Right:
+              expr: 'False'
+        - - expr: ((8), Nothing)
+          - Right:
+              expr: 'False'
+        - - expr: ((-18), Just (-2))
+          - Right:
+              expr: 'False'
+        - - expr: ((-18), Just (-5))
+          - Right:
+              expr: 'False'
+        - - expr: ((-6), Just (-6))
+          - Right:
+              expr: 'True'
+        - - expr: ((-5), Nothing)
+          - Right:
+              expr: 'False'
+    - - - type: (Char, [] Char)
+        - type: Bool
+      - - - expr: ('1', [])
+          - Right:
+              expr: 'False'
+        - - expr: ('9', ['5', '1'])
+          - Right:
+              expr: 'False'
+        - - expr: ('4', ['5', '1', '6'])
+          - Right:
+              expr: 'False'
+        - - expr: ('5', ['5', '1', '6'])
+          - Right:
+              expr: 'True'
+        - - expr: ('5', ['5', '1'])
+          - Right:
+              expr: 'True'
+        - - expr: ('2', ['5', '1'])
+          - Right:
+              expr: 'False'
+        - - expr: ('5', [])
+          - Right:
+              expr: 'False'
+        - - expr: ('8', ['5'])
+          - Right:
+              expr: 'False'
+    - - - type: (Char, Maybe Char)
+        - type: Bool
+      - - - expr: ('5', Just '5')
+          - Right:
+              expr: 'True'
+        - - expr: ('2', Just '5')
+          - Right:
+              expr: 'False'
+        - - expr: ('1', Just '1')
+          - Right:
+              expr: 'True'
+        - - expr: ('9', Just '9')
+          - Right:
+              expr: 'True'
+        - - expr: ('1', Nothing)
+          - Right:
+              expr: 'False'
+        - - expr: ('4', Nothing)
+          - Right:
+              expr: 'False'
+        - - expr: ('8', Just '5')
+          - Right:
+              expr: 'False'
+        - - expr: ('4', Just '9')
+          - Right:
+              expr: 'False'
+generationCfg:
+  numMin: -20
+  seed: 69
+  charMin: '0'
+  crashOnError: true
+  jsonLinesPath: ./run-results/ios.jsonl
+  verbosity: warning
+  test: 0.3
+  maxInstances: 5
+  maxHoles: 1
+  nestLimit: 1
+  charMax: '9'
+  numMax: 20
+  taskPath: ./run-results/datasets-1.yml
+  training: 0.35
+  maxParams: 3
+  maxInstantiations: 4
+  listMin: 0
+  numInputs: 10
+  validation: 0.35
+  listMax: 3
+  maxDataset: 1000
+variantTypes:
+- type: '[a] -> [b] -> [(a, b)]'
+- type: '[b] -> [(a, b)]'
+- type: '[(a, b)]'
+- type: a -> [a] -> [a]
+- type: '[a] -> [a]'
+- type: '[a]'
+- type: '[(a, b)] -> ([a], [b])'
+- type: ([a], [b])
+- type: '  (Foldable t, Eq a) => a -> t a -> Bool'
+- type: '  (Foldable t, Eq a) => t a -> Bool'
+- type: Bool
+- type: '  Num p => p'
+- type: a -> Maybe a
+- type: Maybe a
+- type: '  Monoid a => a'
+- type: '  Enum a => Int -> a'
+- type: '  Enum a => a'
+- type: '  Foldable t => t a -> Int'
+- type: Int
+- type: a -> b -> (a, b)
+- type: b -> (a, b)
+- type: (a, b)
+- type: '  (Traversable t, Monad m) => t (m a) -> m (t a)'
+- type: '  (Traversable t, Monad m) => m (t a)'
+- type: '  (Traversable t, Applicative f) => t (f a) -> f (t a)'
+- type: '  (Traversable t, Applicative f) => f (t a)'
+- type: '  Enum a => a -> Int'
+- type: Int
+- type: '  (Foldable t, Monoid m) => (a -> m) -> t a -> m'
+- type: '  (Foldable t, Monoid m) => t a -> m'
+- type: 'Monoid m => m'
+- type: '  Functor f => (a -> b) -> f a -> f b'
+- type: '  Functor f => f a -> f b'
+- type: '  Functor f => f b'
+- type: '  Semigroup a => a -> a -> a'
+- type: '  Semigroup a => a -> a'
+- type: '  Semigroup a => a'
+- type: b -> (a -> b) -> Maybe a -> b
+- type: (a -> b) -> Maybe a -> b
+- type: Maybe a -> b
+- type: b
+- type: (b -> c) -> (a -> b) -> a -> c
+- type: (a -> b) -> a -> c
+- type: a -> c
+- type: c
+ruleCharMap:
+  ',': 6
+  \: 30
+  l: 40
+  g: 38
+  '7': 15
+  '*': 5
+  ? |2+
+
+  : 0
+  m: 41
+  '-': 7
+  M: 25
+  =: 18
+  ']': 31
+  '0': 8
+  p: 44
+  ' ': 1
+  '[': 29
+  'N': 26
+  '>': 19
+  'n': 42
+  a: 32
+  q: 45
+  A: 20
+  '1': 9
+  d: 35
+  t: 48
+  '4': 12
+  T: 28
+  o: 43
+  '"': 2
+  B: 21
+  '2': 10
+  b: 33
+  r: 46
+  u: 49
+  E: 22
+  '5': 13
+  e: 36
+  (: 3
+  '8': 16
+  c: 34
+  s: 47
+  '3': 11
+  S: 27
+  f: 37
+  v: 50
+  F: 23
+  '6': 14
+  '9': 17
+  i: 39
+  'y': 51
+  ): 4
+  I: 24
+bothCharMap:
+  ',': 5
+  L: 26
+  \: 33
+  l: 44
+  g: 41
+  '''': 2
+  '7': 15
+  J: 25
+  ':': 18
+  m: 45
+  '-': 6
+  M: 27
+  ']': 34
+  '0': 8
+  P: 29
+  ' ': 0
+  '[': 32
+  .: 7
+  'N': 28
+  '>': 19
+  'n': 46
+  a: 35
+  '1': 9
+  d: 38
+  t: 50
+  '4': 12
+  T: 31
+  o: 47
+  '"': 1
+  B: 20
+  '2': 10
+  R: 30
+  b: 36
+  r: 48
+  u: 51
+  E: 22
+  '5': 13
+  e: 39
+  h: 42
+  (: 3
+  '8': 16
+  c: 37
+  s: 49
+  C: 21
+  '3': 11
+  f: 40
+  F: 23
+  '6': 14
+  '9': 17
+  i: 43
+  'y': 52
+  ): 4
+  I: 24
+dsl:
+  length:
+    expr: length
+  maybe:
+    expr: maybe
+  foldMap:
+    expr: foldMap
+  fromEnum:
+    expr: fromEnum
+  unzip:
+    expr: unzip
+  just:
+    expr: Just
+  zip:
+    expr: zip
+  elem:
+    expr: elem
+  sequence:
+    expr: sequence
+  zero:
+    expr: '0'
+  fmap:
+    expr: fmap
+  toEnum:
+    expr: toEnum
+  mempty:
+    expr: mempty
+  compose:
+    expr: (.)
+  tpl:
+    expr: (,)
+  prepend:
+    expr: (:)
+  sequenceA:
+    expr: sequenceA
+  conc:
+    expr: (<>)
+fnTypes:
+- - expr: sequenceA
+  - type: '  (Traversable t, Applicative f) => t (f a) -> f (t a)'
+- - expr: length
+  - type: '  Foldable t => t a -> Int'
+- - expr: zip
+  - type: '[a] -> [b] -> [(a, b)]'
+- - expr: unzip
+  - type: '[(a, b)] -> ([a], [b])'
+- - expr: let prepend = (:) in prepend
+  - type: a -> [a] -> [a]
+- - expr: let tpl = (,) in tpl
+  - type: a -> b -> (a, b)
+- - expr: fmap
+  - type: '  Functor f => (a -> b) -> f a -> f b'
+- - expr: maybe
+  - type: b -> (a -> b) -> Maybe a -> b
+- - expr: fromEnum
+  - type: '  Enum a => a -> Int'
+- - expr: sequence
+  - type: '  (Traversable t, Monad m) => t (m a) -> m (t a)'
+- - expr: let just = Just in just
+  - type: a -> Maybe a
+- - expr: elem
+  - type: '  (Foldable t, Eq a) => a -> t a -> Bool'
+exprCharMap:
+  ',': 5
+  L: 22
+  \: 28
+  l: 39
+  g: 36
+  '''': 2
+  '7': 15
+  J: 21
+  ':': 18
+  m: 40
+  '-': 6
+  ']': 29
+  '0': 8
+  P: 24
+  ' ': 0
+  '[': 27
+  .: 7
+  'N': 23
+  'n': 41
+  a: 30
+  '1': 9
+  d: 33
+  t: 45
+  '4': 12
+  T: 26
+  o: 42
+  '"': 1
+  '2': 10
+  R: 25
+  b: 31
+  r: 43
+  u: 46
+  E: 19
+  '5': 13
+  e: 34
+  h: 37
+  (: 3
+  '8': 16
+  c: 32
+  s: 44
+  '3': 11
+  f: 35
+  F: 20
+  '6': 14
+  '9': 17
+  i: 38
+  ): 4
+datasets:
+- - - expr: sequenceA
+    - - - type: '[] (Maybe Char)'
+        - type: Maybe ([] Char)
+  - - expr: length
+    - - - type: '[] Int'
+        - type: Int
+  - - expr: zip
+    - - - type: ([Char], [Char])
+        - type: '[(Char, Char)]'
+      - - type: ([Char], [Int])
+        - type: '[(Char, Int)]'
+  - - expr: unzip
+    - - - type: '[(Char, Char)]'
+        - type: ([Char], [Char])
+      - - type: '[(Int, Char)]'
+        - type: ([Int], [Char])
+  - - expr: let tpl = (,) in tpl
+    - - - type: (Int, Char)
+        - type: (Int, Char)
+  - - expr: fmap
+    - - - type: ((Int -> Int), Maybe Int)
+        - type: Maybe Int
+      - - type: ((Char -> Int), [] Char)
+        - type: '[] Int'
+  - - expr: maybe
+    - - - type: (Int, (Char -> Int), Maybe Char)
+        - type: Int
+  - - expr: sequence
+    - - - type: '[] ([] Int)'
+        - type: '[] ([] Int)'
+      - - type: '[] (Maybe Int)'
+        - type: Maybe ([] Int)
+      - - type: Maybe (Maybe Int)
+        - type: Maybe (Maybe Int)
+  - - expr: elem
+    - - - type: (Char, [] Char)
+        - type: Bool
+- - - expr: length
+    - - - type: Maybe Char
+        - type: Int
+      - - type: Maybe Int
+        - type: Int
+  - - expr: zip
+    - - - type: ([Int], [Char])
+        - type: '[(Int, Char)]'
+  - - expr: unzip
+    - - - type: '[(Int, Int)]'
+        - type: ([Int], [Int])
+  - - expr: let prepend = (:) in prepend
+    - - - type: (Char, [Char])
+        - type: '[Char]'
+  - - expr: let tpl = (,) in tpl
+    - - - type: (Char, Char)
+        - type: (Char, Char)
+      - - type: (Int, Int)
+        - type: (Int, Int)
+  - - expr: fmap
+    - - - type: ((Char -> Int), Maybe Char)
+        - type: Maybe Int
+      - - type: ((Int -> Int), [] Int)
+        - type: '[] Int'
+  - - expr: maybe
+    - - - type: (Int, (Int -> Int), Maybe Int)
+        - type: Int
+  - - expr: fromEnum
+    - - - type: Char
+        - type: Int
+      - - type: Int
+        - type: Int
+  - - expr: let just = Just in just
+    - - - type: Char
+        - type: Maybe Char
+  - - expr: elem
+    - - - type: (Int, [] Int)
+        - type: Bool
+- - - expr: sequenceA
+    - - - type: Maybe (Maybe Int)
+        - type: Maybe (Maybe Int)
+      - - type: Maybe ([] Int)
+        - type: '[] (Maybe Int)'
+      - - type: Maybe ([] Char)
+        - type: '[] (Maybe Char)'
+  - - expr: length
+    - - - type: '[] Char'
+        - type: Int
+  - - expr: zip
+    - - - type: ([Int], [Int])
+        - type: '[(Int, Int)]'
+  - - expr: unzip
+    - - - type: '[(Char, Int)]'
+        - type: ([Char], [Int])
+  - - expr: let prepend = (:) in prepend
+    - - - type: (Int, [Int])
+        - type: '[Int]'
+  - - expr: let tpl = (,) in tpl
+    - - - type: (Char, Int)
+        - type: (Char, Int)
+  - - expr: maybe
+    - - - type: (Char, (Int -> Char), Maybe Int)
+        - type: Char
+  - - expr: sequence
+    - - - type: Maybe ([] Int)
+        - type: '[] (Maybe Int)'
+  - - expr: let just = Just in just
+    - - - type: Int
+        - type: Maybe Int
+  - - expr: elem
+    - - - type: (Int, Maybe Int)
+        - type: Bool
