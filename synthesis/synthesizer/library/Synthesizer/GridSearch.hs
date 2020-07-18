@@ -29,7 +29,7 @@ import           Data.Proxy
 import           Data.Bifunctor (second)
 import           Data.Yaml
 import           Data.HashMap.Lazy (HashMap, size, fromList)
-import           Util (thdOf3)
+import           Util (fstOf3, thdOf3)
 import           Text.Printf
 import           Language.Haskell.Interpreter (Interpreter, liftIO)
 
