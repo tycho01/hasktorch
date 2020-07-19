@@ -258,8 +258,8 @@ train synthesizerConfig taskFnDataset init_model = do
                 let task_fn :: Expr = fst task_fn_tp
                 -- lift . info $ "task_fn: \n" <> pp task_fn
                 let tpInstPair :: (Tp, Tp) = snd task_fn_tp
-                -- let taskType :: Tp = safeIndexHM fnTypes task_fn
-                -- lift . info $ "taskType: " <> pp taskType
+                let taskType :: Tp = safeIndexHM fnTypes task_fn
+                lift . info $ "taskType: " <> pp taskType
                 let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
                         first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
                 lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
