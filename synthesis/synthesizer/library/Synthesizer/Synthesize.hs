@@ -112,7 +112,7 @@ getM cfg taskFnDataset = let
                 void . interpretUnsafe $ train @device @rules @'[] @RandomSynthesizer cfg taskFnDataset model
             "nsps" -> do
                 model <- A.sample spec
-                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
+                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
                 where
                 variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
                 charMap = exprCharMap
