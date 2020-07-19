@@ -203,7 +203,7 @@ main = do
 
     let tp_pairs :: [(Tp, Tp)] = join . elems $ keys <$> fn_type_ios_
     let longest_tp_string :: Int =
-            maximum $ length <$> fmap (pp . fst) tp_pairs <> fmap (pp . snd) tp_pairs
+            maximum $ length <$> fmap (pp . fst) tp_pairs <> fmap (pp . snd) tp_pairs <> fmap pp variantTypes
     let ios :: [(Expr, Either String Expr)] =
             join . elems $ join . elems <$> fn_type_ios_
 
