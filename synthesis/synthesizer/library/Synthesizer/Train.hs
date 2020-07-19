@@ -371,9 +371,9 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
                         --  :: (Int, Expr) -> IO (Int, Expr)
                         fill = \(ppt, used, filled) -> do
                                 --  :: Tensor device 'D.Float '[num_holes, rules]
-                                let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
+                                predicted <- liftIO $ predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
                                 debug $ "predicted: " <> show predicted
-                                (ppt', used') <- lift . liftIO $ predictHole randomHole variants ppt used predicted
+                                (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
                                 return (ppt', used', filled + 1)
                         in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
                 debug $ pp program
