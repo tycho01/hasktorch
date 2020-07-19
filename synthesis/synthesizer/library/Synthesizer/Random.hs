@@ -83,7 +83,7 @@ data RandomSynthesizerSpec = RandomSynthesizerSpec
 data RandomSynthesizer     = RandomSynthesizer
  deriving (Show, Generic)
 
-instance (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules) => Synthesizer device '[] rules 0 RandomSynthesizer where
+instance (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules) => Synthesizer device '[] rules RandomSynthesizer where
     encode _model _io_pairs = zeros
     predict _model _symbolIdxs ppt _feats = UnsafeMkTensor $ D.ones [length (findHolesExpr ppt), natValI @rules] D.float_opts
     doStep model optim _loss _lr = pure (A.flattenParameters model, optim)
