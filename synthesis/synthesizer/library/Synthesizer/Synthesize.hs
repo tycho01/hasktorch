@@ -109,7 +109,7 @@ getM cfg taskFnDataset = let
         (case synthesizer of
             "random" -> do
                 model <- A.sample RandomSynthesizerSpec
-                void . interpretUnsafe $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
+                void . interpretUnsafe $ train @device @rules @'[] @RandomSynthesizer cfg taskFnDataset model
             "nsps" -> do
                 model <- A.sample spec
                 void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
