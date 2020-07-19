@@ -110,8 +110,7 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
 
 nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
 nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
-    useTypes = natValI @featMult > 1
-    charMap = if useTypes then bothCharMap else exprCharMap
+    charMap = exprCharMap
     encoder_spec :: LstmEncoderSpec device maxStringLength encoderBatch encoderChars h featMult =
         LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
     type_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =

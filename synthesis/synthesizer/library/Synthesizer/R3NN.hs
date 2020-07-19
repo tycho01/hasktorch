@@ -217,7 +217,6 @@ runR3nn r3nn symbolIdxs ppt io_feats = scores where
     getters = fst <$> findHolesExpr ppt
     -- TODO: propagate constraints through to the hole types
     -- | expansion score z_e=ϕ′(e.l)⋅ω(e.r), for expansion e, expansion type e.r (for rule r∈R), leaf node e.l
-    useTypes = natValI @featMult > 1
     scores :: Tensor device 'D.Float '[num_holes, rules] =
             matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
     -- delay softmax for log-sum-exp trick (crossEntropy)

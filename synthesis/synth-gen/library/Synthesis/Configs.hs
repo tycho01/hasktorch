@@ -57,7 +57,6 @@ synthesizerConfig = SynthesizerConfig
     <*> synthesizerOpt
     <*> maskBadOpt
     <*> randomHoleOpt
-    <*> useTypesOpt
     <*> cheatOpt
 
 parseSynthesizerConfig :: IO SynthesizerConfig
@@ -87,7 +86,6 @@ gridSearchConfig = GridSearchConfig
     <*> evalRoundsOpt
     <*> maskBadOpt
     <*> randomHoleOpt
-    <*> useTypesOpt
     <*> cheatOpt
 
 parseGridSearchConfig :: IO GridSearchConfig
@@ -117,7 +115,6 @@ evolutionaryConfig = EvolutionaryConfig
     -- <*> evalRoundsOpt
     <*> maskBadOpt
     <*> randomHoleOpt
-    <*> useTypesOpt
     <*> cheatOpt
 
 parseEvolutionaryConfig :: IO EvolutionaryConfig
@@ -401,11 +398,6 @@ randomHoleOpt = switch
     ( long "randomHole"
     <> short 'm'
     <> help "when specified, a random hole is chosen to fill for training, while any holes are considered during prediction (based on the likelihood scores of their respective expansions). otherwise, we always fill the first hole found in a partial program tree (depth-first)." )
-
-useTypesOpt = switch
-    ( long "useTypes"
-    <> short 't'
-    <> help "supervise synthesis using rule/hole types as additional features." )
 
 cheatOpt = switch
     ( long "cheat"

@@ -104,10 +104,6 @@ gridSearch = do
     setStdGen stdGen
     let hparCombs' :: [(HparComb, IO (EvalResult, IO ()))] =
             fmap (second (`finally` incProgress pb 1)) $ join . join $ (!! length exprBlocks) $
-            -- featMult
-            if useTypes then
-                getRules @device @2 @0 cfg taskFnDataset hparCombs
-            else
                 getRules @device @1 @0 cfg taskFnDataset hparCombs
     let (hparCombs'', _gen') = fisherYates stdGen hparCombs'    -- shuffle
     hparResults :: [(HparComb, (EvalResult, IO ()))] <- sequence $ traverseSnd <$> take evalRounds hparCombs''
@@ -125,8 +121,7 @@ gridSearch = do
 getRules :: forall device featMult rules . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat featMult, KnownNat rules) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
 getRules cfg taskFnDataset hparCombs = let
     TaskFnDataset{..} = taskFnDataset
-    useTypes = natValI @featMult > 1
-    charMap = if useTypes then bothCharMap else exprCharMap
+    charMap = exprCharMap
     in (:)
         ((!! (size charMap + 2)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset hparCombs)
         $ getRules @device @featMult @(rules + 1) cfg taskFnDataset hparCombs
@@ -145,8 +140,7 @@ getTypeEncoderChars cfg taskFnDataset hparCombs = (:)
 
 getSymbols :: forall device featMult rules encoderChars typeEncoderChars symbols . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat symbols) => OptimizationConfig -> TaskFnDataset -> [HparComb] -> [[[[(HparComb, IO (EvalResult, IO ()))]]]]
 getSymbols cfg taskFnDataset hparCombs = let
-        useTypes = natValI @featMult > 1
-        longest = if useTypes then longestString else longestExprString
+        longest = longestExprString
     in (:)
         ((!! longest taskFnDataset) $ getMaxStringLength @device @featMult @rules @encoderChars @typeEncoderChars @symbols @0 cfg taskFnDataset hparCombs)
         $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @(symbols + 1) cfg taskFnDataset hparCombs
@@ -198,8 +192,7 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     let test_set :: [(Expr, (Tp, Tp))] = lists2pairs $ (if cheat then fstOf3 else thdOf3) datasets
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
-    let useTypes = natValI @featMult > 1
-    let charMap = if useTypes then bothCharMap else exprCharMap
+    let charMap = exprCharMap
     let encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
             LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
     let r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =

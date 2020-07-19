@@ -58,17 +58,12 @@ synthesize = do
     say_ $ show generationCfg
     manual_seed_L $ fromIntegral seed
     (!! length exprBlocks) $
-        -- featMult
-        if useTypes then
-            getRules @device @2 @0 cfg taskFnDataset
-        else
             getRules @device @1 @0 cfg taskFnDataset
 
 getRules :: forall device featMult rules . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat featMult, KnownNat rules) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getRules cfg taskFnDataset = let
         TaskFnDataset{..} = taskFnDataset
-        useTypes = natValI @featMult > 1
-        charMap = if useTypes then bothCharMap else exprCharMap
+        charMap = exprCharMap
     in (:)
         ((!! (size charMap + 2)) $ getEncoderChars @device @featMult @rules @0 cfg taskFnDataset)
         $ getRules @device @featMult @(rules + 1) cfg taskFnDataset
@@ -87,8 +82,7 @@ getTypeEncoderChars cfg taskFnDataset = (:)
 
 getSymbols :: forall device featMult rules encoderChars typeEncoderChars symbols . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat featMult, KnownNat rules, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat symbols) => SynthesizerConfig -> TaskFnDataset -> [IO ()]
 getSymbols cfg taskFnDataset = let
-        useTypes = natValI @featMult > 1
-        longest = if useTypes then longestString else longestExprString
+        longest = longestExprString
     in (:)
         ((!! longest taskFnDataset) $ getMaxStringLength @device @featMult @rules @encoderChars @typeEncoderChars @symbols @0 cfg taskFnDataset)
         $ getSymbols @device @featMult @rules @encoderChars @typeEncoderChars @(symbols + 1) cfg taskFnDataset
@@ -121,8 +115,7 @@ getM cfg taskFnDataset = let
                 void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
                 where
                 variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
-                useTypes = natValI @featMult > 1
-                charMap = if useTypes then bothCharMap else exprCharMap
+                charMap = exprCharMap
                 encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
                     LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
                 r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =

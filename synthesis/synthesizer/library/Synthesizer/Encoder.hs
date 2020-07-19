@@ -132,9 +132,8 @@ lstmEncoder encoder tp_io_pairs = UnsafeMkTensor feat_vec where
             \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . (`I.one_hot` max_char) . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
 
     both2t :: Tpl2 String -> Tpl2 featTnsr = mapBoth $ str2tensor maxStringLength_
-    useTypes = natValI @featMult > 1
     addTypes :: (featTnsr, [featTnsr]) -> D.Tensor =
-        \(tp, vecs) -> let sample_vec = stack' 0 (toDynamic <$> vecs) in if useTypes then F.cat (F.Dim 1) [sample_vec, repeatDim 0 (length vecs) (toDynamic tp)] else sample_vec
+        \(tp, vecs) -> let sample_vec = stack' 0 (toDynamic <$> vecs) in sample_vec
     tp_ios :: [(Tpl2 featTnsr, [Tpl2 featTnsr])] = (bimap both2t $ fmap both2t) <$> toList str_map
     vec_pairs :: [(D.Tensor, D.Tensor)] = (\((in_tp, out_tp), ios) -> let (ins, outs) = unzip ios in addTypes `mapBoth` ((in_tp, ins), (out_tp, outs))) <$> tp_ios
     (in_vecs, out_vecs) :: (Tpl2 [Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]]) =
