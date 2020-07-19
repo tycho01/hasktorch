@@ -174,32 +174,30 @@ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt hole_expansion_probs = 
 calcLoss :: forall rules device shape synthesizer num_holes . (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, Synthesizer device shape rules synthesizer) => Bool -> HashMap String Expr -> Expr -> Tp -> HashMap String Int -> synthesizer -> Tensor device 'D.Float shape -> HashMap String Expr -> HashMap String Int -> HashMap String Int -> Int -> Bool -> [(String, Expr)] -> Interpreter (Tensor device 'D.Float '[])
 calcLoss randomHole dsl task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants = do
     debug "calcLoss"
-    -- let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
-    -- (_program, golds, predictions, _filled) :: (Expr, [D.Tensor], [D.Tensor], Int) <- let
-    --         fill = \(ppt, golds, predictions, filled) -> do
-    --                 --  :: Tensor device 'D.Float '[num_holes, rules]
-    --                 let predicted = predict @device @shape @rules @synthesizer model symbolIdxs ppt io_feats
-    --                 -- debug $ "predicted: " <> show (shape' predicted)
-    --                 predicted' <- if not maskBad then pure predicted else do
-    --                     --  :: Tensor device 'D.Float '[num_holes, rules]
-    --                     mask <-
-    --                         fmap (Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.asTensor) $
-    --                         (\(hole_getter, hole_setter) -> mapM (fitExpr . hole_setter ppt . snd) variants)
-    --                         `mapM` findHolesExpr ppt
-    --                     return . Torch.Typed.Tensor.toDevice @device . asUntyped (F.mul $ toDynamic mask) $ predicted
-    --                 -- debug $ "predicted': " <> show (shape' predicted')
-    --                 (ppt', gold) <- liftIO $ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt predicted'
-    --                 debug $ "ppt': " <> pp ppt'
-    --                 return (ppt', (:) (toDynamic gold) $! golds, (:) (toDynamic predicted') $! predictions, filled + 1)
-    --         in while_ (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
-    -- let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
-    -- -- debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
-    -- let hole_expansion_probs :: D.Tensor = F.cat (F.Dim 0) predictions
-    -- -- debug $ "hole_expansion_probs: " <> show (D.shape hole_expansion_probs)
-    -- let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules model variant_sizes $ UnsafeMkTensor $ crossEntropy gold_rule_probs rule_dim hole_expansion_probs
-    -- -- debug $ "loss: " <> show (shape' loss)
-    let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
-    let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules model variant_sizes $ (mulScalar (0.0 :: Float) $ sumAll $ io_feats) `add` (mulScalar (0.0 :: Float) $ sumAll $ predicted)
+    let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
+    (_program, golds, predictions, _filled) :: (Expr, [D.Tensor], [D.Tensor], Int) <- let
+            fill = \(ppt, golds, predictions, filled) -> do
+                    --  :: Tensor device 'D.Float '[num_holes, rules]
+                    let predicted = predict @device @shape @rules @synthesizer model symbolIdxs ppt io_feats
+                    -- debug $ "predicted: " <> show (shape' predicted)
+                    predicted' <- if not maskBad then pure predicted else do
+                        --  :: Tensor device 'D.Float '[num_holes, rules]
+                        mask <-
+                            fmap (Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.asTensor) $
+                            (\(hole_getter, hole_setter) -> mapM (fitExpr . hole_setter ppt . snd) variants)
+                            `mapM` findHolesExpr ppt
+                        return . Torch.Typed.Tensor.toDevice @device . asUntyped (F.mul $ toDynamic mask) $ predicted
+                    -- debug $ "predicted': " <> show (shape' predicted')
+                    (ppt', gold) <- liftIO $ fillHoleTrain randomHole variantMap ruleIdxs task_fn ppt predicted'
+                    debug $ "ppt': " <> pp ppt'
+                    return (ppt', (:) (toDynamic gold) $! golds, (:) (toDynamic predicted') $! predictions, filled + 1)
+            in while_ (\(expr, _, _, filled) -> hasHoles expr && filled < max_holes) fill (letIn dsl (skeleton taskType), [], [], 0 :: Int)
+    let gold_rule_probs :: D.Tensor = F.cat (F.Dim 0) golds
+    -- debug $ "gold_rule_probs: " <> show (D.shape gold_rule_probs)
+    let hole_expansion_probs :: D.Tensor = F.cat (F.Dim 0) predictions
+    -- debug $ "hole_expansion_probs: " <> show (D.shape hole_expansion_probs)
+    let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules model variant_sizes $ UnsafeMkTensor $ crossEntropy gold_rule_probs rule_dim hole_expansion_probs
+    -- debug $ "loss: " <> show (shape' loss)
     return loss
 
 -- | pre-calculate DSL stuff
@@ -254,25 +252,32 @@ train synthesizerConfig taskFnDataset init_model = do
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
                 let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
-                lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
+                -- lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
                 let task_fn :: Expr = fst task_fn_tp
                 -- lift . info $ "task_fn: \n" <> pp task_fn
                 let tpInstPair :: (Tp, Tp) = snd task_fn_tp
                 let taskType :: Tp = safeIndexHM fnTypes task_fn
-                lift . info $ "taskType: " <> pp taskType
+                -- lift . info $ "taskType: " <> pp taskType
                 let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
                         first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
-                lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+                -- lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
                 --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
                 -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
-                loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
+                -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
+                let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
+                let loss :: Tensor device 'D.Float '[] = 
+                        -- patchLoss @device @shape @rules model variant_sizes $
+                        -- (mulScalar (0.0 :: Float) $ sumAll $ io_feats) `add`
+                        (mulScalar (0.0 :: Float) $ sumAll $ predicted)
                 -- lift . debug $ "loss: " <> show (shape' loss)
                 -- TODO: do once for each mini-batch / fn?
                 -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
-                (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss lr
-                let model' :: synthesizer = A.replaceParameters model newParam
+                -- (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss lr
+                -- let model' :: synthesizer = A.replaceParameters model newParam
+                let optim' = optim
+                let model' = model
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
                 let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
                 lift . liftIO $ incProgress pb 1
