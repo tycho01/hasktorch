@@ -262,11 +262,11 @@ train synthesizerConfig taskFnDataset init_model = do
                         first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
                 lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
                 rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] <-
-                        rule_encode @device @shape @rules @ruleFeats model variantTypes
+                        lift . liftIO $ rule_encode @device @shape @rules @ruleFeats model variantTypes
                 -- lift . debug $ "rule_tp_emb: " <> show (shape' rule_tp_emb)
                 --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
                 -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
-                io_feats :: Tensor device 'D.Float shape <- encode @device @shape @rules @ruleFeats model target_tp_io_pairs
+                io_feats :: Tensor device 'D.Float shape <- lift . liftIO $ encode @device @shape @rules @ruleFeats model target_tp_io_pairs
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
                 -- lift . debug $ "loss: " <> show (shape' loss)
@@ -358,7 +358,7 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
             let target_outputs :: [Either String Expr] =
                     fmap snd $ join . elems $ target_tp_io_pairs
 
-            io_feats :: Tensor device 'D.Float shape <- encode @device @shape @rules @ruleFeats model target_tp_io_pairs
+            io_feats :: Tensor device 'D.Float shape <- lift . liftIO $ encode @device @shape @rules @ruleFeats model target_tp_io_pairs
             loss_ :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
 
             -- sample for best of 100 predictions
@@ -373,7 +373,7 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
                                 --  :: Tensor device 'D.Float '[num_holes, rules]
                                 let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
                                 debug $ "predicted: " <> show predicted
-                                (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
+                                (ppt', used') <- lift . liftIO $ predictHole randomHole variants ppt used predicted
                                 return (ppt', used', filled + 1)
                         in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
                 debug $ pp program
