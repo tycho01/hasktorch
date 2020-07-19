@@ -256,8 +256,8 @@ train synthesizerConfig taskFnDataset init_model = do
                 let task_fn :: Expr = fst task_fn_tp
                 -- lift . info $ "task_fn: \n" <> pp task_fn
                 let tpInstPair :: (Tp, Tp) = snd task_fn_tp
-                let taskType :: Tp = safeIndexHM fnTypes task_fn
-                lift . info $ "taskType: " <> pp taskType
+                -- let taskType :: Tp = safeIndexHM fnTypes task_fn
+                -- lift . info $ "taskType: " <> pp taskType
                 let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
                         first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
                 lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
@@ -266,7 +266,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
-                loss :: Tensor device 'D.Float '[] <- mulScalar (0.0 :: Float) $ sumAll $ io_feats
+                let loss :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ io_feats
                 -- lift . debug $ "loss: " <> show (shape' loss)
                 -- TODO: do once for each mini-batch / fn?
                 -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
