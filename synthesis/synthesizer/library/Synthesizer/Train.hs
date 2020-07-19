@@ -268,7 +268,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
                 let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
                 let loss :: Tensor device 'D.Float '[] = 
-                        -- patchLoss @device @shape @rules model variant_sizes $
+                        patchLoss @device @shape @rules model variant_sizes $
                         (mulScalar (0.0 :: Float) $ sumAll $ io_feats) `add`
                         (mulScalar (0.0 :: Float) $ sumAll $ predicted)
                 -- lift . debug $ "loss: " <> show (shape' loss)
