@@ -77,7 +77,7 @@ import           Synthesizer.Encoder
 import           Synthesizer.R3NN
 import           Synthesizer.Params
 
-class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules ruleFeats synthesizer where
+class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules synthesizer where
     encode    :: synthesizer
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
                 -> Tensor device 'D.Float shape
