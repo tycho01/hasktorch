@@ -264,9 +264,9 @@ train synthesizerConfig taskFnDataset init_model = do
                 --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
                 -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs
-                lift . debug $ "io_feats: " <> show (shape' io_feats)
+                -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
-                lift . debug $ "loss: " <> show (shape' loss)
+                -- lift . debug $ "loss: " <> show (shape' loss)
                 -- TODO: do once for each mini-batch / fn?
                 -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
                 (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules @ruleFeats model optim loss lr
