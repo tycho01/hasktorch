@@ -112,7 +112,7 @@ exprBlocks:
   - expr: 'tpl (undefined :: a)'
 - - tpl
   - expr: 'tpl (undefined :: a) (undefined :: b)'
-longestString: 46
+longestString: 54
 fnTypeIOs:
 - - expr: sequenceA
   - - - - type: Maybe (Maybe Int)
