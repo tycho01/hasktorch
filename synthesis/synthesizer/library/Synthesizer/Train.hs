@@ -268,16 +268,16 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
                 let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
                 let loss :: Tensor device 'D.Float '[] = 
-                        patchLoss @device @shape @rules model variant_sizes $
+                        -- patchLoss @device @shape @rules model variant_sizes $
                         (mulScalar (0.0 :: Float) $ sumAll $ io_feats) `add`
                         (mulScalar (0.0 :: Float) $ sumAll $ predicted)
                 -- lift . debug $ "loss: " <> show (shape' loss)
                 -- TODO: do once for each mini-batch / fn?
                 -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
                 (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss lr
-                let model' :: synthesizer = A.replaceParameters model newParam
+                -- let model' :: synthesizer = A.replaceParameters model newParam
                 -- let optim' = optim
-                -- let model' = model
+                let model' = model
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
                 let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
                 lift . liftIO $ incProgress pb 1
