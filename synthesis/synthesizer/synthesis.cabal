@@ -67,8 +67,8 @@ library
       library
   exposed-modules:
       Synthesizer
-      Synthesizer.Evolutionary
-      Synthesizer.GridSearch
+      -- Synthesizer.Evolutionary
+      -- Synthesizer.GridSearch
       Synthesizer.Synthesize
       Synthesizer.Encoder
       Synthesizer.NSPS
@@ -81,21 +81,21 @@ library
       Synthesizer.UntypedMLP
       Synthesizer.Utility
 
-executable evolutionary
-  import: config, synth
-  main-is: Main.hs
-  hs-source-dirs:
-      evolutionary
-  build-depends:
-      synthesizer
+-- executable evolutionary
+--   import: config, synth
+--   main-is: Main.hs
+--   hs-source-dirs:
+--       evolutionary
+--   build-depends:
+--       synthesizer
 
-executable grid-search
-  import: config, synth
-  main-is: Main.hs
-  hs-source-dirs:
-      grid-search
-  build-depends:
-      synthesizer
+-- executable grid-search
+--   import: config, synth
+--   main-is: Main.hs
+--   hs-source-dirs:
+--       grid-search
+--   build-depends:
+--       synthesizer
 
 executable synthesizer
   import: config, synth
