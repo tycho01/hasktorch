@@ -217,9 +217,9 @@ prep_dsl TaskFnDataset{..} =
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
 -- | train a NSPS model and return results
-train :: forall device rules shape synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, Synthesizer device shape rules synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape))) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
+train :: forall device rules shape synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, Synthesizer device shape rules synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape))) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> IO [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
-    debug "train"
+    debug_ "train"
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset
 
@@ -227,66 +227,66 @@ train synthesizerConfig taskFnDataset init_model = do
 
     let [train_set, validation_set, test_set] :: [[(Expr, (Tp, Tp))]] = lists2pairs <$> (if cheat then replicate 3 . fstOf3 else untuple3) datasets
     let stdGen :: StdGen = mkStdGen seed
-    liftIO $ setStdGen stdGen
+    setStdGen stdGen
     let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
     let modelFolder = resultFolder <> "/" <> ppCfg synthesizerConfig
-    liftIO $ createDirectoryIfMissing True modelFolder
+    createDirectoryIfMissing True modelFolder
 
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
-    debug $ "variants: " <> pp_ variants
-    debug $ "variantMap: " <> pp_ variantMap
-    debug $ "symbolIdxs: " <> show symbolIdxs
-    debug $ "ruleIdxs: " <> show ruleIdxs
+    debug_ $ "variants: " <> pp_ variants
+    debug_ $ "variantMap: " <> pp_ variantMap
+    debug_ $ "symbolIdxs: " <> show symbolIdxs
+    debug_ $ "ruleIdxs: " <> show ruleIdxs
 
     -- MODELS
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, 1)
 
     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop then exitWith state else do
-        lift $ notice $ "epoch: " <> show epoch
+        lift $ notice_ $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         let n :: Int = length train_set'
-        pb <- lift . liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
-        start <- lift . liftIO $ getCPUTime
+        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
+        start <- lift $ getCPUTime
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
                 let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
-                lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
+                lift . info_ $ "task_fn_tp: \n" <> pp_ task_fn_tp
                 let task_fn :: Expr = fst task_fn_tp
                 -- lift . info $ "task_fn: \n" <> pp task_fn
                 let tpInstPair :: (Tp, Tp) = snd task_fn_tp
                 let taskType :: Tp = safeIndexHM fnTypes task_fn
-                lift . info $ "taskType: " <> pp taskType
+                lift . info_ $ "taskType: " <> pp taskType
                 let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
                         first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
-                lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+                lift . info_ $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
                 --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
                 -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
-                -- lift . debug $ "io_feats: " <> show (shape' io_feats)
-                loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
+                -- lift . debug_ $ "io_feats: " <> show (shape' io_feats)
+                loss :: Tensor device 'D.Float '[] <- lift . interpretUnsafe $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
                 -- lift . debug $ "loss: " <> show (shape' loss)
                 -- TODO: do once for each mini-batch / fn?
-                -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
-                (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss lr
+                -- (newParam, optim') <- D.runStep model optim (toDynamic loss) $ toDynamic lr
+                (newParam, optim') <- lift $ doStep @device @shape @rules model optim loss lr
                 let model' :: synthesizer = A.replaceParameters model newParam
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
                 let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
-                lift . liftIO $ incProgress pb 1
+                lift $ incProgress pb 1
                 return (train_loss', model', optim', gen', task_fn_id + 1)
 
-        lift . debug $ "finished epoch training"
-        end <- lift . liftIO $ getCPUTime
+        lift . debug_ $ "finished epoch training"
+        end <- lift $ getCPUTime
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
 
         -- EVAL
         (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
-            debug "evaluating"
+            debug_ "evaluating"
 
-            (acc_valid, loss_valid) <- evaluate @device @rules @shape taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
+            (acc_valid, loss_valid) <- interpretUnsafe $ evaluate @device @rules @shape taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
 
-            say $ printf
+            say_ $ printf
                 "Epoch: %03d. Train loss: %.4f. Validation loss: %.4f. Validation accuracy: %.4f.\n"
                 epoch
                 loss_train
@@ -294,7 +294,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 acc_valid
 
             let modelPath = modelFolder <> printf "/%04d.pt" epoch
-            liftIO $ D.save (D.toDependent <$> A.flattenParameters model') modelPath
+            D.save (D.toDependent <$> A.flattenParameters model') modelPath
 
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
             let eval_results' = (:) eval_result $! eval_results
@@ -306,7 +306,7 @@ train synthesizerConfig taskFnDataset init_model = do
                     prev    :: D.Tensor = F.mean . D.asTensor $ prev_losses
                     earlyStop :: Bool = D.asValue $ F.sub current prev `I.gtScalar` convergenceThreshold
                     in earlyStop
-            when earlyStop $ debug "validation loss has converged, stopping early!"
+            when earlyStop $ debug_ "validation loss has converged, stopping early!"
 
             return $ (earlyStop, eval_results', gen'')
 
@@ -314,7 +314,7 @@ train synthesizerConfig taskFnDataset init_model = do
         -- decay the learning rate if accuracy decreases
         -- lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
         --     True -> do
-        --         lift . info $ "accuracy decreased, decaying learning rate!"
+        --         lift . info_ $ "accuracy decreased, decaying learning rate!"
         --         return . divScalar learningDecay $ lr
         --     False -> pure lr
         let lr' = lr
@@ -322,11 +322,11 @@ train synthesizerConfig taskFnDataset init_model = do
         return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
     -- write results to csv
-    liftIO $ createDirectoryIfMissing True resultFolder
+    createDirectoryIfMissing True resultFolder
     let resultPath = resultFolder <> "/" <> ppCfg synthesizerConfig <> ".csv"
     let eval_results' = reverse eval_results -- we want the first epoch first
-    liftIO $ BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader eval_results'
-    info $ "data written to " <> resultPath
+    BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader eval_results'
+    info_ $ "data written to " <> resultPath
 
     return eval_results'
 
