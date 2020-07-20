@@ -263,7 +263,7 @@ train synthesizerConfig taskFnDataset init_model = do
         -- lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
 
         -- TRAIN LOOP
-        (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen__, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
+        (model', optim', _) :: (synthesizer, D.Adam, Int) <- lift $ iterateLoopT (model_, optim_, 0) $ \ !state@(model, optim, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
                 -- let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
                 let io_feats :: Tensor device 'D.Float shape = ones
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
@@ -282,9 +282,8 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- let optim' = optim
                 -- let model' = model
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
-                let train_loss' :: Float = toFloat loss
                 lift . liftIO $ incProgress pb 1
-                return (train_loss', model', optim', gen__, task_fn_id_ + 1)
+                return (model', optim', task_fn_id_ + 1)
 
         lift . debug $ "finished epoch training"
         end <- lift . liftIO $ getCPUTime
