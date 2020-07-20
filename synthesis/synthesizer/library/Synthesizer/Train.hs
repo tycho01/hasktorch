@@ -123,5 +123,5 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- let optim' = optim
                 lift . liftIO $ incProgress pb 1
                 return (optim', task_fn_id_ + 1)
-
+        return $ epoch + 1
     return []
