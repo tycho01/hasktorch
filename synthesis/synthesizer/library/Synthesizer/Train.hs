@@ -98,7 +98,7 @@ prep_dsl TaskFnDataset{..} =
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
 -- | train a NSPS model and return results
-train :: forall device rules shape m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)), TensorOptions shape 'D.Float device) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
+train :: forall device rules m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset
@@ -116,7 +116,7 @@ train synthesizerConfig taskFnDataset init_model = do
         let dummy :: Tensor device 'D.Float '[] = zeros
         -- TRAIN LOOP
         (optim', _) :: (D.Adam, Int) <- lift $ iterateLoopT (init_optim, 0) $ \ !state@(optim, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
-                let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules model variant_sizes dummy
+                let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model variant_sizes dummy
                 (newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic init_lr
                 -- let optim' = optim
                 lift . liftIO $ incProgress pb 1
