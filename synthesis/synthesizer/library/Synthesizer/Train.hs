@@ -98,7 +98,7 @@ train synthesizerConfig taskFnDataset model = do
     let dummy :: Tensor device 'D.Float '[] = zeros
     notice $ "epoch"
     void . lift $ iterateLoopT init_optim $ \ optim -> do
-            let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model (singleton "" 1) dummy
+            let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model dummy
             (_newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) lr
             return optim'
     return []
