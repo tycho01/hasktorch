@@ -249,20 +249,20 @@ train synthesizerConfig taskFnDataset init_model = do
         let n :: Int = length train_set'
         pb <- lift . liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
         start <- lift . liftIO $ getCPUTime
+
+        let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
+        -- lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
+        let task_fn :: Expr = fst task_fn_tp
+        -- lift . info $ "task_fn: \n" <> pp task_fn
+        let tpInstPair :: (Tp, Tp) = snd task_fn_tp
+        let taskType :: Tp = safeIndexHM fnTypes task_fn
+        -- lift . info $ "taskType: " <> pp taskType
+        let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
+                first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
+        -- lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
-                let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
-                -- lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
-                let task_fn :: Expr = fst task_fn_tp
-                -- lift . info $ "task_fn: \n" <> pp task_fn
-                let tpInstPair :: (Tp, Tp) = snd task_fn_tp
-                let taskType :: Tp = safeIndexHM fnTypes task_fn
-                -- lift . info $ "taskType: " <> pp taskType
-                let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
-                        first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
-                -- lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
-                --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
-                -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
@@ -279,7 +279,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- let optim' = optim
                 let model' = model
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
-                let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
+                let train_loss' :: Float = toFloat loss
                 lift . liftIO $ incProgress pb 1
                 return (train_loss', model', optim', gen', task_fn_id + 1)
 
