@@ -119,7 +119,7 @@ train synthesizerConfig taskFnDataset init_model = do
         -- TRAIN LOOP
         (optim', _) :: (D.Adam, Int) <- lift $ iterateLoopT (init_optim, 0) $ \ !state@(optim, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
                 let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules model variant_sizes dummy
-                (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss init_lr
+                (newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic init_lr
                 -- let optim' = optim
                 lift . liftIO $ incProgress pb 1
                 return (optim', task_fn_id_ + 1)
