@@ -86,7 +86,7 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
                 -> HashMap String Int
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
-    patchLoss mdl hm loss = patchEncoderLoss (encoder mdl) . patchR3nnLoss (r3nn mdl) hm $ loss
+    patchLoss mdl hm loss = patchR3nnLoss (r3nn mdl) hm $ loss
 
 nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
 nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
