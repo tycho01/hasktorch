@@ -120,7 +120,7 @@ instance ( KnownDevice device
  where
     sample R3NNSpec {..} = do
         join . return $ R3NN
-            <*> A.sample (LSTMWithZerosInitSpec scoreSpec)
+            <$> A.sample (LSTMWithZerosInitSpec scoreSpec)
             <*> mapM (\q -> A.sample $ MLPSpec (q * m) m) variant_sizes
             <*> (fmap UnsafeMkParameter . D.makeIndependent =<< D.randnIO' [symbols, m])
             where
