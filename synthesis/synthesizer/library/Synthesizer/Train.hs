@@ -90,25 +90,6 @@ import           Synthesizer.R3NN
 import           Synthesizer.Synthesizer
 import           Synthesizer.Params
 
--- -- | deterministically pick the most likely expansion to fill a hole in a PPT
--- -- | deprecated, not in use
--- -- TODO: replace this whole block with argmaxAll (argmax_t) returning non-flat index (like np.unravel_index)...
--- -- (hole_idx, rule_idx) :: (Int, Int) = unravelIdx . argmaxAll $ hole_expansion_probs
--- argmaxExpansion :: forall num_holes rules device . Tensor device 'D.Float '[num_holes, rules] -> (Int, Int)
--- argmaxExpansion hole_expansion_probs = (hole_idx, rule_idx) where
---     (hole_dim, rule_dim) :: (Int, Int) = (0, 1)
---     rule_idx_by_hole :: Tensor device 'D.Int64 '[num_holes] =
---             asUntyped (F.argmax (F.Dim rule_dim) F.RemoveDim) hole_expansion_probs
---     num_holes_ :: Int = shape' rule_idx_by_hole !! 0
---     best_prob_by_hole :: Tensor device 'D.Float '[num_holes] =
---             UnsafeMkTensor . D.reshape [num_holes_] $ I.gather  -- F.squeeze 1
---                 (toDynamic hole_expansion_probs)
---                 rule_dim
---                 (toDynamic $ unsqueeze @1 rule_idx_by_hole)
---                 False
---     hole_idx :: Int = D.asValue $ F.argmax (F.Dim 0) F.RemoveDim $ toDynamic best_prob_by_hole
---     rule_idx :: Int = D.asValue $ D.select 0 hole_idx $ toDynamic rule_idx_by_hole
-
 -- | fill a non-terminal leaf node in a PPT given hole/rule expansion probabilities
 predictHole :: forall num_holes rules device . (StandardFloatingPointDTypeValidation device 'D.Float) => Bool -> [(String, Expr)] -> Expr -> Set String -> Tensor device 'D.Float '[num_holes, rules] -> IO (Expr, Set String)
 predictHole randomHole variants ppt used hole_expansion_probs = do
@@ -288,9 +269,10 @@ train synthesizerConfig taskFnDataset init_model = do
         lift . debug $ "finished epoch training"
         end <- lift . liftIO $ getCPUTime
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
+        let loss_train :: Float = 0.0
 
         -- EVAL
-        (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
+        (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen') (mod (epoch - 1) evalFreq == 0) $ do
             debug "evaluating"
 
             (acc_valid, loss_valid) <- evaluate @device @rules @shape taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
