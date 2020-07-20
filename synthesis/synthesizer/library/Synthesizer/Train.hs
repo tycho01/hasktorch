@@ -243,29 +243,16 @@ train synthesizerConfig taskFnDataset init_model = do
         --         first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen' $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
         -- lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
 
+        let model = model_
+        let model' = model
+        let dummy :: Tensor device 'D.Float '[] = zeros
         -- TRAIN LOOP
-        (model', optim', _) :: (synthesizer, D.Adam, Int) <- lift $ iterateLoopT (model_, optim_, 0) $ \ !state@(model, optim, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
-                -- let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
-                -- let io_feats :: Tensor device 'D.Float shape = ones
-                -- lift . debug $ "io_feats: " <> show (shape' io_feats)
-                -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
-                -- let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
-                let predicted :: Tensor device 'D.Float '[] = ones
-                let loss :: Tensor device 'D.Float '[] = 
-                        patchLoss @device @shape @rules model variant_sizes $
-                        -- (mulScalar (0.0 :: Float) $ sumAll $ io_feats)
-                        -- `add`
-                        (mulScalar (0.0 :: Float) $ sumAll $ predicted)
-                -- lift . debug $ "loss: " <> show (shape' loss)
-                -- TODO: do once for each mini-batch / fn?
-                -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
+        (optim', _) :: (D.Adam, Int) <- lift $ iterateLoopT (optim_, 0) $ \ !state@(optim, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
+                let loss :: Tensor device 'D.Float '[] = patchLoss @device @shape @rules model variant_sizes dummy
                 (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss lr
-                -- let model' :: synthesizer = A.replaceParameters model newParam
                 -- let optim' = optim
-                let model' = model
-                -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
                 lift . liftIO $ incProgress pb 1
-                return (model', optim', task_fn_id_ + 1)
+                return (optim', task_fn_id_ + 1)
 
         lift . debug $ "finished epoch training"
         end <- lift . liftIO $ getCPUTime
