@@ -250,6 +250,7 @@ train synthesizerConfig taskFnDataset init_model = do
         pb <- lift . liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
         start <- lift . liftIO $ getCPUTime
 
+        let task_fn_id :: Int = 0
         let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
         -- lift . info $ "task_fn_tp: \n" <> pp_ task_fn_tp
         let task_fn :: Expr = fst task_fn_tp
@@ -258,11 +259,11 @@ train synthesizerConfig taskFnDataset init_model = do
         let taskType :: Tp = safeIndexHM fnTypes task_fn
         -- lift . info $ "taskType: " <> pp taskType
         let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
-                first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
+                first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen' $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
         -- lift . info $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
 
         -- TRAIN LOOP
-        (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+        (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen', task_fn_id) -> if task_fn_id >= n then exitWith state else do
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
