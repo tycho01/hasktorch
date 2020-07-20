@@ -87,7 +87,7 @@ data R3NN
  where
     R3NN :: forall m symbols rules maxStringLength batch_size device h numChars featMult
       . { condition_model :: LSTMWithInit (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
-        , left_nnets :: HashMap String MLP
+        , left_nnets :: MLP
         }
         -> R3NN device m symbols rules maxStringLength batch_size h numChars featMult
  deriving (Show, Generic)
@@ -122,7 +122,7 @@ instance ( KnownDevice device
             -- condition_model
             <$> A.sample (LSTMWithZerosInitSpec conditionSpec)
             -- left: untyped as q is not static
-            <*> mapM (\q -> A.sample $ MLPSpec (q * m) m) variant_sizes
+            <*> A.sample (MLPSpec (1 * m) m)
             where
                 -- m must be divisible by Dirs for `Div` in the LSTM specs to work out due to integer division...
                 m = assertP ((== 0) . (`mod` natValI @Dirs)) $ natValI @m
@@ -150,6 +150,6 @@ patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numC
 patchR3nnLoss r3nn_model variant_sizes = let
         dropoutOn = True
         m :: Int = natValI @m
-        left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
+        left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ (\mlp_ -> mlp mlp_ $ D.zeros' [1,1*m]) $ left_nnets r3nn_model
         condition_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (condition_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,(m + batch_size * maxStringLength * (2 * featMult * Dirs * h))])
     in add $ Torch.Typed.Tensor.toDevice $ left_dummy `add` condition_dummy
