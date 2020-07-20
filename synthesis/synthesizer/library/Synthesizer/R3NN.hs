@@ -87,11 +87,6 @@ data R3NN
     R3NN :: forall m symbols rules maxStringLength batch_size device h numChars featMult
       . { condition_model :: LSTMWithInit (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
         , score_model     :: LSTMWithInit  m                                    (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
-        -- NSPS: for each production rule r∈R, a nnet f_r from x∈R^(Q⋅M) to y∈R^M,
-        -- with Q as the number of symbols on the RHS of the production rule r.
-        , left_nnets :: HashMap String MLP
-        -- for each production rule r∈R, a nnet g_r from x'∈R^M to y'∈R^(Q⋅M).
-        , right_nnets :: HashMap String MLP
         -- for each symbol s∈S, an M-dimensional representation ϕ(s)∈R^M.
         , symbol_emb :: Parameter device 'D.Float '[symbols, m]
         -- for each production rule r∈R, an M−dimensional representation: ω(r)∈R^M.
@@ -131,10 +126,6 @@ instance ( KnownDevice device
             <$> A.sample (LSTMWithZerosInitSpec conditionSpec)
             -- score_model
             <*> A.sample (LSTMWithZerosInitSpec scoreSpec)
-            -- left: untyped as q is not static
-            <*> mapM (\q -> A.sample $ MLPSpec (q * m) m) variant_sizes
-            -- right: ditto
-            <*> mapM (\q -> A.sample $ MLPSpec m (q * m)) variant_sizes
             -- symbol_emb
             <*> (fmap UnsafeMkParameter . D.makeIndependent =<< D.randnIO' [symbols, m])
             -- rule_emb
@@ -172,14 +163,12 @@ variantInt :: Expr -> (String, Int)
 variantInt = (appRule &&& length) . fnAppNodes
 
 -- | Torch gets sad not all nnets get used in the loss 😢 so let's give it a hug... 🤗🙄
-patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numChars featMult . (KnownNat m, KnownNat featMult, KnownNat h, KnownNat batch_size, KnownNat maxStringLength, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h numChars featMult -> HashMap String Int -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
-patchR3nnLoss r3nn_model variant_sizes = let
+patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numChars featMult . (KnownNat m, KnownNat featMult, KnownNat h, KnownNat batch_size, KnownNat maxStringLength, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h numChars featMult -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
+patchR3nnLoss r3nn_model = let
         dropoutOn = True
         m :: Int = natValI @m
-        left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
-        right_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\   mlp_  ->                              mlp mlp_ $ D.zeros' [1,  m]) $ elems  $ right_nnets r3nn_model
         condition_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (condition_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,(m + batch_size * maxStringLength * (2 * featMult * Dirs * h))])
         score_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (score_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,m])
         symbol_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Parameter.toDependent $ (symbol_emb r3nn_model)
         rule_dummy   :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Parameter.toDependent $ (rule_emb   r3nn_model)
-    in add $ Torch.Typed.Tensor.toDevice $ left_dummy `add` right_dummy `add` condition_dummy `add` score_dummy `add` symbol_dummy `add` rule_dummy
+    in add $ Torch.Typed.Tensor.toDevice $ condition_dummy `add` score_dummy `add` symbol_dummy `add` rule_dummy
