@@ -267,12 +267,12 @@ train synthesizerConfig taskFnDataset init_model = do
                 let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
-                -- let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
+                let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
                 let loss :: Tensor device 'D.Float '[] = 
                         patchLoss @device @shape @rules model variant_sizes $
-                        (mulScalar (0.0 :: Float) $ sumAll $ io_feats)
+                        -- (mulScalar (0.0 :: Float) $ sumAll $ io_feats)
                         -- `add`
-                        -- (mulScalar (0.0 :: Float) $ sumAll $ predicted)
+                        (mulScalar (0.0 :: Float) $ sumAll $ predicted)
                 -- lift . debug $ "loss: " <> show (shape' loss)
                 -- TODO: do once for each mini-batch / fn?
                 -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
