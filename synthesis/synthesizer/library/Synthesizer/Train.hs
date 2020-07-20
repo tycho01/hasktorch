@@ -264,7 +264,8 @@ train synthesizerConfig taskFnDataset init_model = do
 
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen__, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
-                let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
+                -- let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules model target_tp_io_pairs
+                let io_feats :: Tensor device 'D.Float shape = ones
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
                 let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
