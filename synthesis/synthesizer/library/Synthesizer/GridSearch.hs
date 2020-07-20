@@ -70,7 +70,7 @@ hparCombs :: [HparComb] = uncurry5 HparComb <$> cartesianProduct5
     hOpts
 
 learningRateOpts :: [Float]
-learningRateOpts = reverse ((\x -> 10 ** (-x)) <$> [3..6])
+learningRateOpts = ((\x -> 10 ** (-x)) <$> [2..5])
 
 dropoutRateOpts :: [Double]
 dropoutRateOpts = [dropoutRateDef] -- 0 : reverse ((\x -> 2 ** (-x)) <$> [1..5])
