@@ -107,13 +107,13 @@ getM cfg taskFnDataset = let
                 model <- A.sample spec
                 void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
                 where
-                variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
-                charMap = exprCharMap
-                encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
-                    LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-                r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
-                    initR3nn variants r3nnBatch dropoutRate ruleCharMap
-                spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
-                    NSPSSpec encoder_spec r3nn_spec
+                    variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
+                    charMap = exprCharMap
+                    encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
+                        LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
+                    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
+                        initR3nn variants r3nnBatch dropoutRate ruleCharMap
+                    spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
+                        NSPSSpec encoder_spec r3nn_spec
             )
         $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset
