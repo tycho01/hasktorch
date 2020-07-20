@@ -103,7 +103,7 @@ getM cfg taskFnDataset = let
     TaskFnDataset{..} = taskFnDataset
     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
     in (:)
-        do
+        (do
                 model <- A.sample spec
                 void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
                 where
@@ -115,4 +115,5 @@ getM cfg taskFnDataset = let
                     initR3nn variants r3nnBatch dropoutRate ruleCharMap
                 spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
                     NSPSSpec encoder_spec r3nn_spec
+            )
         $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset
