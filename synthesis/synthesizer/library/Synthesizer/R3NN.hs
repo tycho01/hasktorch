@@ -68,8 +68,6 @@ data R3NNSpec
         -- symbolIdxs :: HashMap String Int
         -- ppt :: Expr
       . { variant_sizes :: HashMap String Int
-        , conditionSpec :: LSTMSpec (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'D.Float device
-        , scoreSpec     :: LSTMSpec  m                                                             (Div m Dirs) NumLayers Dir 'D.Float device
         }
         -> R3NNSpec device m symbols rules maxStringLength batch_size h numChars featMult
  deriving (Show)
