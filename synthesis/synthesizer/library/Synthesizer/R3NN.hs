@@ -150,6 +150,6 @@ patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numC
 patchR3nnLoss r3nn_model variant_sizes = let
         dropoutOn = True
         m :: Int = natValI @m
-        left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
-        condition_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (condition_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,(m + batch_size * maxStringLength * (2 * featMult * Dirs * h))])
-    in add $ Torch.Typed.Tensor.toDevice $ left_dummy `add` condition_dummy
+        left_dummy  :: Tensor device 'D.Float '[] = sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
+        condition_dummy :: Tensor device 'D.Float '[] = sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (condition_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,(m + batch_size * maxStringLength * (2 * featMult * Dirs * h))])
+    in add $ Torch.Typed.Tensor.toDevice $ mulScalar (0.0 :: Float) $ left_dummy `add` condition_dummy
