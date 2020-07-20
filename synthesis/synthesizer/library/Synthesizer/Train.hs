@@ -96,13 +96,10 @@ train synthesizerConfig taskFnDataset model = do
     let lr :: D.Tensor = D.asTensor $ learningRate
     let variant_sizes :: HashMap String Int = fromList $ variantInt . snd . (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
-
-    _ <- iterateLoopT (1 :: Int) $ \ !epoch -> do
-        lift $ notice $ "epoch: " <> show epoch
-        let dummy :: Tensor device 'D.Float '[] = zeros
-        optim' :: D.Adam <- lift $ iterateLoopT init_optim $ \ !optim -> do
-                let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model variant_sizes dummy
-                (_newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) lr
-                return optim'
-        return $ epoch + 1
+    let dummy :: Tensor device 'D.Float '[] = zeros
+    notice $ "epoch"
+    void . lift $ iterateLoopT init_optim $ \ optim -> do
+            let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model variant_sizes dummy
+            (_newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) lr
+            return optim'
     return []
