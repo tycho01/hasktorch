@@ -86,7 +86,7 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
                 -> HashMap String Int
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
-    patchLoss mdl hm loss = patchEncoderLoss (encoder mdl) . patchR3nnLoss (r3nn mdl) hm $ loss
+    patchLoss mdl hm loss = patchEncoderLoss (encoder mdl) $ loss
 
 nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
 nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
@@ -108,7 +108,6 @@ data NSPSSpec (device :: (D.DeviceType, Nat)) (m :: Nat) (symbols :: Nat) (rules
 data NSPS (device :: (D.DeviceType, Nat)) (m :: Nat) (symbols :: Nat) (rules :: Nat) (maxStringLength :: Nat) (encoderBatch :: Nat) (r3nnBatch :: Nat) (encoderChars :: Nat) (typeEncoderChars :: Nat) (h :: Nat) (featMult :: Nat) where
   NSPS :: forall device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
         . { encoder :: LstmEncoder device maxStringLength encoderBatch encoderChars h featMult
-          , r3nn :: R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult }
        -> NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
  deriving (Show, Generic)
 
@@ -131,6 +130,5 @@ instance ( KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat m, Kno
                 (natValI @h)
                 (natValI @featMult)
         encoder     <- A.sample encoderSpec
-        r3nn        <- A.sample r3nnSpec
-        return $ NSPS encoder r3nn
+        return $ NSPS encoder
 
