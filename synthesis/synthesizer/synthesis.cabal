@@ -68,8 +68,6 @@ library
   exposed-modules:
       Synthesizer
       Synthesizer.Synthesize
-      Synthesizer.Encoder
-      Synthesizer.NSPS
       Synthesizer.Params
       Synthesizer.R3NN
       Synthesizer.Synthesizer

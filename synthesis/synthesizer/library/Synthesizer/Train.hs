@@ -85,9 +85,7 @@ import           Synthesis.FindHoles
 import           Synthesis.Hint
 import           Synthesis.Types
 import           Synthesizer.Utility
-import           Synthesizer.Encoder
 import           Synthesizer.R3NN
-import           Synthesizer.Synthesizer
 import           Synthesizer.Params
 
 -- | pre-calculate DSL stuff
@@ -100,7 +98,7 @@ prep_dsl TaskFnDataset{..} =
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
 -- | train a NSPS model and return results
-train :: forall device rules shape synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, Synthesizer device shape rules synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)), TensorOptions shape 'D.Float device) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
+train :: forall device rules shape m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)), TensorOptions shape 'D.Float device) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset

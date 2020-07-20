@@ -33,9 +33,7 @@ import Synthesis.Data (TaskFnDataset (..), SynthesizerConfig (..))
 import Synthesis.Configs
 import Synthesis.Utility
 import Synthesizer.Utility
-import Synthesizer.Encoder
 import Synthesizer.R3NN
-import Synthesizer.NSPS
 import Synthesizer.Params
 import Synthesizer.Train
 
@@ -106,13 +104,9 @@ getM cfg taskFnDataset = let
         (do
                 let variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
                     charMap = exprCharMap
-                let encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
-                        LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
                 let r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
                         initR3nn variants r3nnBatch dropoutRate ruleCharMap
-                let spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
-                        NSPSSpec encoder_spec r3nn_spec
-                model <- A.sample spec
-                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
+                model <- A.sample r3nn_spec
+                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] cfg taskFnDataset model
             )
         $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset
