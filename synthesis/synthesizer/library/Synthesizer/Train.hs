@@ -198,7 +198,7 @@ prep_dsl TaskFnDataset{..} =
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
 -- | train a NSPS model and return results
-train :: forall device rules shape synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, Synthesizer device shape rules synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)), TensorOptions shape 'D.Float device, TensorOptions '[num_holes, rules] 'D.Float device) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
+train :: forall device rules shape synthesizer . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownShape shape, Synthesizer device shape rules synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)), TensorOptions shape 'D.Float device) => SynthesizerConfig -> TaskFnDataset -> synthesizer -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
     debug "train"
     let SynthesizerConfig{..} = synthesizerConfig
@@ -250,7 +250,7 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- lift . debug $ "io_feats: " <> show (shape' io_feats)
                 -- loss :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants
                 -- let predicted = predict @device @shape @rules @synthesizer model symbolIdxs (letIn dsl (skeleton taskType)) io_feats
-                let predicted :: Tensor device 'D.Float '[num_holes, rules] = ones
+                let predicted :: Tensor device 'D.Float '[] = ones
                 let loss :: Tensor device 'D.Float '[] = 
                         patchLoss @device @shape @rules model variant_sizes $
                         -- (mulScalar (0.0 :: Float) $ sumAll $ io_feats)
