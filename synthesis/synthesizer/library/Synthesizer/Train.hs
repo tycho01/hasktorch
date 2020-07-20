@@ -98,7 +98,7 @@ prep_dsl TaskFnDataset{..} =
     dsl' = filterWithKey (\k v -> k /= pp v) dsl
 
 -- | train a NSPS model and return results
-train :: forall device rules m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
+train :: forall device rules m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat m, KnownNat symbols, KnownNat maxStringLength, KnownNat r3nnBatch, KnownNat h, KnownNat typeEncoderChars, KnownNat featMult) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
 train synthesizerConfig taskFnDataset init_model = do
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset
