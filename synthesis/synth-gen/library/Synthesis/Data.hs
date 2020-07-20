@@ -231,10 +231,6 @@ combineConfig optCfg hparComb = cfg
 data PreppedDSL = PreppedDSL
     { variants :: !([(String, Expr)])
     , variant_sizes :: !(HashMap String Int)
-    , symbolIdxs :: !(HashMap String Int)
-    , ruleIdxs :: !(HashMap String Int)
-    , variantMap :: !(HashMap String Expr)
-    , max_holes :: !Int
     , dsl' :: !(HashMap String Expr)
     }
 
