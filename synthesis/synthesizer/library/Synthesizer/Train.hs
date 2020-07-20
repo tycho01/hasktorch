@@ -299,7 +299,7 @@ train synthesizerConfig taskFnDataset init_model = do
                     in earlyStop
             when earlyStop $ debug "validation loss has converged, stopping early!"
 
-            return $ (earlyStop, eval_results', gen'')
+            return $ (earlyStop, eval_results', gen')
 
         let acc_valid :: Float = accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
