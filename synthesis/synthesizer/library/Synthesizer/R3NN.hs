@@ -69,7 +69,6 @@ data R3NNSpec
         -- ppt :: Expr
       . { variant_sizes :: HashMap String Int
         , conditionSpec :: LSTMSpec (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'D.Float device
-        , scoreSpec     :: LSTMSpec  m                                                             (Div m Dirs) NumLayers Dir 'D.Float device
         }
         -> R3NNSpec device m symbols rules maxStringLength batch_size h numChars featMult
  deriving (Show)
@@ -88,9 +87,6 @@ data R3NN
  where
     R3NN :: forall m symbols rules maxStringLength batch_size device h numChars featMult
       . { condition_model :: LSTMWithInit (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
-        , score_model     :: LSTMWithInit  m                                    (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
-        -- NSPS: for each production rule r∈R, a nnet f_r from x∈R^(Q⋅M) to y∈R^M,
-        -- with Q as the number of symbols on the RHS of the production rule r.
         , left_nnets :: HashMap String MLP
         -- for each production rule r∈R, a nnet g_r from x'∈R^M to y'∈R^(Q⋅M).
         , right_nnets :: HashMap String MLP
@@ -127,8 +123,6 @@ instance ( KnownDevice device
         join . return $ R3NN
             -- condition_model
             <$> A.sample (LSTMWithZerosInitSpec conditionSpec)
-            -- score_model
-            <*> A.sample (LSTMWithZerosInitSpec scoreSpec)
             -- left: untyped as q is not static
             <*> mapM (\q -> A.sample $ MLPSpec (q * m) m) variant_sizes
             -- right: ditto
@@ -149,8 +143,6 @@ initR3nn variants batch_size dropoutRate charMap = R3NNSpec @device @m @symbols 
         variant_sizes
         -- condition
         (LSTMSpec $ DropoutSpec dropoutRate)
-        -- score
-        (LSTMSpec $ DropoutSpec dropoutRate)
     where
         variant_sizes :: HashMap String Int = fromList $ variantInt . snd <$> variants
 
@@ -165,5 +157,4 @@ patchR3nnLoss r3nn_model variant_sizes = let
         left_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
         right_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\   mlp_  ->                              mlp mlp_ $ D.zeros' [1,  m]) $ elems  $ right_nnets r3nn_model
         condition_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (condition_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,(m + batch_size * maxStringLength * (2 * featMult * Dirs * h))])
-        score_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (score_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,m])
-    in add $ Torch.Typed.Tensor.toDevice $ left_dummy `add` right_dummy `add` condition_dummy `add` score_dummy
+    in add $ Torch.Typed.Tensor.toDevice $ left_dummy `add` right_dummy `add` condition_dummy
