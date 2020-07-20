@@ -149,6 +149,7 @@ patchEncoderLoss
     -> Tensor device 'D.Float '[]
     -> Tensor device 'D.Float '[]
 patchEncoderLoss encoder_model = let
+        dropoutOn = True
         in_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (inModel  encoder_model) $ (ones :: Tensor device 'D.Float '[1,1,numChars])
         out_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (outModel encoder_model) $ (ones :: Tensor device 'D.Float '[1,1,numChars])
     in add $ Torch.Typed.Tensor.toDevice $ in_dummy `add` out_dummy
