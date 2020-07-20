@@ -90,58 +90,6 @@ instance (KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat numChar
             -- TODO: consider LearnedInitialization
             where spec :: LSTMWithInitSpec numChars h NumLayers Dir 'ConstantInitialization 'D.Float device = LSTMWithZerosInitSpec lstmSpec
 
--- instance (KnownDevice device, KnownNat batch_size, KnownNat n', KnownNat maxStringLength, KnownNat numChars, KnownNat h, shape ~ '[n', maxStringLength * (2 * featMult * Dirs * h)])
---     => HasForward (LstmEncoder device maxStringLength batch_size numChars h featMult) [(Expr, Either String Expr)] (Tensor device 'D.Float shape) where
---         forward      = lstmEncoder
---         -- forwardStoch = lstmEncoder
-
-lstmBatch
-    :: forall batch_size maxStringLength numChars device h featMult
-     . (KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult)
-    => LstmEncoder device maxStringLength batch_size numChars h featMult
-    -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]
-    -> Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]
-    -> Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]
-lstmBatch LstmEncoder{..} in_vec out_vec = feat_vec where
-    lstm' = \model -> fstOf3 . lstmForwardWithDropout @'BatchFirst model
-    emb_in  :: Tensor device 'D.Float '[batch_size, featMult * maxStringLength, h * Dirs] = lstm'  inModel  in_vec
-    emb_out :: Tensor device 'D.Float '[batch_size, featMult * maxStringLength, h * Dirs] = lstm' outModel out_vec
-    -- | For each pair, it then concatenates the topmost hidden representation at every time step to produce a 4HT-dimensional feature vector per I/O pair
-    feat_vec :: Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)] =
-            -- reshape $ cat @2 $ emb_in :. emb_out :. HNil
-            asUntyped (D.reshape [natValI @batch_size, natValI @maxStringLength * (2 * natValI @featMult * natValI @Dirs * natValI @h)]) $ cat @2 $ emb_in :. emb_out :. HNil
-
--- | NSPS paper's Baseline LSTM encoder
-lstmEncoder
-    :: forall batch_size maxStringLength numChars n' device h featTnsr featMult
-     . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult, featTnsr ~ Tensor device 'D.Float '[maxStringLength, numChars])
-    => LstmEncoder device maxStringLength batch_size numChars h featMult
-    -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-    -> Tensor device 'D.Float '[n', maxStringLength * (2 * featMult * Dirs * h)]
-lstmEncoder encoder tp_io_pairs = UnsafeMkTensor feat_vec where
-    LstmEncoder{..} = encoder
-    maxStringLength_ :: Int = natValI @maxStringLength
-    batch_size_ :: Int = natValI @batch_size
-    max_char :: Int = natValI @numChars
-
-    -- TODO: use tree encoding (R3NN) also for expressions instead of just converting to string
-    str_map :: HashMap (Tpl2 String) [(Tpl2 String)] =
-            bimap (mapBoth pp) (fmap (bimap pp (show . second pp))) `asPairs` tp_io_pairs
-    -- convert char to one-hot encoding (byte -> 256 1/0s as float) as third lstm dimension
-    str2tensor :: Int -> String -> featTnsr =
-            \len -> Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor . D.toDevice (deviceVal @device) . (`I.one_hot` max_char) . D.asTensor . padRight 0 len . fmap ((fromIntegral :: Int -> Int64) . (+1) . safeIndexHM charMap)
-
-    both2t :: Tpl2 String -> Tpl2 featTnsr = mapBoth $ str2tensor maxStringLength_
-    addTypes :: (featTnsr, [featTnsr]) -> D.Tensor =
-        \(tp, vecs) -> let sample_vec = stack' 0 (toDynamic <$> vecs) in sample_vec
-    tp_ios :: [(Tpl2 featTnsr, [Tpl2 featTnsr])] = (bimap both2t $ fmap both2t) <$> toList str_map
-    vec_pairs :: [(D.Tensor, D.Tensor)] = (\((in_tp, out_tp), ios) -> let (ins, outs) = unzip ios in addTypes `mapBoth` ((in_tp, ins), (out_tp, outs))) <$> tp_ios
-    (in_vecs, out_vecs) :: (Tpl2 [Tensor device 'D.Float '[batch_size, featMult * maxStringLength, numChars]]) =
-            mapBoth (fmap UnsafeMkTensor . batchTensor batch_size_ . F.cat (F.Dim 0)) . unzip $ vec_pairs
-    feat_vecs :: [Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]] =
-            uncurry (lstmBatch encoder) <$> zip in_vecs out_vecs
-    feat_vec :: D.Tensor = F.cat (F.Dim 0) $ toDynamic <$> feat_vecs
-
 patchEncoderLoss
     :: forall batch_size maxStringLength numChars n' device h featTnsr featMult
      . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float)

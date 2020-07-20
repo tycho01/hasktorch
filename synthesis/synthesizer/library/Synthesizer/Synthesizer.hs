@@ -78,15 +78,6 @@ import           Synthesizer.R3NN
 import           Synthesizer.Params
 
 class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules synthesizer where
-    encode    :: synthesizer
-                -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
-                -> Tensor device 'D.Float shape
-    predict   :: forall num_holes
-                 . synthesizer
-                -> HashMap String Int
-                -> Expr
-                -> Tensor device 'D.Float shape
-                -> Tensor device 'D.Float '[num_holes, rules]
     patchLoss ::   synthesizer
                 -> HashMap String Int
                 -> Tensor device 'D.Float '[]
