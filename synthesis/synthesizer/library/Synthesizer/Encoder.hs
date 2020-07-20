@@ -144,7 +144,7 @@ lstmEncoder encoder tp_io_pairs = UnsafeMkTensor feat_vec where
 
 patchEncoderLoss
     :: forall batch_size maxStringLength numChars n' device h featTnsr featMult
-     . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult)
+     . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult, SumDTypeIsValid device 'D.Float)
     => LstmEncoder device maxStringLength batch_size numChars h featMult
     -> Tensor device 'D.Float '[]
     -> Tensor device 'D.Float '[]
