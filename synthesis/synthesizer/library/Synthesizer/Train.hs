@@ -97,7 +97,5 @@ train synthesizerConfig taskFnDataset model = do
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
     let dummy :: Tensor device 'D.Float '[] = zeros
     notice $ "epoch"
-    void . lift $ iterateLoopT init_optim $ \ optim -> do
-            let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model variant_sizes dummy
-            lift . liftIO $ snd <$> D.runStep model optim (toDynamic loss) lr
+    void $ iterateLoopT init_optim $ \ optim -> lift . liftIO $ snd <$> D.runStep model optim (toDynamic $ patchR3nnLoss model variant_sizes dummy) lr
     return []
