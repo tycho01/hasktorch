@@ -141,3 +141,14 @@ lstmEncoder encoder tp_io_pairs = UnsafeMkTensor feat_vec where
     feat_vecs :: [Tensor device 'D.Float '[batch_size, maxStringLength * (2 * featMult * Dirs * h)]] =
             uncurry (lstmBatch encoder) <$> zip in_vecs out_vecs
     feat_vec :: D.Tensor = F.cat (F.Dim 0) $ toDynamic <$> feat_vecs
+
+patchEncoderLoss
+    :: forall batch_size maxStringLength numChars n' device h featTnsr featMult
+     . (KnownDevice device, KnownNat batch_size, KnownNat maxStringLength, KnownNat numChars, KnownNat h, KnownNat featMult)
+    => LstmEncoder device maxStringLength batch_size numChars h featMult
+    -> Tensor device 'D.Float '[]
+    -> Tensor device 'D.Float '[]
+patchEncoderLoss encoder_model = let
+        in_dummy  :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (inModel  encoder_model) $ (ones :: Tensor device 'D.Float '[1,1,numChars])
+        out_dummy :: Tensor device 'D.Float '[] = mulScalar (0.0 :: Float) $ sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (outModel encoder_model) $ (ones :: Tensor device 'D.Float '[1,1,numChars])
+    in add $ Torch.Typed.Tensor.toDevice $ in_dummy `add` out_dummy
