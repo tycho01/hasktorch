@@ -88,15 +88,15 @@ import           Synthesizer.R3NN
 import           Synthesizer.Params
 
 -- | train a NSPS model and return results
-train :: forall device rules m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat m, KnownNat symbols, KnownNat maxStringLength, KnownNat r3nnBatch, KnownNat h, KnownNat typeEncoderChars, KnownNat featMult) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
+train :: forall device rules m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat m, KnownNat symbols, KnownNat maxStringLength, KnownNat r3nnBatch, KnownNat h, KnownNat typeEncoderChars, KnownNat featMult) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> IO [EvalResult]
 train synthesizerConfig taskFnDataset model = do
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset
     let lr :: D.Tensor = D.asTensor $ learningRate
     let variant_sizes :: HashMap String Int = fromList $ variantInt . snd . (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
-    let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
+    let optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
     let dummy :: Tensor device 'D.Float '[] = zeros
     let loss :: D.Tensor = toDynamic $ patchR3nnLoss model variant_sizes dummy
-    notice $ "epoch"
-    void $ iterateLoopT () $ \ _ -> lift . liftIO $ const () <$> D.runStep model init_optim loss lr
+    notice_ $ "epoch"
+    void $ iterateLoopT () $ \ _ -> lift $ const () <$> D.runStep model optim loss lr
     return []

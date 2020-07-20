@@ -107,6 +107,6 @@ getM cfg taskFnDataset = let
                 let r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
                         initR3nn variants r3nnBatch dropoutRate ruleCharMap
                 model <- A.sample r3nn_spec
-                void . interpretUnsafe $ train @device @rules cfg taskFnDataset model
+                void $ train @device @rules cfg taskFnDataset model
             )
         $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset
