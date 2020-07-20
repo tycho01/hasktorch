@@ -100,7 +100,7 @@ train synthesizerConfig taskFnDataset model = do
     _ <- iterateLoopT (1 :: Int) $ \ !epoch -> do
         lift $ notice $ "epoch: " <> show epoch
         let dummy :: Tensor device 'D.Float '[] = zeros
-        optim' :: D.Adam <- lift $ iterateLoopT (init_optim, 0) $ \ !optim -> do
+        optim' :: D.Adam <- lift $ iterateLoopT init_optim $ \ !optim -> do
                 let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model variant_sizes dummy
                 (_newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) lr
                 return optim'
