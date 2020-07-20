@@ -111,14 +111,14 @@ getM cfg taskFnDataset = let
     TaskFnDataset{..} = taskFnDataset
     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
     in (:)
-        -- (void . interpretUnsafe $ train @device cfg taskFnDataset model)
+        -- (void $ train @device cfg taskFnDataset model)
         (case synthesizer of
             "random" -> do
                 model <- A.sample RandomSynthesizerSpec
-                void . interpretUnsafe $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
+                void $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
             "nsps" -> do
                 model <- A.sample spec
-                void . interpretUnsafe $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
+                void $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
                 where
                 variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
                 useTypes = natValI @featMult > 1
