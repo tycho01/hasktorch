@@ -70,7 +70,6 @@ library
       Synthesizer.Synthesize
       Synthesizer.Params
       Synthesizer.R3NN
-      Synthesizer.Synthesizer
       Synthesizer.Train
       Synthesizer.UntypedMLP
       Synthesizer.Utility
