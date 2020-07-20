@@ -260,9 +260,9 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- TODO: do once for each mini-batch / fn?
                 -- (newParam, optim') <- liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic lr
                 (newParam, optim') <- lift . liftIO $ doStep @device @shape @rules model optim loss lr
-                let model' :: synthesizer = A.replaceParameters model newParam
+                -- let model' :: synthesizer = A.replaceParameters model newParam
                 -- let optim' = optim
-                -- let model' = model
+                let model' = model
                 -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
                 lift . liftIO $ incProgress pb 1
                 return (model', optim', task_fn_id_ + 1)
