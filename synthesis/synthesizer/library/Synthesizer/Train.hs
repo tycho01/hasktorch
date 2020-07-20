@@ -88,38 +88,21 @@ import           Synthesizer.Utility
 import           Synthesizer.R3NN
 import           Synthesizer.Params
 
--- | pre-calculate DSL stuff
-prep_dsl :: TaskFnDataset -> PreppedDSL
-prep_dsl TaskFnDataset{..} =
-    PreppedDSL variants variant_sizes dsl'
-    where
-    variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
-    variant_sizes :: HashMap String Int = fromList $ variantInt . snd <$> variants
-    dsl' = filterWithKey (\k v -> k /= pp v) dsl
-
 -- | train a NSPS model and return results
 train :: forall device rules m symbols maxStringLength r3nnBatch h typeEncoderChars featMult . (KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat m, KnownNat symbols, KnownNat maxStringLength, KnownNat r3nnBatch, KnownNat h, KnownNat typeEncoderChars, KnownNat featMult) => SynthesizerConfig -> TaskFnDataset -> R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult -> Interpreter [EvalResult]
-train synthesizerConfig taskFnDataset init_model = do
+train synthesizerConfig taskFnDataset model = do
     let SynthesizerConfig{..} = synthesizerConfig
     let TaskFnDataset{..} = taskFnDataset
-    let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
-    let prepped_dsl = prep_dsl taskFnDataset
-    let PreppedDSL{..} = prepped_dsl
-    let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
+    let lr :: D.Tensor = D.asTensor $ learningRate
+    let variant_sizes :: HashMap String Int = fromList $ variantInt . snd . (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
+    let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters model
 
     _ <- iterateLoopT (1 :: Int) $ \ !epoch -> do
         lift $ notice $ "epoch: " <> show epoch
-        let n :: Int = 1000
-        pb <- lift . liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
-
-        let model = init_model
         let dummy :: Tensor device 'D.Float '[] = zeros
-        -- TRAIN LOOP
-        (optim', _) :: (D.Adam, Int) <- lift $ iterateLoopT (init_optim, 0) $ \ !state@(optim, task_fn_id_) -> if task_fn_id_ >= n then exitWith state else do
+        optim' :: D.Adam <- lift $ iterateLoopT (init_optim, 0) $ \ !optim -> do
                 let loss :: Tensor device 'D.Float '[] = patchR3nnLoss model variant_sizes dummy
-                (newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) $ toDynamic init_lr
-                -- let optim' = optim
-                lift . liftIO $ incProgress pb 1
-                return (optim', task_fn_id_ + 1)
+                (_newParam, optim') <- lift . liftIO $ D.runStep model optim (toDynamic loss) lr
+                return optim'
         return $ epoch + 1
     return []
