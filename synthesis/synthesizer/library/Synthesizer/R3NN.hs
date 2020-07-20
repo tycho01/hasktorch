@@ -146,10 +146,10 @@ variantInt :: Expr -> (String, Int)
 variantInt = (appRule &&& length) . fnAppNodes
 
 -- | Torch gets sad not all nnets get used in the loss 😢 so let's give it a hug... 🤗🙄
-patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numChars featMult . (KnownNat m, KnownNat featMult, KnownNat h, KnownNat batch_size, KnownNat maxStringLength, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h numChars featMult -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
-patchR3nnLoss r3nn_model = let
+patchR3nnLoss :: forall m symbols rules maxStringLength batch_size device h numChars featMult . (KnownNat m, KnownNat featMult, KnownNat h, KnownNat batch_size, KnownNat maxStringLength, KnownDevice device, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float) => R3NN device m symbols rules maxStringLength batch_size h numChars featMult -> HashMap String Int -> Tensor device 'D.Float '[] -> Tensor device 'D.Float '[]
+patchR3nnLoss r3nn_model variant_sizes = let
         dropoutOn = True
         m :: Int = natValI @m
-        left_dummy  :: Tensor device 'D.Float '[] = sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> mlp mlp_ $ D.zeros' [1,m]) $ toList $  left_nnets r3nn_model
+        left_dummy  :: Tensor device 'D.Float '[] = sumAll $ Torch.Typed.Tensor.toDType @'D.Float . UnsafeMkTensor $ F.cat (F.Dim 1) $ fmap (\(k,mlp_) -> let q = safeIndexHM variant_sizes k in mlp mlp_ $ D.zeros' [1,q*m]) $ toList $  left_nnets r3nn_model
         condition_dummy :: Tensor device 'D.Float '[] = sumAll $ fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn (condition_model r3nn_model) $ (ones :: Tensor device 'D.Float '[1,1,(m + batch_size * maxStringLength * (2 * featMult * Dirs * h))])
     in add $ Torch.Typed.Tensor.toDevice $ mulScalar (0.0 :: Float) $ left_dummy `add` condition_dummy
