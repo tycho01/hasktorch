@@ -29,8 +29,8 @@ l2 :: Tensor -> Tensor
 l2 x = mseLoss (zerosLike x) x
 
 -- | Setup pruning parameters and run
-runPrune :: (Dataset d) => d -> IO (CNN, CNN) 
-runPrune mnistData = do
+regularizationTest :: (Dataset d) => d -> IO () 
+regularizationTest mnistData = do
 
     print "sampling"
     -- train reference model
@@ -61,7 +61,7 @@ runPrune mnistData = do
 
     l1Model <- train
             optimSpec { optimizer = mkAdam (0 :: Int) 0.9 0.999 (flattenParameters initRefL1),  
-                        lossFn = mkReg l1 (selectWeights pruneSpec) 1.0 100.0 }
+                        lossFn = mkReg l1 (selectWeights pruneSpec) 1.0 10.0 }
             mnistData 
             initRefL1
 
@@ -69,7 +69,7 @@ runPrune mnistData = do
     initRefL2 <- sample refSpec
     l2Model <- train
         optimSpec { optimizer = mkAdam 0 0.9 0.999 (flattenParameters initRefL2), 
-                    lossFn = mkReg l2 (selectWeights pruneSpec) 1.0 1000.0 }
+                    lossFn = mkReg l2 (selectWeights pruneSpec) 1.0 1.0 }
         mnistData 
         initRefL2
 
@@ -104,8 +104,7 @@ runPrune mnistData = do
 pruneTest = do
     putStrLn "Loading Data"
     (mnistTrain, mnistTest) <- loadMNIST "datasets/mnist"
-    putStrLn "Running Prune"
-    (original, derived) <- runPrune mnistTrain
+    regularizationTest mnistTrain
     putStrLn "Done"
 
 gradTest = do
