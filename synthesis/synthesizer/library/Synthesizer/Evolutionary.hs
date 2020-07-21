@@ -148,7 +148,7 @@ instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
 
 -- | main function
 main :: IO ()
-main = if False -- hasCuda
+main = if hasCuda
         then evolutionary @Gpu
         else evolutionary @Cpu
 

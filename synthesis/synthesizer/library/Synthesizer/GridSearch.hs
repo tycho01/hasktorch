@@ -70,7 +70,7 @@ hparCombs :: [HparComb] = uncurry5 HparComb <$> cartesianProduct5
     hOpts
 
 learningRateOpts :: [Float]
-learningRateOpts = reverse ((\x -> 10 ** (-x)) <$> [3..6])
+learningRateOpts = ((\x -> 10 ** (-x)) <$> [2..5])
 
 dropoutRateOpts :: [Double]
 dropoutRateOpts = [dropoutRateDef] -- 0 : reverse ((\x -> 2 ** (-x)) <$> [1..5])
@@ -87,7 +87,7 @@ hOpts = [hDef] -- (2 ^) <$> [3..7]
 
 -- | main function
 main :: IO ()
-main = if False -- hasCuda
+main = if hasCuda
         then gridSearch @Gpu
         else gridSearch @Cpu
 

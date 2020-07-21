@@ -43,7 +43,7 @@ import Synthesizer.Train
 
 -- | main function
 main :: IO ()
-main = if False -- hasCuda
+main = if hasCuda
         then synthesize @Gpu
         else synthesize @Cpu
 
