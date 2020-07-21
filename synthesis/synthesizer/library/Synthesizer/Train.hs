@@ -312,12 +312,11 @@ train synthesizerConfig taskFnDataset init_model = do
 
         let acc_valid :: Float = accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
-        -- lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
-        --     True -> do
-        --         lift . info_ $ "accuracy decreased, decaying learning rate!"
-        --         return . divScalar learningDecay $ lr
-        --     False -> pure lr
-        let lr' = lr
+        lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
+            True -> do
+                lift . info_ $ "accuracy decreased, decaying learning rate!"
+                return . divScalar learningDecay $ lr
+            False -> pure lr
 
         return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
