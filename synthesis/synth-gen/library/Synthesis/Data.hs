@@ -31,19 +31,19 @@ type Tpl3 a = (a,a,a)
 
 -- | things I wanna transfer between generation and synthesis sessions
 data TaskFnDataset = TaskFnDataset
-    { generationCfg :: !GenerationConfig
-    , dsl :: !(HashMap String Expr)
-    , generatedTypes :: !(HashMap Int [String])  -- i.e. typesByArity
-    , fnTypes :: !(HashMap Expr Tp)
-    , fnTypeIOs :: !(HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]))
-    , datasets :: !(Tpl3 (HashMap Expr [(Tp, Tp)]))
-    , exprBlocks :: !([(String, Expr)])
-    , variantTypes :: !([Tp])
-    , longestExprString :: !Int
-    , longestString :: !Int
-    , exprCharMap :: !(HashMap Char Int)
-    , bothCharMap :: !(HashMap Char Int)
-    , ruleCharMap :: !(HashMap Char Int)
+    { generationCfg :: !GenerationConfig -- ^ the config used during data generation, to make data reproducible
+    , dsl :: !(HashMap String Expr) -- ^ the DSL of functions/variables to be used for data gen / synthesis
+    , generatedTypes :: !(HashMap Int [String])  -- ^ i.e. `typesByArity` as defined in `Blocks.hs` at time of data gen. this determines the types we generate to instantiate type variables. separated by 'arity' based on the number of type parameters they take.
+    , fnTypes :: !(HashMap Expr Tp) -- ^ types of any task function in our dataset
+    , fnTypeIOs :: !(HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)])) -- ^ sample input-output pairs for different type instantiations of our task functions
+    , datasets :: !(Tpl3 (HashMap Expr [(Tp, Tp)])) -- ^ a split over training/validation/test sets of any of our tasks, which currently are separate type instantiations (in, out) for a given task function.
+    , exprBlocks :: !([(String, Expr)]) -- ^ pairs of operators in our DSL with their corresponding expressions, including their curried variants, where some of their arguments would already have been filled (annotating each such hole with their appropriate type).
+    , variantTypes :: !([Tp]) -- ^ types of any operators in our DSL, including of their curried variants, where some of their arguments would already have been filled.
+    , longestExprString :: !Int -- ^ the maximum length encountered among (stringified) input-output sets, as used in the vanilla NSPS model.
+    , longestString :: !Int -- ^ the maximum length encountered among either (stringified) input-output sets or types, as used in our type-enhanced model.
+    , exprCharMap :: !(HashMap Char Int) -- ^ a mapping to contiguous integers from any characters used in either our input-output sets or in types.
+    , bothCharMap :: !(HashMap Char Int) -- ^ a mapping to contiguous integers from any characters used in our input-output sets.
+    , ruleCharMap :: !(HashMap Char Int) -- ^ a mapping to contiguous integers from any characters used in our types.
     } deriving (Show, Generic)
 
 data GenerationConfig = GenerationConfig
@@ -77,6 +77,7 @@ data GenerationConfig = GenerationConfig
 data SynthesizerConfig = SynthesizerConfig
     { taskPath :: !String
     , seed :: !Int
+    , numEpochs :: !Int
     -- , encoderBatch :: !Int
     -- , r3nnBatch :: !Int
     , bestOf :: !Int
@@ -101,6 +102,7 @@ data SynthesizerConfig = SynthesizerConfig
 data GridSearchConfig = GridSearchConfig
     { taskPath :: !String
     , seed :: !Int
+    , numEpochs :: !Int
     , bestOf :: !Int
     -- , dropoutRate :: !Double
     , evalFreq :: !Int
@@ -125,6 +127,7 @@ data GridSearchConfig = GridSearchConfig
 data EvolutionaryConfig = EvolutionaryConfig
     { taskPath :: !String
     , seed :: !Int
+    , numEpochs :: !Int
     , bestOf :: !Int
     -- , dropoutRate :: !Double
     , evalFreq :: !Int
@@ -146,6 +149,7 @@ data EvolutionaryConfig = EvolutionaryConfig
 data OptimizationConfig = OptimizationConfig
     { taskPath :: !String
     , seed :: !Int
+    , numEpochs :: !Int
     , bestOf :: !Int
     -- , dropoutRate :: !Double
     , evalFreq :: !Int
@@ -214,6 +218,7 @@ combineConfig optCfg hparComb = cfg
         cfg = SynthesizerConfig
                 { taskPath             = taskPath
                 , seed                 = seed
+                , numEpochs            = numEpochs
                 , bestOf               = bestOf
                 , dropoutRate          = dropoutRate
                 , evalFreq             = evalFreq

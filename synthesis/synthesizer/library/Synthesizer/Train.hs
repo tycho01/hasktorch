@@ -243,7 +243,7 @@ train synthesizerConfig taskFnDataset init_model = do
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, 1)
 
-    (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop then exitWith state else do
+    (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
         lift $ notice_ $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         let n :: Int = length train_set'

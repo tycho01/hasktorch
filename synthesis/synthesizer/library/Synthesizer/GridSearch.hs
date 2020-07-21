@@ -70,7 +70,7 @@ hparCombs :: [HparComb] = uncurry5 HparComb <$> cartesianProduct5
     hOpts
 
 learningRateOpts :: [Float]
-learningRateOpts = reverse ((\x -> 10 ** (-x)) <$> [3..6])
+learningRateOpts = ((\x -> 10 ** (-x)) <$> [2..5])
 
 dropoutRateOpts :: [Double]
 dropoutRateOpts = [dropoutRateDef] -- 0 : reverse ((\x -> 2 ** (-x)) <$> [1..5])
@@ -181,7 +181,7 @@ evalHparComb taskFnDataset cfg hparComb = do
     manual_seed_L $ fromIntegral seed
     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
             <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
-    lastEvalResult :: EvalResult <- last <.> interpretUnsafe $ train @device @rules @shape @ruleFeats cfg' taskFnDataset model
+    lastEvalResult :: EvalResult <- last <$> train @device @rules @shape @ruleFeats cfg' taskFnDataset model
     let testEval :: IO () = finalEval @device @featMult @m @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h @shape @ruleFeats cfg taskFnDataset hparComb lastEvalResult
     return (lastEvalResult, testEval)
 
