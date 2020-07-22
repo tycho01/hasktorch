@@ -47,8 +47,8 @@ data TaskFnDataset = TaskFnDataset
     } deriving (Show, Generic)
 
 data GenerationConfig = GenerationConfig
-    { taskPath :: !String
-    , jsonLinesPath :: !String
+    { taskFile :: !String
+    , resultFolder :: !String
     , crashOnError :: !Bool
     , seed :: !Int
     -- type generation
