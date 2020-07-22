@@ -1,28 +1,36 @@
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 -- | utility functions
 module Synthesis.Utility (module Synthesis.Utility) where
 
 import Control.Arrow ((***))
-import Control.Monad (filterM, join, foldM)
+import Control.Monad (filterM, join, foldM, void, (<=<))
 import Data.Bifoldable (biList)
 import Data.List (replicate, intercalate, maximumBy, minimumBy)
 import Data.List.Split (splitOn)
 import Data.Bifunctor (Bifunctor, bimap, first, second)
-import Data.HashMap.Lazy ((!), HashMap, fromList, fromListWith, toList, member, elems)
+import Data.HashMap.Lazy ((!), HashMap, fromList, fromListWith, toList, member, keys, elems)
 import qualified Data.HashMap.Lazy as HM
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Hashable (Hashable)
 import Data.Maybe (fromJust, isJust)
-import Data.Foldable (foldl', foldr')
+import Data.Foldable (foldl', foldr', foldlM, foldrM)
 import qualified Data.Foldable as Foldable
 import qualified Data.Text.Prettyprint.Doc as PP
+import Data.ByteString.Char8 (pack)
+import qualified Data.Text.Lazy as T
+import Data.ByteString.Lazy (toStrict, fromStrict)
 import GHC.Exts (groupWith)
 import Language.Haskell.Exts.Pretty (Pretty, prettyPrint)
 import System.Random (RandomGen(..), StdGen, mkStdGen, randomR, randomRIO)
 import System.Log.Logger
 import System.ProgressBar
+import System.Directory (doesFileExist)
+import Control.Monad.IO.Class
+import qualified Data.Aeson as Aeson
+import qualified Data.ByteString as BS
 
 -- | map over both elements of a bifunctor
 mapBoth :: Bifunctor p => (a -> b) -> p a a -> p b b
@@ -241,20 +249,69 @@ fixSize n g xs = first (take n . cycle) $ fisherYates g xs
 sampleWithoutReplacement :: Int -> StdGen -> [a] -> ([a], StdGen)
 sampleWithoutReplacement n g xs = first (take n) $ fisherYates g xs
 
+-- | help convert maps of lists to flat pairs
 expandPair :: (a, [b]) -> [(a,b)]
 expandPair (k,vs) = (k,) <$> vs
 
+-- | convert flat pairs to maps of lists
 pairs2lists :: (Hashable k, Eq k) => [(k,v)] -> HashMap k [v]
 pairs2lists = fromListWith (<>) . fmap (second pure)
 
+-- | convert maps of lists to flat pairs
 lists2pairs :: (Hashable k, Eq k) => HashMap k [v] -> [(k,v)]
 lists2pairs = (=<<) expandPair . toList
 
-statefulMap :: (Functor f, Applicative f, Foldable f, Monoid (f b)) => StdGen -> (StdGen -> a -> (b, StdGen)) -> f a -> (f b, StdGen)
-statefulMap g fn xs = (ys', g') where
+-- | an `fmap` variant that allows passing state, useful for mapping over functions that take an RNG that should stay uncorrelated
+statefulMap :: (Functor f, Applicative f, Foldable f, Monoid (f b)) => state -> (state -> a -> (b, state)) -> f a -> (f b, state)
+statefulMap state fn xs = (ys', state') where
     xs' = Foldable.toList xs
-    (ys, g') = foldr' (\ x (lst, g) -> first (: lst) $ fn g x) ([], g) xs'
+    (ys, state') = foldr' (\ x (lst, staet) -> first (: lst) $ fn staet x) ([], state) xs'
     ys' = mconcat $ pure <$> ys
 
+-- | sample items from lists in a hashmap
 sampleHmLists :: (Hashable k, Eq k) => StdGen -> Int -> HashMap k [v] -> (HashMap k [v], StdGen)
 sampleHmLists g n hm = first (pairs2lists . join) . statefulMap g (sampleWithoutReplacement n) . fmap expandPair . toList $ hm
+
+-- | implement saving/resuming progress over monadic list computation
+resumableList :: (MonadIO m, Aeson.ToJSON b, Aeson.FromJSON b) => String -> String -> m [b] -> m [b]
+resumableList fldr name m_xs = do
+    let jsonLinesPath = fldr <> "/" <> name <> ".jsonl"
+    exists :: Bool <- liftIO $ doesFileExist jsonLinesPath
+    if exists then pure () else do
+        liftIO $ writeFile jsonLinesPath ""
+        let finalize = liftIO . BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode
+        join $ mapM_ finalize <$> m_xs
+    liftIO $ fmap (fromJust . Aeson.decode . fromStrict . pack) . lines <$> readFile jsonLinesPath
+
+-- | track progress and implement saving/resuming progress over stateful monadic mapping operations (specialized to list)
+trackStatefulMapMList :: (MonadIO m, Aeson.ToJSON b, Aeson.FromJSON b) => String -> String -> state -> [a] -> (state -> a -> m (b, state)) -> m [b]
+trackStatefulMapMList fldr name init_state xs fold_fn = do
+    let jsonLinesPath = fldr <> "/" <> name <> ".jsonl"
+    exists :: Bool <- liftIO $ doesFileExist jsonLinesPath
+    if exists then pure () else do
+        pb <- liftIO $ newProgressBar pgStyle 1 $ Progress 0 (length xs) $ T.pack $ name
+        liftIO $ writeFile jsonLinesPath ""
+        let finalize (x', state) = do
+                liftIO $ BS.appendFile jsonLinesPath . (<> pack "\n") . toStrict . Aeson.encode $ x'
+                liftIO $ incProgress pb 1
+                return state
+        void $ foldlM (\ state x -> finalize =<< fold_fn state x) init_state xs
+    liftIO $ fmap (fromJust . Aeson.decode . fromStrict . pack) . lines <$> readFile jsonLinesPath
+
+-- | track progress and implement saving/resuming progress over stateful monadic mapping operations (specialized to hashmap)
+trackStatefulMapMHm :: (MonadIO m, Aeson.ToJSON (k, v2), Aeson.FromJSON (k, v2), Hashable k, Eq k) => String -> String -> state -> HashMap k v1 -> (state -> v1 -> m (v2, state)) -> m (HashMap k v2)
+trackStatefulMapMHm fldr name init_state hm fold_fn = fromList <$> trackStatefulMapMList fldr name init_state (toList hm) (\ state (k,v) -> first (k,) <$> fold_fn state v)
+--  . zip (keys hm)
+
+-- | track progress and implement saving/resuming progress over stateless monadic mapping operations (specialized to list)
+trackMapMList :: (MonadIO m, Aeson.ToJSON b, Aeson.FromJSON b) => String -> String -> [a] -> (a -> m b) -> m [b]
+trackMapMList fldr name xs fold_fn = trackStatefulMapMList fldr name () xs (\ () x -> (,()) <$> fold_fn x)
+
+-- | track progress and implement saving/resuming progress over stateless monadic mapping operations (specialized to hashmap)
+trackMapMHm :: (MonadIO m, Aeson.ToJSON (k, v2), Aeson.FromJSON (k, v2), Hashable k, Eq k) => String -> String -> HashMap k v1 -> (v1 -> m v2) -> m (HashMap k v2)
+trackMapMHm fldr name hm fold_fn = trackStatefulMapMHm fldr name () hm (\ () x -> (,()) <$> fold_fn x)
+-- traverseSnd $ 
+
+-- | track progress and implement saving/resuming progress while creating a monadic HashMap by mapping over a list of keys
+trackFromKeysM :: (MonadIO m, Hashable k, Eq k, Aeson.ToJSON v, Aeson.FromJSON v) => String -> String -> (k -> m v) -> [k] -> m (HashMap k v)
+trackFromKeysM fldr name fn ks = fromList . zip ks <$> trackMapMList fldr name ks fn
