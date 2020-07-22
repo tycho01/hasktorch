@@ -6,8 +6,8 @@ import Data.Semigroup ((<>))
 
 generationConfig :: Parser GenerationConfig
 generationConfig = GenerationConfig
-    <$> genTaskPathOpt
-    <*> jsonLinesPathOpt
+    <$> genTaskFileOpt
+    <*> resultFolderOpt
     <*> crashOnErrorOpt
     <*> seedOpt
     <*> nestLimitOpt
@@ -130,7 +130,7 @@ parseEvolutionaryConfig = execParser opts
 
 viewDatasetConfig :: Parser ViewDatasetConfig
 viewDatasetConfig = ViewDatasetConfig
-    <$> genTaskPathOpt
+    <$> viewTaskPathOpt
 
 parseViewDatasetConfig :: IO ViewDatasetConfig
 parseViewDatasetConfig = execParser opts
@@ -142,19 +142,12 @@ parseViewDatasetConfig = execParser opts
 
 -- shared options
 
-genTaskPathOpt = strOption
-    ( long "taskPath"
+genTaskFileOpt = strOption
+    ( long "taskFile"
     <> short 'f'
-    <> value "./run-results/datasets.yml"
+    <> value "datasets.yml"
     <> showDefault
-    <> help "the file path at which to store generated datasets" )
-
-jsonLinesPathOpt = strOption
-    ( long "jsonLinesPath"
-    <> short 'j'
-    <> value "./run-results/ios.jsonl"
-    <> showDefault
-    <> help "the file path at which to temporarily store generated ios" )
+    <> help "name for the file at which to store generated datasets" )
 
 crashOnErrorOpt = switch
     ( long "crashOnError"
@@ -267,6 +260,13 @@ maxParamsOpt = option auto
     <> showDefault
     <> help "the maximum number of parameters we will permit a task function to have. not restricting this may result in a stack overflow from e.g. the number of potential argument permutations for functions taking as many as e.g. 6 parameters." )
 
+viewTaskPathOpt = strOption
+    ( long "taskPath"
+    <> short 'f'
+    <> value "./run-results/datasets.yml"
+    <> showDefault
+    <> help "the file path from which to load generated datasets" )
+
 taskPathOpt = strOption
     ( long "taskPath"
     <> short 'f'
@@ -345,7 +345,7 @@ convergenceThresholdOpt = option auto
 
 resultFolderOpt = strOption
     ( long "resultFolder"
-    <> short 'f'
+    <> short 'r'
     <> value "run-results"
     <> showDefault
     <> help "the folder in which to store result files" )

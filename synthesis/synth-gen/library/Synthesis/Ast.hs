@@ -14,13 +14,10 @@ import Synthesis.Data hiding (nestLimit)
 import Synthesis.Utility
 import Util (nTimes)
 
--- | generate applied variants of a function, e.g. [`id`, `id _`]
+-- | generate applied variants of a function, e.g. [`id`, `id _`]:
+-- | under currying we will allow any level of application.
 genBlockVariants :: HashMap String Tp -> [(String, Expr)]
-genBlockVariants block_types =
-  let generated :: HashMap String [Expr] = mapWithKey genHoledVariants block_types
-   in
-      -- under currying we will allow any level of application
-      concat $ (\k vs -> (\v -> (k, v)) <$> vs) `mapWithKey` generated
+genBlockVariants = concat . mapWithKey (curry expandPair) . mapWithKey genHoledVariants
 
 -- | as any block/parameter may be a (nested) function, generate variants with holes curried in to get all potential return types
 genHoledVariants :: String -> Tp -> [Expr]
