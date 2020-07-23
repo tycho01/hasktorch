@@ -60,6 +60,7 @@ synthesizerConfig = SynthesizerConfig
     <*> randomHoleOpt
     <*> useTypesOpt
     <*> cheatOpt
+    <*> gpuOpt
 
 parseSynthesizerConfig :: IO SynthesizerConfig
 parseSynthesizerConfig = execParser opts
@@ -91,6 +92,7 @@ gridSearchConfig = GridSearchConfig
     <*> randomHoleOpt
     <*> useTypesOpt
     <*> cheatOpt
+    <*> gpuOpt
 
 parseGridSearchConfig :: IO GridSearchConfig
 parseGridSearchConfig = execParser opts
@@ -122,6 +124,7 @@ evolutionaryConfig = EvolutionaryConfig
     <*> randomHoleOpt
     <*> useTypesOpt
     <*> cheatOpt
+    <*> gpuOpt
 
 parseEvolutionaryConfig :: IO EvolutionaryConfig
 parseEvolutionaryConfig = execParser opts
@@ -419,3 +422,8 @@ useTypesOpt = switch
 cheatOpt = switch
     ( long "cheat"
     <> help "evaluate on the training set to verify learning capability." )
+
+gpuOpt = switch
+    ( long "gpu"
+    <> short 'g'
+    <> help "when specified, perform calculations on GPU instead of CPU." )
