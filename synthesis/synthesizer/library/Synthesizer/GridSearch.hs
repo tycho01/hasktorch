@@ -87,7 +87,9 @@ hOpts = [hDef] -- (2 ^) <$> [3..7]
 
 -- | main function
 main :: IO ()
-main = if False -- hasCuda
+main = do
+    GridSearchConfig{..} <- parseGridSearchConfig
+    if gpu
         then gridSearch @Gpu
         else gridSearch @Cpu
 

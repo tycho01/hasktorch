@@ -43,7 +43,9 @@ import Synthesizer.Train
 
 -- | main function
 main :: IO ()
-main = if False -- hasCuda
+main = do
+    SynthesizerConfig{..} <- parseSynthesizerConfig
+    if gpu
         then synthesize @Gpu
         else synthesize @Cpu
 
