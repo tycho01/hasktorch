@@ -96,6 +96,7 @@ data SynthesizerConfig = SynthesizerConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , cheat :: !Bool
+    , gpu :: !Bool
     } deriving (Eq, Show, Generic)
 
 data GridSearchConfig = GridSearchConfig
@@ -117,6 +118,7 @@ data GridSearchConfig = GridSearchConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , cheat :: !Bool
+    , gpu :: !Bool
     } deriving (Eq, Show, Generic)
 
 -- I should probably include the actual GA config here,
@@ -141,6 +143,7 @@ data EvolutionaryConfig = EvolutionaryConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , cheat :: !Bool
+    , gpu :: !Bool
     } deriving (Eq, Show, Generic)
 
 data OptimizationConfig = OptimizationConfig
@@ -162,6 +165,7 @@ data OptimizationConfig = OptimizationConfig
     , maskBad :: !Bool
     , randomHole :: !Bool
     , cheat :: !Bool
+    , gpu :: !Bool
     } deriving (Eq, Show, Generic)
 
 data HparComb = HparComb
@@ -176,7 +180,6 @@ data ViewDatasetConfig = ViewDatasetConfig
     { taskPath :: !String
     } deriving (Eq, Show, Generic)
 
--- I don't actually know what the exclamation mark does, but Aeson used that in their examples
 data EvalResult = EvalResult
     { epoch        :: !Int
     , epochSeconds :: !Double
@@ -231,6 +234,7 @@ combineConfig optCfg hparComb = cfg
                 , maskBad              = maskBad
                 , randomHole           = randomHole
                 , cheat                = cheat
+                , gpu                  = gpu
                 }
 
 data PreppedDSL = PreppedDSL
