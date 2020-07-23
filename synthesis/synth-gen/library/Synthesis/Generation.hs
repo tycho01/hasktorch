@@ -12,6 +12,7 @@ import Data.HashMap.Lazy
     HashMap,
     empty,
     fromList,
+    fromListWith,
     keys,
     elems,
     lookupDefault,
@@ -20,7 +21,7 @@ import Data.HashMap.Lazy
     member,
   )
 import qualified Data.HashMap.Lazy as HM
-import Data.List (minimumBy, partition, nubBy, sort)
+import Data.List (maximumBy, partition, nubBy, sort)
 import Data.Ord (Ordering (..))
 import Data.Set (Set, insert, delete, notMember, isProperSubsetOf)
 import Data.Bifunctor (first)
@@ -197,42 +198,29 @@ matchesConstraints arity tp constraints = do
 
 -- | deduplicate functions by matching i/o examples
 -- | TODO: dedupe out only functions equivalent to those in validation/test sets, having redundancy within training seems okay
-dedupeFunctions :: [Expr] -> HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) -> [Expr]
-dedupeFunctions task_fns fn_type_ios = kept_fns
+dedupeFunctions :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) -> [(Expr, (Tp, Tp))]
+dedupeFunctions fn_type_ios = kept_fns
   where
-  -- programs by types and i/o
-  programsByTypeIOs :: HashMap (HashMap (Tp, Tp) String) [Expr] =
-      groupByVal $ toList $ fmap pp_ <$> fn_type_ios
-  -- programs that overlap in i/o for any monomorphic parameter combo instantiation
-  programsByBehavior :: HashMap (Tp, Tp) (HashMap String [Expr]) =
-      fromList $ (\(tpStrMap, exprs) -> second (`singleton` exprs) <.> toList $ tpStrMap) =<< toList programsByTypeIOs
-  -- generate any ('ascending') (Expr, Expr) pairs contained in any of those [Expr]; dedupe pairs
-  behaviorOverlapping :: [(Expr, Expr)] = nubBy (equating pp_) . join . elems $ ((=<<) createGroups . elems <$> programsByBehavior)
-  -- ditch removed expr for any remaining pairs, then continue going over the rest
-  kept_fns :: [Expr] = Set.toList . flip (foldr' checkExprPair) behaviorOverlapping . Set.fromList $ task_fns
-  -- for each pair: ditch the least general or longest or just either
-  checkExprPair :: (Expr, Expr) -> Set Expr -> Set Expr =
-      \ (e1,e2) exprSet -> if notMember e1 exprSet || notMember e1 exprSet then exprSet else
-          let
-              hm1 = fn_type_ios ! e1
-              hm2 = fn_type_ios ! e2
-              ks1 = Set.fromList . keys $ hm1
-              ks2 = Set.fromList . keys $ hm2
+  -- program instances by i/o behavior
+  fnInstsByIOs :: [[(Expr, (Tp, Tp))]] =
+      elems . fromListWith (<>) . fmap (\(expr, (tp, str)) -> (str, [(expr, tp)])) . lists2pairs . fmap (lists2pairs . fmap (fmap pp_)) $ fn_type_ios
+  -- keep the 'best' program for each group identical in behavior
+  kept_fns :: [(Expr, (Tp, Tp))] = maximumBy checkExprPair <$> fnInstsByIOs
+  -- compare generalization (high is better): least general or longest or just either
+  checkExprPair :: (Expr, (Tp, Tp)) -> (Expr, (Tp, Tp)) -> Ordering =
+      \ (e1,_tp1) (e2,_tp2) -> let
+            hm1 = fn_type_ios ! e1
+            hm2 = fn_type_ios ! e2
+            n1 = length . keys $ hm1
+            n2 = length . keys $ hm2
           in
-          -- least general
-               if isProperSubsetOf ks1 ks2 then
-              if equating pp_ hm1 (pickKeys (keys hm1) hm2)
-              then delete e1 exprSet else exprSet
-          else if isProperSubsetOf ks2 ks1 then
-              if equating pp_ hm2 (pickKeys (keys hm2) hm1)
-              then delete e2 exprSet else exprSet
-          -- longest
-          else case compare (numAstNodes e1) (numAstNodes e2) of
-              LT -> delete e2 exprSet
-              GT -> delete e1 exprSet
-              -- tiebreaker: drop whichever
-              -- random should be better but deterministic works without monad
-              EQ -> delete e2 exprSet
+          -- number of covered types
+          case compare n1 n2 of
+                    -- shortest (flipped from longest)
+              EQ -> case compare (numAstNodes e2) (numAstNodes e1) of
+                  EQ -> LT  -- arbitrary tiebreaker
+                  x -> x
+              x -> x
 
 createGroups :: [a] -> [(a, a)]
 createGroups [] = []

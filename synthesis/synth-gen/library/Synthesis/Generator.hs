@@ -32,6 +32,7 @@ import Data.HashMap.Lazy
 import qualified Data.HashMap.Lazy as HM
 import Data.List (partition, maximum)
 import Data.Maybe (catMaybes, fromJust)
+import Data.Set (Set)
 import qualified Data.Set as Set
 import qualified Data.Aeson as Aeson
 import Data.Yaml
@@ -158,7 +159,7 @@ main = do
 
     -- hard-coding R3nnBatch as I can't pass it thru as config given the R3NN's LSTMs require it to be static
     let samplesPerInstantiation :: Int = fromIntegral . natVal $ Proxy @R3nnBatch
-    fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList <.> trackStatefulMapMList fldr "fn_type_ios" gen'' (toList fn_type_instantiations) $ \ gen_ (fn, tp_instantiations) -> do
+    fn_type_ios' :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) <- fromList <.> trackStatefulMapMList fldr "fn_type_ios'" gen'' (toList fn_type_instantiations) $ \ gen_ (fn, tp_instantiations) -> do
         -- notice_ $ "\nloop: " <> show (pp fn, bimap (fmap pp) pp <$> tp_instantiations)
         target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <-
                 interpretUnsafe $ fnOutputs crashOnError maxParams both_instantiation_inputs fn tp_instantiations
@@ -166,32 +167,46 @@ main = do
         let (target_tp_io_pairs', gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
                 sampleHmLists gen_ samplesPerInstantiation target_tp_io_pairs
         return ((fn, target_tp_io_pairs'), gen')
+    say_ "\nfn_type_ios':"
+    notice_ $ pp_ fn_type_ios'
+    say_ "filtering out program type instances without i/o samples"
+    let fn_type_ios :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) = HM.filter (not . null) <$> fn_type_ios'
     say_ "\nfn_type_ios:"
     notice_ $ pp_ fn_type_ios
     say_ "combining i/o lists across type instances"
     let task_io_pairs :: HashMap Expr [(Expr, Either String Expr)] =
             join . elems <$> fn_type_ios
+    say_ "\ntask_io_pairs:"
+    notice_ $ pp_ task_io_pairs
     task_io_pairs' :: HashMap String [(Expr, Either String Expr)] <- fromList <.> trackMapMList fldr "task_io_pairs'" (toList task_io_pairs) $ pure . first pp
+    say_ "\ntask_io_pairs':"
+    notice_ $ pp_ task_io_pairs'
 
-    say_ "filtering out programs without i/o samples"
-    let kept_fns_ :: [Expr] = (not . null . ((\k -> lookupDefault [] k task_io_pairs') . pp)) `filter` task_fns
-    say_ "\nkept_fns_:"
-    notice_ $ pp_ kept_fns_
     say_ "checking sets contain no fns w/ behavior identical to any in other sets to prevent cheating"
-    let kept_fns' :: [Expr] = dedupeFunctions kept_fns_ fn_type_ios
+    let kept_fns' :: [(Expr, (Tp, Tp))] = dedupeFunctions $ fn_type_ios
     say_ "\nkept_fns':"
     notice_ $ pp_ kept_fns'
-    say_ "filtering out program type instances without i/o samples"
-    let fn_type_ios_ = HM.filter (not . null) <$> pickKeysByPp kept_fns' fn_type_ios
+    let kept_fn_strs :: Set String = Set.fromList $ pp_ <$> kept_fns'
+    say_ "\nkept_fn_strs:"
+    notice_ $ pp_ kept_fn_strs
+    say_ "filtering to only used data"
+    let fn_type_ios_ :: HashMap Expr (HashMap (Tp, Tp) [(Expr, Either String Expr)]) = fmap fromList . pairs2lists . filter ((`Set.member` kept_fn_strs) . pp_ . second fst) . lists2pairs . fmap toList $ fn_type_ios
+    say_ "\nfn_type_ios_:"
+    notice_ $ pp_ fn_type_ios_
     say_ "taking type instantiations of task fns as separate entries"
     let tp_instances :: [(Expr, (Tp, Tp))] = lists2pairs $ keys <$> fn_type_ios_
+    say_ "\ntp_instances:"
+    notice_ $ pp_ tp_instances
     say_ "sampling task function type instances from any remaining programs"
     let kept_instances :: [(Expr, (Tp, Tp))] = take maxDataset . fst . fisherYates gen $ tp_instances
+    say_ "\nkept_instances:"
+    notice_ $ pp_ kept_instances
     let kept_fns :: [Expr] = keys $ pairs2lists kept_instances
     say_ "\nkept_fns:"
     notice_ $ pp_ kept_fns
     let fn_types_ = pickKeysByPp kept_fns fn_types
 
+    say_ "calculating longest strings and character maps"
     let tp_pairs :: [(Tp, Tp)] = join . elems $ keys <$> fn_type_ios_
     let longest_tp_string :: Int =
             maximum $ length <$> fmap (pp . fst) tp_pairs <> fmap (pp . snd) tp_pairs <> fmap pp variantTypes
