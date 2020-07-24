@@ -73,7 +73,7 @@ import qualified Torch.Distributions.Categorical as Categorical
 
 import Synthesis.Data
 import Synthesis.Orphanage ()
-import Synthesis.Utility (pp, fisherYates, replacements)
+import Synthesis.Utility
 import Synthesis.Ast (genBlockVariants)
 import Synthesis.Hint
 
