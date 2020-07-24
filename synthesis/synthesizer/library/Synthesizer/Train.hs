@@ -231,7 +231,15 @@ train synthesizerConfig taskFnDataset init_model = do
     setStdGen stdGen
     let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
     let modelFolder = resultFolder <> "/" <> ppCfg synthesizerConfig
+    createDirectoryIfMissing True resultFolder
     createDirectoryIfMissing True modelFolder
+
+    let resultPath = resultFolder <> "/" <> ppCfg synthesizerConfig <> ".csv"
+    when (null savedModelPath) $ do
+        exists :: Bool <- doesFileExist resultPath
+        if exists
+            then error $ "path " <> resultPath <> " exists!"
+            else BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader []
 
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
@@ -301,6 +309,9 @@ train synthesizerConfig taskFnDataset init_model = do
                 acc_valid
 
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
+            -- write result to csv
+            BS.appendFile resultPath . (<> pack "\n") . BS.packChars $ BL.unpackChars $ Csv.encodeByNameWith (defaultEncodeOptions { encIncludeHeader = Bool }) evalResultHeader [eval_result]
+
             let eval_results' = (:) eval_result $! eval_results
             let earlyStop :: Bool = whenOr False (length eval_results' >= 2 * checkWindow) $ let
                     losses  :: [Float] = lossValid <$> eval_results'
@@ -324,11 +335,6 @@ train synthesizerConfig taskFnDataset init_model = do
 
         return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
-    -- write results to csv
-    createDirectoryIfMissing True resultFolder
-    let resultPath = resultFolder <> "/" <> ppCfg synthesizerConfig <> ".csv"
-    let eval_results' = reverse eval_results -- we want the first epoch first
-    BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader eval_results'
     info_ $ "data written to " <> resultPath
 
     return eval_results'
