@@ -117,7 +117,6 @@ data EvaluateConfig = EvaluateConfig
     , synthesizer :: !String
     , maskBad :: !Bool
     , randomHole :: !Bool
-    , useTypes :: !Bool
     , evaluateSet :: !String
     , gpu :: !Bool
     } deriving (Eq, Show, Generic)

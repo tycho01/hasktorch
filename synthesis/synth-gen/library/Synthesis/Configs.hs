@@ -87,7 +87,6 @@ evaluateConfig = EvaluateConfig
     <*> synthesizerOpt
     <*> maskBadOpt
     <*> randomHoleOpt
-    <*> useTypesOpt
     <*> evaluateSetOpt
     <*> gpuOpt
 
