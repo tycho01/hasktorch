@@ -42,7 +42,7 @@ import qualified Torch.Autograd                as D
 import qualified Torch.Serialize               as D
 import qualified Torch.NN                      as A
 
-import Synthesis.Data hiding (SynthesizerConfig(..))
+import Synthesis.Data hiding (SynthesizerConfig(..), EvaluateConfig(..))
 import Synthesis.Configs
 import Synthesis.Utility
 import Synthesis.Hint
