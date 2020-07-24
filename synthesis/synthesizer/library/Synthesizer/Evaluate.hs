@@ -124,11 +124,11 @@ getM cfg taskFnDataset = let
                 "random" -> do
                     model <- A.sample RandomSynthesizerSpec
                     let model' = A.replaceParameters model params
-                    interpretUnsafe $ evaluate @device @rules @'[] @0 @RandomSynthesizer taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
+                    interpretUnsafe $ evaluate @device @rules @'[] @RandomSynthesizer taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
                 "nsps" -> do
                     model <- A.sample spec
                     let model' = A.replaceParameters model params
-                    interpretUnsafe $ evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
+                    interpretUnsafe $ evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
                     where
                     useTypes = natValI @featMult > 1
                     charMap = if useTypes then bothCharMap else exprCharMap
