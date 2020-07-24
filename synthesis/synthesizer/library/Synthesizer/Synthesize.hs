@@ -25,6 +25,8 @@ import Torch.Typed.Aux
 import Torch.Typed.NN
 import Torch.Typed.NN.Recurrent.LSTM
 import qualified Torch.DType                   as D
+import qualified Torch.Serialize               as D
+import qualified Torch.Autograd                as D
 import qualified Torch.NN                      as A
 import Synthesis.Data
 import Synthesis.Hint
