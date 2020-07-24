@@ -241,13 +241,13 @@ train synthesizerConfig taskFnDataset init_model = do
 
     -- MODELS
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
-    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, 1)
+    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, initialEpoch)
 
     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
         lift $ notice_ $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         let n :: Int = length train_set'
-        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
+        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n ("epoch " <> show epoch <> " task-fns" :: Text))
         start <- lift $ getCPUTime
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
@@ -283,6 +283,9 @@ train synthesizerConfig taskFnDataset init_model = do
         end <- lift $ getCPUTime
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
 
+        let modelPath = modelFolder <> printf "/%04d.pt" epoch
+        lift $ D.save (D.toDependent <$> A.flattenParameters model') modelPath
+
         -- EVAL
         (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
             debug_ "evaluating"
@@ -295,9 +298,6 @@ train synthesizerConfig taskFnDataset init_model = do
                 loss_train
                 loss_valid
                 acc_valid
-
-            let modelPath = modelFolder <> printf "/%04d.pt" epoch
-            D.save (D.toDependent <$> A.flattenParameters model') modelPath
 
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
             let eval_results' = (:) eval_result $! eval_results
