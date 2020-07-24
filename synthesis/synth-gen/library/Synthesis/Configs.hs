@@ -60,6 +60,8 @@ synthesizerConfig = SynthesizerConfig
     <*> randomHoleOpt
     <*> cheatOpt
     <*> gpuOpt
+    <*> savedModelPathOpt
+    <*> initialEpochOpt
 
 parseSynthesizerConfig :: IO SynthesizerConfig
 parseSynthesizerConfig = execParser opts
@@ -68,6 +70,34 @@ parseSynthesizerConfig = execParser opts
       ( fullDesc
      <> progDesc "train a synthesizer on a dataset"
      <> header "program synthesizer" )
+
+evaluateConfig :: Parser EvaluateConfig
+evaluateConfig = EvaluateConfig
+    <$> taskPathOpt
+    <*> modelPathOpt
+    <*> seedOpt
+    -- <*> encoderBatchOpt
+    -- <*> r3nnBatchOpt
+    <*> bestOfOpt
+    <*> dropoutRateOpt
+    <*> regularizationOpt
+    <*> verbosityOpt
+    <*> mOpt
+    <*> hOpt
+    <*> synthesizerOpt
+    <*> maskBadOpt
+    <*> randomHoleOpt
+    <*> useTypesOpt
+    <*> evaluateSetOpt
+    <*> gpuOpt
+
+parseEvaluateConfig :: IO EvaluateConfig
+parseEvaluateConfig = execParser opts
+  where
+    opts = info (evaluateConfig <**> helper)
+      ( fullDesc
+     <> progDesc "evaluate a synthesizer on a dataset"
+     <> header "evaluate synthesizer" )
 
 gridSearchConfig :: Parser GridSearchConfig
 gridSearchConfig = GridSearchConfig
@@ -277,6 +307,27 @@ taskPathOpt = strOption
     <> showDefault
     <> help "the file path from which to load generated datasets" )
 
+modelPathOpt = strOption
+    ( long "modelPath"
+    <> short 'm'
+    <> value "./run-results/model.pt"
+    <> showDefault
+    <> help "the file path from which to load the model" )
+
+savedModelPathOpt = strOption
+    ( long "savedModelPath"
+    <> short 'm'
+    <> value ""
+    <> showDefault
+    <> help "the file path from which to load the model (optional)" )
+
+initialEpochOpt = option auto
+    ( long "initialEpoch"
+    <> short 'i'
+    <> value (1 :: Int)
+    <> showDefault
+    <> help "the epoch from which to start (for when resuming training)" )
+
 seedDef :: Int = 123
 seedOpt = option auto
     ( long "seed"
@@ -403,17 +454,25 @@ evalRoundsOpt = option auto
 
 maskBadOpt = switch
     ( long "maskBad"
-    <> short 'm'
+    <> short 'b'
     <> help "when specified, compile any possible hole fill to mask out any predictions for non-compiling expressions (present implementation for this is slow but this could be improved)." )
 
 randomHoleOpt = switch
     ( long "randomHole"
-    <> short 'm'
+    <> short 'h'
     <> help "when specified, a random hole is chosen to fill for training, while any holes are considered during prediction (based on the likelihood scores of their respective expansions). otherwise, we always fill the first hole found in a partial program tree (depth-first)." )
 
 cheatOpt = switch
     ( long "cheat"
     <> help "evaluate on the training set to verify learning capability." )
+
+evaluateSetOpt = strOption
+    ( long "evaluateSet"
+    <> short 'e'
+    <> value "test"
+    <> showDefault
+    <> completeWith ["training", "validation", "test"]
+    <> help "the dataset on which to evaluate" )
 
 gpuOpt = switch
     ( long "gpu"
