@@ -61,6 +61,8 @@ synthesizerConfig = SynthesizerConfig
     <*> useTypesOpt
     <*> cheatOpt
     <*> gpuOpt
+    <*> savedModelPathOpt
+    <*> initialEpochOpt
 
 parseSynthesizerConfig :: IO SynthesizerConfig
 parseSynthesizerConfig = execParser opts
@@ -314,6 +316,20 @@ modelPathOpt = strOption
     <> value "./run-results/model.pt"
     <> showDefault
     <> help "the file path from which to load the model" )
+
+savedModelPathOpt = strOption
+    ( long "savedModelPath"
+    <> short 'm'
+    <> value ""
+    <> showDefault
+    <> help "the file path from which to load the model (optional)" )
+
+initialEpochOpt = option auto
+    ( long "initialEpoch"
+    <> short 'i'
+    <> value (1 :: Int)
+    <> showDefault
+    <> help "the epoch from which to start (for when resuming training)" )
 
 seedDef :: Int = 123
 seedOpt = option auto
