@@ -241,7 +241,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
     -- MODELS
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
-    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, 1)
+    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, initialEpoch)
 
     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
         lift $ notice_ $ "epoch: " <> show epoch

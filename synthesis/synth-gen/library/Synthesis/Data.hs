@@ -98,6 +98,8 @@ data SynthesizerConfig = SynthesizerConfig
     , useTypes :: !Bool
     , cheat :: !Bool
     , gpu :: !Bool
+    , savedModelPath :: !String
+    , initialEpoch :: !Int
     } deriving (Eq, Show, Generic)
 
 data EvaluateConfig = EvaluateConfig
@@ -261,6 +263,8 @@ combineConfig optCfg hparComb = cfg
                 , useTypes             = useTypes
                 , cheat                = cheat
                 , gpu                  = gpu
+                , savedModelPath       = ""
+                , initialEpoch         = (1 :: Int)
                 }
 
 data PreppedDSL = PreppedDSL

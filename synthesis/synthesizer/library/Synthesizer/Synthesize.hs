@@ -113,25 +113,30 @@ getM cfg taskFnDataset = let
     TaskFnDataset{..} = taskFnDataset
     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
     in (:)
-        -- (void $ train @device cfg taskFnDataset model)
-        (case synthesizer of
-            "random" -> do
-                model <- A.sample RandomSynthesizerSpec
-                void $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
-            "nsps" -> do
-                model <- A.sample spec
-                void $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model
-                where
-                variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
-                useTypes = natValI @featMult > 1
-                charMap = if useTypes then bothCharMap else exprCharMap
-                encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
-                    LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-                r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
-                    initR3nn variants r3nnBatch dropoutRate ruleCharMap
-                rule_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
-                    TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropoutRate
-                spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
-                    NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
-            _ -> error "synthesizer not recognized")
+        (do
+            -- let dataset = pickDataset datasets evaluateSet
+            case synthesizer of
+                "random" -> do
+                    model <- A.sample RandomSynthesizerSpec
+                    void $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
+                "nsps" -> do
+                    model <- A.sample spec
+                    model' <- if null savedModelPath
+                        then pure model
+                        else A.replaceParameters model . fmap D.IndependentTensor <$> D.load savedModelPath
+                    void $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) cfg taskFnDataset model'
+                    where
+                    variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
+                    useTypes = natValI @featMult > 1
+                    charMap = if useTypes then bothCharMap else exprCharMap
+                    encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
+                        LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
+                    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
+                        initR3nn variants r3nnBatch dropoutRate ruleCharMap
+                    rule_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
+                        TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropoutRate
+                    spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
+                        NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
+                _ -> error "synthesizer not recognized"
+            )
         $ getM @device @featMult @(m + 1) @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h cfg taskFnDataset
