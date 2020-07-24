@@ -541,3 +541,12 @@ sampleIdxs t = do
     let ps :: D.Tensor = flip I.unsqueeze 0 . F.flattenAll $ t
     [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
     return $ unravelIdx t idx
+
+pickDataset :: [[(Expr, (Tp, Tp))]] -> String -> [(Expr, (Tp, Tp))]
+pickDataset datasets dataset_str = dataset where
+    [train_set, validation_set, test_set] :: [[(Expr, (Tp, Tp))]] = lists2pairs <$> untuple3 datasets
+    dataset = case evaluateSet of
+        "training" -> train_set
+        "validation" -> validation_set
+        "test" -> test_set
+        x -> error "dataset " <> x <> " not recognized!"
