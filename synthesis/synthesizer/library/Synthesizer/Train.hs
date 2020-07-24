@@ -28,6 +28,7 @@ import           System.Timeout                (timeout)
 import           System.Directory              (createDirectoryIfMissing)
 import           System.CPUTime
 import           System.ProgressBar
+import qualified Data.Text as Text
 import           Data.Text.Internal.Lazy (Text)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
@@ -247,7 +248,7 @@ train synthesizerConfig taskFnDataset init_model = do
         lift $ notice_ $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         let n :: Int = length train_set'
-        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n ("epoch " <> show epoch <> " task-fns" :: Text))
+        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n (Text.pack $ "epoch " <> show epoch <> " task-fns"))
         start <- lift $ getCPUTime
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
