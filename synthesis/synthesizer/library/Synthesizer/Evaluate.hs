@@ -11,6 +11,7 @@
 module Synthesizer.Evaluate (module Synthesizer.Evaluate) where
 
 import System.Log.Logger
+import Text.Printf
 import GHC.TypeNats (type (+))
 import GHC.TypeLits
 import Data.Yaml
