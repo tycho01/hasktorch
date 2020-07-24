@@ -113,7 +113,7 @@ getM cfg taskFnDataset = let
             case synthesizer of
                 "random" -> do
                     model <- A.sample RandomSynthesizerSpec
-                    void $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
+                    void $ train @device @rules @'[] @RandomSynthesizer cfg taskFnDataset model
                 "nsps" -> do
                     model <- A.sample spec
                     model' <- if null savedModelPath
