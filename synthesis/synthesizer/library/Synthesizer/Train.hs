@@ -283,6 +283,9 @@ train synthesizerConfig taskFnDataset init_model = do
         end <- lift $ getCPUTime
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
 
+        let modelPath = modelFolder <> printf "/%04d.pt" epoch
+        lift $ D.save (D.toDependent <$> A.flattenParameters model') modelPath
+
         -- EVAL
         (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
             debug_ "evaluating"
@@ -295,9 +298,6 @@ train synthesizerConfig taskFnDataset init_model = do
                 loss_train
                 loss_valid
                 acc_valid
-
-            let modelPath = modelFolder <> printf "/%04d.pt" epoch
-            D.save (D.toDependent <$> A.flattenParameters model') modelPath
 
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
             let eval_results' = (:) eval_result $! eval_results
