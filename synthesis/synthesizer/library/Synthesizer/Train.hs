@@ -25,7 +25,7 @@ module Synthesizer.Train (module Synthesizer.Train) where
 
 import           System.Random                 (StdGen, mkStdGen, setStdGen)
 import           System.Timeout                (timeout)
-import           System.Directory              (createDirectoryIfMissing)
+import           System.Directory              (createDirectoryIfMissing, doesFileExist)
 import           System.CPUTime
 import           System.ProgressBar
 import qualified Data.Text.Lazy as T
@@ -310,7 +310,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
             -- write result to csv
-            BS.appendFile resultPath . (<> pack "\n") . BS.packChars $ BL.unpackChars $ Csv.encodeByNameWith (Csv.defaultEncodeOptions { Csv.encIncludeHeader = Bool }) evalResultHeader [eval_result]
+            BS.appendFile resultPath . (<> BS.pack "\n") . BS.packChars $ BL.unpackChars $ Csv.encodeByNameWith (Csv.defaultEncodeOptions { Csv.encIncludeHeader = False }) evalResultHeader [eval_result]
 
             let eval_results' = (:) eval_result $! eval_results
             let earlyStop :: Bool = whenOr False (length eval_results' >= 2 * checkWindow) $ let
@@ -337,7 +337,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
     info_ $ "data written to " <> resultPath
 
-    return eval_results'
+    return $ reverse eval_results
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
