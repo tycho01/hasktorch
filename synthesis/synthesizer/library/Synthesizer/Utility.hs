@@ -542,7 +542,7 @@ sampleIdxs t = do
     [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
     return $ unravelIdx t idx
 
-pickDataset :: [[(Expr, (Tp, Tp))]] -> String -> [(Expr, (Tp, Tp))]
+pickDataset :: Tpl3 [(Expr, (Tp, Tp))] -> String -> [(Expr, (Tp, Tp))]
 pickDataset datasets dataset_str = dataset where
     (train_set, validation_set, test_set) :: Tpl3 [(Expr, (Tp, Tp))] = mapTuple3 lists2pairs datasets
     dataset = case dataset_str of
