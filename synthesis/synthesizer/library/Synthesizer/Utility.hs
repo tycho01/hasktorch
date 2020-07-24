@@ -544,9 +544,9 @@ sampleIdxs t = do
 
 pickDataset :: [[(Expr, (Tp, Tp))]] -> String -> [(Expr, (Tp, Tp))]
 pickDataset datasets dataset_str = dataset where
-    [train_set, validation_set, test_set] :: [[(Expr, (Tp, Tp))]] = lists2pairs <$> untuple3 datasets
+    (train_set, validation_set, test_set) :: Tpl3 [(Expr, (Tp, Tp))] = mapTuple3 lists2pairs datasets
     dataset = case dataset_str of
         "training" -> train_set
         "validation" -> validation_set
         "test" -> test_set
-        x -> error "dataset " <> x <> " not recognized!"
+        x -> error $ "dataset " <> x <> " not recognized!"
