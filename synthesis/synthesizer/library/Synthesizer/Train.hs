@@ -239,7 +239,7 @@ train synthesizerConfig taskFnDataset init_model = do
         exists :: Bool <- doesFileExist resultPath
         if exists
             then error $ "path " <> resultPath <> " exists!"
-            else BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader []
+            else BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader ([] :: [EvalResult])
 
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
