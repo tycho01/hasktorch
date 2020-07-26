@@ -1,0 +1,3416 @@
+Build profile: -w ghc-8.10.1 -O1
+In order, the following will be built (use -v for more details):
+ - synth-gen-0.2.0.0 (lib) (file library/Synthesis/Generator.hs changed)
+ - synthesizer-0.2.0.0 (lib) (dependency rebuilt)
+ - synthesizer-0.2.0.0 (exe:synthesizer) (dependency rebuilt)
+Preprocessing library for synth-gen-0.2.0.0..
+Building library for synth-gen-0.2.0.0..
+[ 3 of 15] Compiling Synthesis.Data   ( library/Synthesis/Data.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Data.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Data.dyn_o )
+
+library/Synthesis/Data.hs:15:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.SrcLoc’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.SrcLoc’
+    To import instances alone, use: import Language.Haskell.Exts.SrcLoc()
+   |
+15 | import Language.Haskell.Exts.SrcLoc (SrcSpanInfo)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Data.hs:222:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      evalResultHeader :: Header
+    |
+222 | evalResultHeader :: Header = header ["epoch", "epochSeconds", "lossTrain", "lossValid", "accValid"]
+    | ^^^^^^^^^^^^^^^^
+
+library/Synthesis/Data.hs:233:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      gridSearchHeader :: Header
+    |
+233 | gridSearchHeader :: Header = header ["dropoutRate", "regularization", "m", "h"] <> evalResultHeader
+    | ^^^^^^^^^^^^^^^^
+[ 4 of 15] Compiling Synthesis.Configs ( library/Synthesis/Configs.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Configs.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Configs.dyn_o )
+
+library/Synthesis/Configs.hs:5:1: warning: [-Wunused-imports]
+    The import of ‘Data.Semigroup’ is redundant
+      except perhaps to import instances from ‘Data.Semigroup’
+    To import instances alone, use: import Data.Semigroup()
+  |
+5 | import Data.Semigroup ((<>))
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:177:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      genTaskFileOpt :: Parser [Char]
+    |
+177 | genTaskFileOpt = strOption
+    | ^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:184:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      crashOnErrorOpt :: Parser Bool
+    |
+184 | crashOnErrorOpt = switch
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:189:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: nestLimitDef :: Int
+    |
+189 | nestLimitDef :: Int = 1
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:190:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      nestLimitOpt :: Parser Int
+    |
+190 | nestLimitOpt = option auto
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:196:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: maxInstancesDef :: Int
+    |
+196 | maxInstancesDef :: Int = 5
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:197:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      maxInstancesOpt :: Parser Int
+    |
+197 | maxInstancesOpt = option auto
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:204:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: numInputsDef :: Int
+    |
+204 | numInputsDef :: Int = 10
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:205:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      numInputsOpt :: Parser Int
+    |
+205 | numInputsOpt = option auto
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:211:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: numMinDef :: Integer
+    |
+211 | numMinDef :: Integer = -20
+    | ^^^^^^^^^
+
+library/Synthesis/Configs.hs:212:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      numMinOpt :: Parser Integer
+    |
+212 | numMinOpt = option auto
+    | ^^^^^^^^^
+
+library/Synthesis/Configs.hs:218:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: numMaxDef :: Integer
+    |
+218 | numMaxDef :: Integer = 20
+    | ^^^^^^^^^
+
+library/Synthesis/Configs.hs:219:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      numMaxOpt :: Parser Integer
+    |
+219 | numMaxOpt = option auto
+    | ^^^^^^^^^
+
+library/Synthesis/Configs.hs:225:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: charMinDef :: Char
+    |
+225 | charMinDef = '0'
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:226:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: charMinOpt :: Parser Char
+    |
+226 | charMinOpt = option auto
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:232:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: charMaxDef :: Char
+    |
+232 | charMaxDef = '9'
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:233:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: charMaxOpt :: Parser Char
+    |
+233 | charMaxOpt = option auto
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:239:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: listMinDef :: Int
+    |
+239 | listMinDef :: Int = 0
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:240:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: listMinOpt :: Parser Int
+    |
+240 | listMinOpt = option auto
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:246:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: listMaxDef :: Int
+    |
+246 | listMaxDef :: Int = 3
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:247:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: listMaxOpt :: Parser Int
+    |
+247 | listMaxOpt = option auto
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:253:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      maxInstantiationsDef :: Int
+    |
+253 | maxInstantiationsDef :: Int = 4
+    | ^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:254:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      maxInstantiationsOpt :: Parser Int
+    |
+254 | maxInstantiationsOpt = option auto
+    | ^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:260:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: trainDef :: Double
+    |
+260 | trainDef :: Double = 0.35
+    | ^^^^^^^^
+
+library/Synthesis/Configs.hs:261:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: trainOpt :: Parser Double
+    |
+261 | trainOpt = option auto
+    | ^^^^^^^^
+
+library/Synthesis/Configs.hs:267:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: validationDef :: Double
+    |
+267 | validationDef :: Double = 0.35
+    | ^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:268:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      validationOpt :: Parser Double
+    |
+268 | validationOpt = option auto
+    | ^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:274:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: testDef :: Double
+    |
+274 | testDef :: Double = 0.3
+    | ^^^^^^^
+
+library/Synthesis/Configs.hs:275:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: testOpt :: Parser Double
+    |
+275 | testOpt = option auto
+    | ^^^^^^^
+
+library/Synthesis/Configs.hs:281:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: maxDatasetDef :: Int
+    |
+281 | maxDatasetDef :: Int = 1000
+    | ^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:282:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      maxDatasetOpt :: Parser Int
+    |
+282 | maxDatasetOpt = option auto
+    | ^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:288:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: maxParamsDef :: Int
+    |
+288 | maxParamsDef :: Int = 3
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:289:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      maxParamsOpt :: Parser Int
+    |
+289 | maxParamsOpt = option auto
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:295:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      viewTaskPathOpt :: Parser [Char]
+    |
+295 | viewTaskPathOpt = strOption
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:302:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      taskPathOpt :: Parser [Char]
+    |
+302 | taskPathOpt = strOption
+    | ^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:309:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      modelPathOpt :: Parser [Char]
+    |
+309 | modelPathOpt = strOption
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:316:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      savedModelPathOpt :: Parser [Char]
+    |
+316 | savedModelPathOpt = strOption
+    | ^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:323:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      initialEpochOpt :: Parser Int
+    |
+323 | initialEpochOpt = option auto
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:330:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: seedDef :: Int
+    |
+330 | seedDef :: Int = 123
+    | ^^^^^^^
+
+library/Synthesis/Configs.hs:331:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: seedOpt :: Parser Int
+    |
+331 | seedOpt = option auto
+    | ^^^^^^^
+
+library/Synthesis/Configs.hs:337:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      numEpochsOpt :: Parser Int
+    |
+337 | numEpochsOpt = option auto
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:343:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: maxHolesOpt :: Parser Int
+    |
+343 | maxHolesOpt = option auto
+    | ^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:349:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: bestOfOpt :: Parser Int
+    |
+349 | bestOfOpt = option auto
+    | ^^^^^^^^^
+
+library/Synthesis/Configs.hs:355:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      encoderBatchOpt :: Parser Int
+    |
+355 | encoderBatchOpt = option auto
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:361:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      r3nnBatchOpt :: Parser Int
+    |
+361 | r3nnBatchOpt = option auto
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:367:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: dropoutRateDef :: Double
+    |
+367 | dropoutRateDef = 0.0    -- drop-out not mentioned in NSPS
+    | ^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:368:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      dropoutRateOpt :: Parser Double
+    |
+368 | dropoutRateOpt = option auto
+    | ^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:374:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: evalFreqOpt :: Parser Int
+    |
+374 | evalFreqOpt = option auto
+    | ^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:380:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: learningRateDef :: Float
+    |
+380 | learningRateDef = 0.001
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:381:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      learningRateOpt :: Parser Float
+    |
+381 | learningRateOpt = option auto
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:387:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      checkWindowOpt :: Parser Int
+    |
+387 | checkWindowOpt = option auto
+    | ^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:393:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      convergenceThresholdOpt :: Parser Float
+    |
+393 | convergenceThresholdOpt = option auto
+    | ^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:399:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      resultFolderOpt :: Parser [Char]
+    |
+399 | resultFolderOpt = strOption
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:406:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      learningDecayOpt :: Parser Int
+    |
+406 | learningDecayOpt = option auto
+    | ^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:412:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      regularizationDef :: Float
+    |
+412 | regularizationDef = 0.0
+    | ^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:413:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      regularizationOpt :: Parser Float
+    |
+413 | regularizationOpt = option auto
+    | ^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:419:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      verbosityOpt :: Parser [Char]
+    |
+419 | verbosityOpt = strOption
+    | ^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:427:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: mDef :: Int
+    |
+427 | mDef = (32 :: Int)
+    | ^^^^
+
+library/Synthesis/Configs.hs:428:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: mOpt :: Parser Int
+    |
+428 | mOpt = option auto
+    | ^^^^
+
+library/Synthesis/Configs.hs:434:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: hDef :: Int
+    |
+434 | hDef = (32 :: Int)
+    | ^^^^
+
+library/Synthesis/Configs.hs:435:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: hOpt :: Parser Int
+    |
+435 | hOpt = option auto
+    | ^^^^
+
+library/Synthesis/Configs.hs:441:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      synthesizerOpt :: Parser [Char]
+    |
+441 | synthesizerOpt = strOption
+    | ^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:448:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      evalRoundsOpt :: Parser Int
+    |
+448 | evalRoundsOpt = option auto
+    | ^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:454:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: maskBadOpt :: Parser Bool
+    |
+454 | maskBadOpt = switch
+    | ^^^^^^^^^^
+
+library/Synthesis/Configs.hs:459:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      randomHoleOpt :: Parser Bool
+    |
+459 | randomHoleOpt = switch
+    | ^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:464:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: cheatOpt :: Parser Bool
+    |
+464 | cheatOpt = switch
+    | ^^^^^^^^
+
+library/Synthesis/Configs.hs:468:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      evaluateSetOpt :: Parser [Char]
+    |
+468 | evaluateSetOpt = strOption
+    | ^^^^^^^^^^^^^^
+
+library/Synthesis/Configs.hs:476:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: gpuOpt :: Parser Bool
+    |
+476 | gpuOpt = switch
+    | ^^^^^^
+[ 5 of 15] Compiling Synthesis.Types  ( library/Synthesis/Types.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Types.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Types.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/Types.hs:9:1: warning: [-Wunused-imports]
+    The import of ‘second’ from module ‘Data.Bifunctor’ is redundant
+  |
+9 | import Data.Bifunctor (first, second)
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Types.hs:28:1: warning: [-Wunused-imports]
+    The import of ‘SrcSpan, SrcSpanInfo(srcInfoPoints),
+                   SrcSpanInfo(srcInfoSpan)’
+    from module ‘Language.Haskell.Exts.SrcLoc’ is redundant
+   |
+28 | import Language.Haskell.Exts.SrcLoc
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Types.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘IPName’
+    from module ‘Language.Haskell.Exts.Syntax’ is redundant
+   |
+34 | import Language.Haskell.Exts.Syntax
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Types.hs:287:3: warning: [-Wname-shadowing]
+    This binding for ‘exp’ shadows the existing binding
+      imported from ‘Prelude’ at library/Synthesis/Types.hs:7:8-22
+      (and originally defined in ‘GHC.Float’)
+    |
+287 |   exp -> [exp]
+    |   ^^^
+
+library/Synthesis/Types.hs:298:19: warning: [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In a case alternative:
+        Patterns not matched:
+            ('N':'o':'t':'h':'i':'n':'g':_:_)
+            ['N', 'o', 't', 'h', 'i', 'n', p] where p is not one of {'g'}
+            ('N':'o':'t':'h':'i':'n':p:_:_) where p is not one of {'g'}
+            ['N', 'o', 't', 'h', 'i', 'n']
+            ...
+    |
+298 |   Con _l qname -> case unQName qname of
+    |                   ^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Types.hs:300:17: warning: [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In a case alternative:
+        Patterns not matched:
+            Var _ _
+            OverloadedLabel _ _
+            IPVar _ _
+            Lit _ _
+            ...
+    |
+300 |   App _l a b -> case a of
+    |                 ^^^^^^^^^...
+
+library/Synthesis/Types.hs:301:21: warning: [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In a case alternative:
+        Patterns not matched:
+            ('J':'u':'s':'t':_:_)
+            ['J', 'u', 's', p] where p is not one of {'t'}
+            ('J':'u':'s':p:_:_) where p is not one of {'t'}
+            ['J', 'u', 's']
+            ...
+    |
+301 |     Con _l qname -> case unQName qname of
+    |                     ^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Types.hs:437:17: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In a case alternative: _ -> ...
+    |
+437 |                 _ -> error "unsupported Assist!"
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ 6 of 15] Compiling Synthesis.Blocks ( library/Synthesis/Blocks.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Blocks.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Blocks.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/Blocks.hs:3:1: warning: [-Wunused-imports]
+    The import of ‘union’ from module ‘Data.HashMap.Lazy’ is redundant
+  |
+3 | import Data.HashMap.Lazy (HashMap, insert, singleton, union)
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ 7 of 15] Compiling Synthesis.TypeGen ( library/Synthesis/TypeGen.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/TypeGen.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/TypeGen.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/TypeGen.hs:9:1: warning: [-Wunused-imports]
+    The import of ‘mkStdGen’ from module ‘System.Random’ is redundant
+  |
+9 | import System.Random (StdGen, mkStdGen, newStdGen)
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/TypeGen.hs:60:10: warning: [-Wunused-matches]
+    Defined but not used: ‘g'’
+   |
+60 |         (g', tp) <- nest arity (\(gen_, a) -> do
+   |          ^^
+
+library/Synthesis/TypeGen.hs:60:35: warning: [-Wunused-matches]
+    Defined but not used: ‘gen_’
+   |
+60 |         (g', tp) <- nest arity (\(gen_, a) -> do
+   |                                   ^^^^
+
+library/Synthesis/TypeGen.hs:113:15: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In a case alternative: _ -> ...
+    |
+113 |               _ -> error "unsupported Assist"
+    |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ 8 of 15] Compiling Synthesis.Orphanage ( library/Synthesis/Orphanage.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Orphanage.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Orphanage.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/Orphanage.hs:18:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.SrcLoc’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.SrcLoc’
+    To import instances alone, use: import Language.Haskell.Exts.SrcLoc()
+   |
+18 | import Language.Haskell.Exts.SrcLoc
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Orphanage.hs:184:11: warning: [-Wname-shadowing]
+    This binding for ‘l’ shadows the existing binding
+      imported from ‘Synthesis.Types’ at library/Synthesis/Orphanage.hs:21:1-22
+      (and originally defined at library/Synthesis/Types.hs:59:1)
+    |
+184 |     Left  l -> PP.pretty ( "Left (" :: String) <> PP.pretty l <> PP.pretty (")" :: String)
+    |           ^
+[ 9 of 15] Compiling Synthesis.FindHoles ( library/Synthesis/FindHoles.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/FindHoles.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/FindHoles.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/FindHoles.hs:8:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Data’ is redundant
+      except perhaps to import instances from ‘Synthesis.Data’
+    To import instances alone, use: import Synthesis.Data()
+  |
+8 | import Synthesis.Data (Expr)
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[10 of 15] Compiling Synthesis.Ast    ( library/Synthesis/Ast.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Ast.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Ast.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/Ast.hs:6:1: warning: [-Wunused-imports]
+    The import of ‘empty’ from module ‘Data.HashMap.Lazy’ is redundant
+  |
+6 | import Data.HashMap.Lazy (HashMap, empty, mapWithKey)
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Ast.hs:12:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.TypeGen’ is redundant
+      except perhaps to import instances from ‘Synthesis.TypeGen’
+    To import instances alone, use: import Synthesis.TypeGen()
+   |
+12 | import Synthesis.TypeGen
+   | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Ast.hs:102:18: warning: [-Wname-shadowing]
+    This binding for ‘a’ shadows the existing binding
+      bound at library/Synthesis/Ast.hs:95:16
+    |
+102 |         TyApp _l a c -> case a of
+    |                  ^
+[11 of 15] Compiling Synthesis.Hint   ( library/Synthesis/Hint.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Hint.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Hint.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/Hint.hs:11:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Stack’ is redundant
+      except perhaps to import instances from ‘GHC.Stack’
+    To import instances alone, use: import GHC.Stack()
+   |
+11 | import GHC.Stack
+   | ^^^^^^^^^^^^^^^^
+
+library/Synthesis/Hint.hs:12:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.Syntax’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.Syntax’
+    To import instances alone, use: import Language.Haskell.Exts.Syntax()
+   |
+12 | import Language.Haskell.Exts.Syntax
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Hint.hs:37:10: warning: [-Wname-shadowing]
+    This binding for ‘err_’ shadows the existing binding
+      defined at library/Synthesis/Hint.hs:58:1
+   |
+37 |     Left err_ -> error $ "interpretUnsafe failed: " <> errorString err_
+   |          ^^^^
+
+library/Synthesis/Hint.hs:101:5: warning: [-Wname-shadowing]
+    This binding for ‘either’ shadows the existing binding
+      imported from ‘Prelude’ at library/Synthesis/Hint.hs:4:8-21
+      (and originally defined in ‘Data.Either’)
+    |
+101 |     either <- sequence . bimap
+    |     ^^^^^^
+[12 of 15] Compiling Synthesis.Generation ( library/Synthesis/Generation.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Generation.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Generation.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesis/Generation.hs:10:1: warning: [-Wunused-imports]
+    The import of ‘singleton’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+10 | import Data.HashMap.Lazy
+   | ^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Generation.hs:24:1: warning: [-Wunused-imports]
+    The import of ‘sort’ from module ‘Data.List’ is redundant
+   |
+24 | import Data.List (maximumBy, partition, nubBy, sort)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generation.hs:25:1: warning: [-Wunused-imports]
+    The import of ‘Data.Ord’ is redundant
+      except perhaps to import instances from ‘Data.Ord’
+    To import instances alone, use: import Data.Ord()
+   |
+25 | import Data.Ord (Ordering (..))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generation.hs:26:1: warning: [-Wunused-imports]
+    The import of ‘delete, isProperSubsetOf, notMember’
+    from module ‘Data.Set’ is redundant
+   |
+26 | import Data.Set (Set, insert, delete, notMember, isProperSubsetOf)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generation.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘lift’
+    from module ‘Language.Haskell.Interpreter’ is redundant
+   |
+33 | import Language.Haskell.Interpreter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Generation.hs:49:1: warning: [-Wunused-imports]
+    The import of ‘sndOf3’ from module ‘Util’ is redundant
+   |
+49 | import Util (nTimes, fstOf3, sndOf3, thdOf3)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generation.hs:54:8: warning: [-Wname-shadowing]
+    This binding for ‘maxHoles’ shadows the existing binding
+      imported from ‘Synthesis.Data’ at library/Synthesis/Generation.hs:47:1-21
+      (and originally defined at library/Synthesis/Data.hs:58:7-14)
+   |
+54 | genFns maxHoles expr_blocks block_asts =
+   |        ^^^^^^^^
+
+library/Synthesis/Generation.hs:59:11: warning: [-Wname-shadowing]
+    This binding for ‘maxHoles’ shadows the existing binding
+      imported from ‘Synthesis.Data’ at library/Synthesis/Generation.hs:47:1-21
+      (and originally defined at library/Synthesis/Data.hs:58:7-14)
+   |
+59 | fillHoles maxHoles block_asts used_blocks expr_blocks expr = do
+   |           ^^^^^^^^
+
+library/Synthesis/Generation.hs:128:26: warning: [-Wname-shadowing]
+    This binding for ‘maxParams’ shadows the existing binding
+      imported from ‘Synthesis.Data’ at library/Synthesis/Generation.hs:47:1-21
+      (and originally defined at library/Synthesis/Data.hs:73:7-15)
+    |
+128 | fnOutputs crash_on_error maxParams instantiation_inputs fn_ast tp_instantiations =
+    |                          ^^^^^^^^^
+[13 of 15] Compiling Synthesis.Generator ( library/Synthesis/Generator.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Generator.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/Generator.dyn_o )
+
+library/Synthesis/Generator.hs:11:1: warning: [-Wunused-imports]
+    The import of ‘System.ProgressBar’ is redundant
+      except perhaps to import instances from ‘System.ProgressBar’
+    To import instances alone, use: import System.ProgressBar()
+   |
+11 | import System.ProgressBar
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:13:1: warning: [-Wunused-imports]
+    The import of ‘Control.Exception’ is redundant
+      except perhaps to import instances from ‘Control.Exception’
+    To import instances alone, use: import Control.Exception()
+   |
+13 | import Control.Exception (finally)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:14:1: warning: [-Wunused-imports]
+    The import of ‘void’ from module ‘Control.Monad’ is redundant
+   |
+14 | import Control.Monad (join, filterM, forM_, void, when)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:15:1: warning: [-Wunused-imports]
+    The import of ‘Data.Foldable’ is redundant
+      except perhaps to import instances from ‘Data.Foldable’
+    To import instances alone, use: import Data.Foldable()
+   |
+15 | import Data.Foldable (foldr')
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:16:1: warning: [-Wunused-imports]
+    The import of ‘Data.Text’ is redundant
+      except perhaps to import instances from ‘Data.Text’
+    To import instances alone, use: import Data.Text()
+   |
+16 | import Data.Text (Text)
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:17:1: warning: [-Wunused-imports]
+    The import of ‘bimap’ from module ‘Data.Bifunctor’ is redundant
+   |
+17 | import Data.Bifunctor (first, second, bimap)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:18:1: warning: [-Wunused-imports]
+    The import of ‘!, fromListWith, lookupDefault, mapWithKey’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+18 | import Data.HashMap.Lazy
+   | ^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesis/Generator.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘maximum’ from module ‘Data.List’ is redundant
+   |
+33 | import Data.List (partition, maximum)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Data.Maybe’ is redundant
+      except perhaps to import instances from ‘Data.Maybe’
+    To import instances alone, use: import Data.Maybe()
+   |
+34 | import Data.Maybe (catMaybes, fromJust)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis/Generator.hs:37:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Aeson’ is redundant
+      except perhaps to import instances from ‘Data.Aeson’
+    To import instances alone, use: import Data.Aeson()
+   |
+37 | import qualified Data.Aeson as Aeson
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[14 of 15] Compiling Synthesis        ( library/Synthesis.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis.dyn_o ) [Synthesis.Configs changed]
+
+library/Synthesis.hs:2:5: warning: [-Wdodgy-exports]
+    The export item ‘module Synthesis’ exports nothing
+  |
+2 |     module Synthesis
+  |     ^^^^^^^^^^^^^^^^
+
+library/Synthesis.hs:7:7: warning: [-Wdodgy-exports]
+    The export item ‘module Synthesis.Orphanage’ exports nothing
+  |
+7 |     , module Synthesis.Orphanage
+  |       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesis.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Orphanage’ is redundant
+      except perhaps to import instances from ‘Synthesis.Orphanage’
+    To import instances alone, use: import Synthesis.Orphanage()
+   |
+20 | import Synthesis.Orphanage
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[15 of 15] Compiling Synthesis.ViewDataset ( library/Synthesis/ViewDataset.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/ViewDataset.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synth-gen-0.2.0.0/build/Synthesis/ViewDataset.dyn_o ) [Synthesis.Configs changed]
+Preprocessing library for synthesizer-0.2.0.0..
+Building library for synthesizer-0.2.0.0..
+[ 2 of 16] Compiling Synthesizer.Params ( library/Synthesizer/Params.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Params.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Params.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesizer/Params.hs:8:1: warning: [-Wunused-imports]
+    The import of ‘GHC.TypeNats’ is redundant
+      except perhaps to import instances from ‘GHC.TypeNats’
+    To import instances alone, use: import GHC.TypeNats()
+  |
+8 | import GHC.TypeNats (type (+))
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ 4 of 16] Compiling Synthesizer.Utility ( library/Synthesizer/Utility.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Utility.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Utility.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesizer/Utility.hs:21:1: warning: [-Wunused-imports]
+    The import of ‘mkStdGen’ from module ‘System.Random’ is redundant
+   |
+21 | import System.Random (StdGen, mkStdGen)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:22:1: warning: [-Wunused-imports]
+    The import of ‘System.ProgressBar’ is redundant
+      except perhaps to import instances from ‘System.ProgressBar’
+    To import instances alone, use: import System.ProgressBar()
+   |
+22 | import System.ProgressBar
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:23:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Stack’ is redundant
+      except perhaps to import instances from ‘GHC.Stack’
+    To import instances alone, use: import GHC.Stack()
+   |
+23 | import GHC.Stack
+   | ^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:25:1: warning: [-Wunused-imports]
+    The import of ‘GHC.TypeNats’ is redundant
+      except perhaps to import instances from ‘GHC.TypeNats’
+    To import instances alone, use: import GHC.TypeNats()
+   |
+25 | import GHC.TypeNats (Nat, KnownNat, type (+), type (*))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:30:1: warning: [-Wunused-imports]
+    The import of ‘cycle’ from module ‘Data.List’ is redundant
+   |
+30 | import Data.List (findIndex, cycle)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:32:1: warning: [-Wunused-imports]
+    The import of ‘Data.Monoid’ is redundant
+      except perhaps to import instances from ‘Data.Monoid’
+    To import instances alone, use: import Data.Monoid()
+   |
+32 | import Data.Monoid
+   | ^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘fromList’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+34 | import Data.HashMap.Lazy (HashMap, fromList, lookup, filterWithKey)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:35:1: warning: [-Wunused-imports]
+    The import of ‘Data.Proxy’ is redundant
+      except perhaps to import instances from ‘Data.Proxy’
+    To import instances alone, use: import Data.Proxy()
+   |
+35 | import Data.Proxy
+   | ^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:44:1: warning: [-Wunused-imports]
+    The import of ‘assert’ from module ‘Control.Exception’ is redundant
+   |
+44 | import Control.Exception (SomeException, try, assert)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:46:1: warning: [-Wunused-imports]
+    The import of ‘Control.Monad’ is redundant
+      except perhaps to import instances from ‘Control.Monad’
+    To import instances alone, use: import Control.Monad()
+   |
+46 | import Control.Monad (void, foldM, (=<<))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:52:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Tensor’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Tensor’
+    To import instances alone, use: import Torch.Typed.Tensor()
+   |
+52 | import qualified Torch.Typed.Tensor
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:55:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+55 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:57:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+57 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:69:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Internal.Managed.Native’ is redundant
+      except perhaps to import instances from ‘Torch.Internal.Managed.Native’
+    To import instances alone, use: import Torch.Internal.Managed.Native()
+   |
+69 | import qualified Torch.Internal.Managed.Native           as ATen
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:80:1: warning: [-Wunused-imports]
+    The import of ‘System.IO.Unsafe’ is redundant
+      except perhaps to import instances from ‘System.IO.Unsafe’
+    To import instances alone, use: import System.IO.Unsafe()
+   |
+80 | import System.IO.Unsafe (unsafePerformIO)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:84:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Internal.Managed.Native’ is redundant
+      except perhaps to import instances from ‘Torch.Internal.Managed.Native’
+    To import instances alone, use: import Torch.Internal.Managed.Native()
+   |
+84 | import qualified Torch.Internal.Managed.Native as ATen
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:86:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Internal.Managed.Cast’ is redundant
+      except perhaps to import instances from ‘Torch.Internal.Managed.Cast’
+    To import instances alone, use: import Torch.Internal.Managed.Cast()
+   |
+86 | import qualified Torch.Internal.Managed.Cast
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:87:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Internal.Cast’ is redundant
+      except perhaps to import instances from ‘Torch.Internal.Cast’
+    To import instances alone, use: import Torch.Internal.Cast()
+   |
+87 | import Torch.Internal.Cast
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Utility.hs:90:13: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+   |
+90 | d_repeat ns t = unsafePerformIO $ (cast2 ATen.tensor_repeat_l) t ns
+   |             ^
+
+library/Synthesizer/Utility.hs:93:17: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+   |
+93 | repeatDim dim n t = d_repeat (replicate dim 1 <> [n] <> replicate (D.dim t - dim) 1) $ I.unsqueeze t dim
+   |                 ^
+
+library/Synthesizer/Utility.hs:103:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: cpu :: D.Device
+    |
+103 | cpu :: D.Device = D.Device D.CPU  0
+    | ^^^
+
+library/Synthesizer/Utility.hs:104:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      Synthesizer.Utility.gpu :: D.Device
+    |
+104 | gpu :: D.Device = D.Device D.CUDA 0
+    | ^^^
+
+library/Synthesizer/Utility.hs:163:9: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+163 | asCPU f t = D.toDevice (D.device t) . f . D.toDevice (D.Device D.CPU 0) $ t
+    |         ^
+
+library/Synthesizer/Utility.hs:299:19: warning: [-Wunticked-promoted-constructors]
+    Unticked promoted constructor: ‘Just’.
+    Use ‘'Just’ instead of ‘Just’.
+    |
+299 |   FromMaybe _def (Just a) = a
+    |                   ^^^^
+
+library/Synthesizer/Utility.hs:300:17: warning: [-Wunticked-promoted-constructors]
+    Unticked promoted constructor: ‘Nothing’.
+    Use ‘'Nothing’ instead of ‘Nothing’.
+    |
+300 |   FromMaybe def Nothing = def
+    |                 ^^^^^^^
+
+library/Synthesizer/Utility.hs:361:12: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+361 | softmaxAll t = D.reshape (D.shape t) $ F.softmax (F.Dim 0) $ F.flattenAll t
+    |            ^
+
+library/Synthesizer/Utility.hs:365:12: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+365 | unravelIdx t idx = snd . foldr' (\ dim_ (idx_, idxs) -> (idx_ `Prelude.div` dim_, idx_ `Prelude.mod` dim_ : idxs)) (idx, []) $ D.shape t
+    |            ^
+
+library/Synthesizer/Utility.hs:422:1: warning: [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In an equation for ‘lstmDynamicBatch’:
+        Patterns not matched:
+            False (LSTMWithLearnedInit _ _ _) (UnsafeMkTensor _)
+            True (LSTMWithLearnedInit _ _ _) (UnsafeMkTensor _)
+    |
+422 | lstmDynamicBatch dropoutOn (LSTMWithConstInit lstm@(LSTM _ (Dropout dropoutProb)) cc hc) input
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesizer/Utility.hs:422:47: warning: [-Wname-shadowing]
+    This binding for ‘lstm’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+422 | lstmDynamicBatch dropoutOn (LSTMWithConstInit lstm@(LSTM _ (Dropout dropoutProb)) cc hc) input
+    |                                               ^^^^
+
+library/Synthesizer/Utility.hs:447:11: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+447 |       . (\t -> F.expand t False [batchSize, natValI @(numLayers * NumberOfDirections directionality), natValI @hiddenSize])
+    |           ^
+
+library/Synthesizer/Utility.hs:453:11: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+453 |       . (\t -> F.expand t False [batchSize, natValI @(numLayers * NumberOfDirections directionality), natValI @hiddenSize])
+    |           ^
+
+library/Synthesizer/Utility.hs:472:1: warning: [-Worphans]
+    Orphan instance:
+      instance (Foldable t, Traversable t, A.Parameterized a) =>
+               A.Parameterized (t a)
+    To avoid this
+        move the instance declaration to the module of the class or of the type, or
+        wrap the type with a newtype and declare the instance on the new type.
+    |
+472 | instance (Foldable t, Traversable t, A.Parameterized a) => A.Parameterized (t a) where
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesizer/Utility.hs:476:1: warning: [-Worphans]
+    Orphan instance:
+      instance A.Parameterized (Parameter device dtype shape)
+    To avoid this
+        move the instance declaration to the module of the class or of the type, or
+        wrap the type with a newtype and declare the instance on the new type.
+    |
+476 | instance A.Parameterized (Parameter device dtype shape) where
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesizer/Utility.hs:492:5: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+492 |     t = UnsafeMkTensor $ D.indexSelect (natValI @dim) sampled_idxs tensor
+    |     ^
+
+library/Synthesizer/Utility.hs:540:12: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/Utility.hs:53:1-54
+    |
+540 | sampleIdxs t = do
+    |            ^
+[ 5 of 16] Compiling Synthesizer.Encoder ( library/Synthesizer/Encoder.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Encoder.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Encoder.dyn_o )
+
+library/Synthesizer/Encoder.hs:17:1: warning: [-Wunused-imports]
+    The import of ‘first’ from module ‘Data.Bifunctor’ is redundant
+   |
+17 | import Data.Bifunctor (first, second, bimap)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:19:1: warning: [-Wunused-imports]
+    The import of ‘Data.Char’ is redundant
+      except perhaps to import instances from ‘Data.Char’
+    To import instances alone, use: import Data.Char()
+   |
+19 | import Data.Char (ord)
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘!’ from module ‘Data.HashMap.Lazy’ is redundant
+   |
+20 | import Data.HashMap.Lazy (HashMap, (!), toList)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:26:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Tensor’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Tensor’
+    To import instances alone, use: import Torch.Typed.Tensor()
+   |
+26 | import qualified Torch.Typed.Tensor
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:31:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+31 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:32:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+32 | import           Torch.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Scalar’ is redundant
+      except perhaps to import instances from ‘Torch.Scalar’
+    To import instances alone, use: import Torch.Scalar()
+   |
+34 | import           Torch.Scalar
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:43:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+43 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Encoder.hs:79:1: warning: [-Worphans]
+    Orphan instance: instance A.Parameterized Int
+    To avoid this
+        move the instance declaration to the module of the class or of the type, or
+        wrap the type with a newtype and declare the instance on the new type.
+   |
+79 | instance A.Parameterized Int where
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesizer/Encoder.hs:136:11: warning: [-Wunused-matches]
+    Defined but not used: ‘tp’
+    |
+136 |         \(tp, vecs) -> let sample_vec = stack' 0 (toDynamic <$> vecs) in sample_vec
+    |           ^^
+[ 6 of 16] Compiling Synthesizer.TypeEncoder ( library/Synthesizer/TypeEncoder.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/TypeEncoder.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/TypeEncoder.dyn_o ) [Synthesis.Data changed]
+
+library/Synthesizer/TypeEncoder.hs:18:1: warning: [-Wunused-imports]
+    The import of ‘Data.Bifunctor’ is redundant
+      except perhaps to import instances from ‘Data.Bifunctor’
+    To import instances alone, use: import Data.Bifunctor()
+   |
+18 | import Data.Bifunctor (second, bimap)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘Data.Char’ is redundant
+      except perhaps to import instances from ‘Data.Char’
+    To import instances alone, use: import Data.Char()
+   |
+20 | import Data.Char (ord)
+   | ^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:21:1: warning: [-Wunused-imports]
+    The import of ‘!, toList’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+21 | import Data.HashMap.Lazy (HashMap, (!), toList)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:27:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Tensor’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Tensor’
+    To import instances alone, use: import Torch.Typed.Tensor()
+   |
+27 | import qualified Torch.Typed.Tensor
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:32:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+32 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+33 | import           Torch.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Torch.HList’ is redundant
+      except perhaps to import instances from ‘Torch.HList’
+    To import instances alone, use: import Torch.HList()
+   |
+34 | import           Torch.HList
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:35:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Scalar’ is redundant
+      except perhaps to import instances from ‘Torch.Scalar’
+    To import instances alone, use: import Torch.Scalar()
+   |
+35 | import           Torch.Scalar
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:37:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional’ is redundant
+      except perhaps to import instances from ‘Torch.Functional’
+    To import instances alone, use: import Torch.Functional()
+   |
+37 | import qualified Torch.Functional              as F
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:44:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+44 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:47:1: warning: [-Wunused-imports]
+    The import of ‘Expr, Tpl2’
+    from module ‘Synthesis.Data’ is redundant
+   |
+47 | import Synthesis.Data (Expr, Tp, Tpl2)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:48:1: warning: [-Wunused-imports]
+    The import of ‘asPairs, mapBoth’
+    from module ‘Synthesis.Utility’ is redundant
+   |
+48 | import Synthesis.Utility (pp, mapBoth, asPairs, safeIndexHM)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/TypeEncoder.hs:51:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Encoder’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Encoder’
+    To import instances alone, use: import Synthesizer.Encoder()
+   |
+51 | import Synthesizer.Encoder
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ 7 of 16] Compiling Synthesizer.R3NN ( library/Synthesizer/R3NN.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/R3NN.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/R3NN.dyn_o )
+
+library/Synthesizer/R3NN.hs:18:1: warning: [-Wunused-imports]
+    The import of ‘!’ from module ‘Data.HashMap.Lazy’ is redundant
+   |
+18 | import Data.HashMap.Lazy (HashMap, fromList, toList, (!), elems)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘=<<’ from module ‘Control.Monad’ is redundant
+   |
+20 | import Control.Monad ((=<<), join)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:31:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+31 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+33 | import Torch.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN’
+    To import instances alone, use: import Torch.Typed.NN()
+   |
+34 | import Torch.Typed.NN
+   | ^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:36:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+36 | import Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:37:1: warning: [-Wunused-imports]
+    The import of ‘Torch.HList’ is redundant
+      except perhaps to import instances from ‘Torch.HList’
+    To import instances alone, use: import Torch.HList()
+   |
+37 | import Torch.HList
+   | ^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:48:1: warning: [-Wunused-imports]
+    The import of ‘Tp’ from module ‘Synthesis.Data’ is redundant
+   |
+48 | import Synthesis.Data (Expr, Tp)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:49:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Types’ is redundant
+      except perhaps to import instances from ‘Synthesis.Types’
+    To import instances alone, use: import Synthesis.Types()
+   |
+49 | import Synthesis.Types (holeType)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:174:9: warning: [-Wunused-local-binds]
+    Defined but not used: ‘maxStringLength’
+    |
+174 |         maxStringLength :: Int = natValI @maxStringLength
+    |         ^^^^^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:175:9: warning: [-Wunused-local-binds]
+    Defined but not used: ‘m’
+    |
+175 |         m :: Int = natValI @m
+    |         ^
+
+library/Synthesizer/R3NN.hs:176:9: warning: [-Wunused-local-binds]
+    Defined but not used: ‘h’
+    |
+176 |         h :: Int = natValI @h
+    |         ^
+
+library/Synthesizer/R3NN.hs:177:9: warning: [-Wunused-local-binds]
+    Defined but not used: ‘featMult’
+    |
+177 |         featMult :: Int = natValI @featMult 
+    |         ^^^^^^^^
+
+library/Synthesizer/R3NN.hs:179:9: warning: [-Wunused-local-binds]
+    Defined but not used: ‘conditionIn’
+    |
+179 |         conditionIn = m + batch_size * 2 * featMult * dirs * h * maxStringLength
+    |         ^^^^^^^^^^^
+
+library/Synthesizer/R3NN.hs:195:5: warning: [-Wname-shadowing]
+    This binding for ‘device’ shadows the existing binding
+      imported from ‘Torch.Typed.Tensor’ at library/Synthesizer/R3NN.hs:26:1-25
+    |
+195 |     device = deviceVal @device
+    |     ^^^^^^
+
+library/Synthesizer/R3NN.hs:206:25: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/R3NN.hs:27:1-29
+    |
+206 |             asUntyped (\t -> I.squeezeDim t 0) .
+    |                         ^
+
+library/Synthesizer/R3NN.hs:214:25: warning: [-Wname-shadowing]
+    This binding for ‘t’ shadows the existing binding
+      imported from ‘Torch.Typed.Functional’ at library/Synthesizer/R3NN.hs:27:1-29
+    |
+214 |             asUntyped (\t -> I.squeezeDim t 0) .
+    |                         ^
+
+library/Synthesizer/R3NN.hs:217:5: warning: [-Wunused-local-binds]
+    Defined but not used: ‘getters’
+    |
+217 |     getters = fst <$> findHolesExpr ppt
+    |     ^^^^^^^
+[ 8 of 16] Compiling Synthesizer.Synthesizer ( library/Synthesizer/Synthesizer.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Synthesizer.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Synthesizer.dyn_o )
+
+library/Synthesizer/Synthesizer.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘System.Random’ is redundant
+      except perhaps to import instances from ‘System.Random’
+    To import instances alone, use: import System.Random()
+   |
+20 | import           System.Random                 (StdGen, mkStdGen)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:21:1: warning: [-Wunused-imports]
+    The import of ‘System.Timeout’ is redundant
+      except perhaps to import instances from ‘System.Timeout’
+    To import instances alone, use: import System.Timeout()
+   |
+21 | import           System.Timeout                (timeout)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:22:1: warning: [-Wunused-imports]
+    The import of ‘System.Directory’ is redundant
+      except perhaps to import instances from ‘System.Directory’
+    To import instances alone, use: import System.Directory()
+   |
+22 | import           System.Directory              (createDirectoryIfMissing)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:23:1: warning: [-Wunused-imports]
+    The import of ‘System.CPUTime’ is redundant
+      except perhaps to import instances from ‘System.CPUTime’
+    To import instances alone, use: import System.CPUTime()
+   |
+23 | import           System.CPUTime
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:24:1: warning: [-Wunused-imports]
+    The import of ‘Data.Maybe’ is redundant
+      except perhaps to import instances from ‘Data.Maybe’
+    To import instances alone, use: import Data.Maybe()
+   |
+24 | import           Data.Maybe                    (fromMaybe)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:25:1: warning: [-Wunused-imports]
+    The import of ‘Data.Set’ is redundant
+      except perhaps to import instances from ‘Data.Set’
+    To import instances alone, use: import Data.Set()
+   |
+25 | import           Data.Set                      (Set, empty, insert)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:26:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Set’ is redundant
+      except perhaps to import instances from ‘Data.Set’
+    To import instances alone, use: import Data.Set()
+   |
+26 | import qualified Data.Set
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:27:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString’ is redundant
+      except perhaps to import instances from ‘Data.ByteString’
+    To import instances alone, use: import Data.ByteString()
+   |
+27 | import qualified Data.ByteString               as BS
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:28:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString.Internal’ is redundant
+      except perhaps to import instances from ‘Data.ByteString.Internal’
+    To import instances alone, use: import Data.ByteString.Internal()
+   |
+28 | import qualified Data.ByteString.Internal      as BS
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:29:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString.Lazy.Internal’ is redundant
+      except perhaps to import instances from ‘Data.ByteString.Lazy.Internal’
+    To import instances alone, use: import Data.ByteString.Lazy.Internal()
+   |
+29 | import qualified Data.ByteString.Lazy.Internal as BL
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:30:1: warning: [-Wunused-imports]
+    The import of ‘!, elems, filterWithKey, keys, mapWithKey, size’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+30 | import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:31:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Csv’ is redundant
+      except perhaps to import instances from ‘Data.Csv’
+    To import instances alone, use: import Data.Csv()
+   |
+31 | import qualified Data.Csv as Csv
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:32:1: warning: [-Wunused-imports]
+    The import of ‘Data.Text.Prettyprint.Doc’ is redundant
+      except perhaps to import instances from ‘Data.Text.Prettyprint.Doc’
+    To import instances alone, use: import Data.Text.Prettyprint.Doc()
+   |
+32 | import           Data.Text.Prettyprint.Doc (pretty)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘Text.Printf’ is redundant
+      except perhaps to import instances from ‘Text.Printf’
+    To import instances alone, use: import Text.Printf()
+   |
+33 | import           Text.Printf
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Foreign.Marshal.Utils’ is redundant
+      except perhaps to import instances from ‘Foreign.Marshal.Utils’
+    To import instances alone, use: import Foreign.Marshal.Utils()
+   |
+34 | import           Foreign.Marshal.Utils         (fromBool)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:35:1: warning: [-Wunused-imports]
+    The import of ‘Control.Monad’ is redundant
+      except perhaps to import instances from ‘Control.Monad’
+    To import instances alone, use: import Control.Monad()
+   |
+35 | import           Control.Monad                 (join, replicateM, forM, void, when)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:36:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.Syntax’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.Syntax’
+    To import instances alone, use: import Language.Haskell.Exts.Syntax()
+   |
+36 | import           Language.Haskell.Exts.Syntax  ( Exp (..) )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:38:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Interpreter’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Interpreter’
+    To import instances alone, use: import Language.Haskell.Interpreter()
+   |
+38 | import           Language.Haskell.Interpreter  ( Interpreter, liftIO, lift )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:39:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Exts’ is redundant
+      except perhaps to import instances from ‘GHC.Exts’
+    To import instances alone, use: import GHC.Exts()
+   |
+39 | import           GHC.Exts
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:40:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Generics’ is redundant
+      except perhaps to import instances from ‘GHC.Generics’
+    To import instances alone, use: import GHC.Generics()
+   |
+40 | import           GHC.Generics                  (Generic)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:41:1: warning: [-Wunused-imports]
+    The import of ‘*, -, Nat’ from module ‘GHC.TypeNats’ is redundant
+   |
+41 | import           GHC.TypeNats                  (KnownNat, Nat, type (*), type (-))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:42:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional.Internal’ is redundant
+      except perhaps to import instances from ‘Torch.Functional.Internal’
+    To import instances alone, use: import Torch.Functional.Internal()
+   |
+42 | import qualified Torch.Functional.Internal     as I
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:44:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Tensor’ is redundant
+      except perhaps to import instances from ‘Torch.Tensor’
+    To import instances alone, use: import Torch.Tensor()
+   |
+44 | import qualified Torch.Tensor                  as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:45:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Device’ is redundant
+      except perhaps to import instances from ‘Torch.Device’
+    To import instances alone, use: import Torch.Device()
+   |
+45 | import qualified Torch.Device                  as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:46:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorFactories’ is redundant
+      except perhaps to import instances from ‘Torch.TensorFactories’
+    To import instances alone, use: import Torch.TensorFactories()
+   |
+46 | import qualified Torch.TensorFactories         as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:47:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorOptions’ is redundant
+      except perhaps to import instances from ‘Torch.TensorOptions’
+    To import instances alone, use: import Torch.TensorOptions()
+   |
+47 | import qualified Torch.TensorOptions           as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:49:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Serialize’
+    To import instances alone, use: import Torch.Serialize()
+   |
+49 | import qualified Torch.Serialize               as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:50:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+50 | import qualified Torch.Autograd                as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:51:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional’ is redundant
+      except perhaps to import instances from ‘Torch.Functional’
+    To import instances alone, use: import Torch.Functional()
+   |
+51 | import qualified Torch.Functional              as F
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:53:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+53 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:54:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Aux’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Aux’
+    To import instances alone, use: import Torch.Typed.Aux()
+   |
+54 | import           Torch.Typed.Aux
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:56:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN’
+    To import instances alone, use: import Torch.Typed.NN()
+   |
+56 | import           Torch.Typed.NN
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:57:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+57 | import           Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:58:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+58 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:60:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Optim’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Optim’
+    To import instances alone, use: import Torch.Typed.Optim()
+   |
+60 | import           Torch.Typed.Optim
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:62:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Autograd’
+    To import instances alone, use: import Torch.Typed.Autograd()
+   |
+62 | import           Torch.Typed.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:63:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Serialize’
+    To import instances alone, use: import Torch.Typed.Serialize()
+   |
+63 | import           Torch.Typed.Serialize
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:64:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Distributions.Distribution’ is redundant
+      except perhaps to import instances from ‘Torch.Distributions.Distribution’
+    To import instances alone, use: import Torch.Distributions.Distribution()
+   |
+64 | import qualified Torch.Distributions.Distribution as Distribution
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:65:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Distributions.Categorical’ is redundant
+      except perhaps to import instances from ‘Torch.Distributions.Categorical’
+    To import instances alone, use: import Torch.Distributions.Categorical()
+   |
+65 | import qualified Torch.Distributions.Categorical as Categorical
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:69:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Utility’ is redundant
+      except perhaps to import instances from ‘Synthesis.Utility’
+    To import instances alone, use: import Synthesis.Utility()
+   |
+69 | import           Synthesis.Utility
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:70:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Ast’ is redundant
+      except perhaps to import instances from ‘Synthesis.Ast’
+    To import instances alone, use: import Synthesis.Ast()
+   |
+70 | import           Synthesis.Ast
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:71:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Generation’ is redundant
+      except perhaps to import instances from ‘Synthesis.Generation’
+    To import instances alone, use: import Synthesis.Generation()
+   |
+71 | import           Synthesis.Generation
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:72:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.FindHoles’ is redundant
+      except perhaps to import instances from ‘Synthesis.FindHoles’
+    To import instances alone, use: import Synthesis.FindHoles()
+   |
+72 | import           Synthesis.FindHoles
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:73:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Hint’ is redundant
+      except perhaps to import instances from ‘Synthesis.Hint’
+    To import instances alone, use: import Synthesis.Hint()
+   |
+73 | import           Synthesis.Hint
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:74:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Types’ is redundant
+      except perhaps to import instances from ‘Synthesis.Types’
+    To import instances alone, use: import Synthesis.Types()
+   |
+74 | import           Synthesis.Types
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:75:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Utility’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Utility’
+    To import instances alone, use: import Synthesizer.Utility()
+   |
+75 | import           Synthesizer.Utility
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:76:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Encoder’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Encoder’
+    To import instances alone, use: import Synthesizer.Encoder()
+   |
+76 | import           Synthesizer.Encoder
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:77:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.R3NN’ is redundant
+      except perhaps to import instances from ‘Synthesizer.R3NN’
+    To import instances alone, use: import Synthesizer.R3NN()
+   |
+77 | import           Synthesizer.R3NN
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesizer.hs:78:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Params’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Params’
+    To import instances alone, use: import Synthesizer.Params()
+   |
+78 | import           Synthesizer.Params
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[ 9 of 16] Compiling Synthesizer.Train ( library/Synthesizer/Train.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Train.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Train.dyn_o )
+
+library/Synthesizer/Train.hs:27:1: warning: [-Wunused-imports]
+    The import of ‘System.Timeout’ is redundant
+      except perhaps to import instances from ‘System.Timeout’
+    To import instances alone, use: import System.Timeout()
+   |
+27 | import           System.Timeout                (timeout)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘Data.Maybe’ is redundant
+      except perhaps to import instances from ‘Data.Maybe’
+    To import instances alone, use: import Data.Maybe()
+   |
+33 | import           Data.Maybe                    (fromMaybe)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:36:1: warning: [-Wunused-imports]
+    The import of ‘second’ from module ‘Data.Bifunctor’ is redundant
+   |
+36 | import           Data.Bifunctor                (first, second)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:40:1: warning: [-Wunused-imports]
+    The import of ‘!, fromListWith, size’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+40 | import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey, fromListWith, singleton)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:42:1: warning: [-Wunused-imports]
+    The import of ‘Data.Text.Prettyprint.Doc’ is redundant
+      except perhaps to import instances from ‘Data.Text.Prettyprint.Doc’
+    To import instances alone, use: import Data.Text.Prettyprint.Doc()
+   |
+42 | import           Data.Text.Prettyprint.Doc (pretty)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:45:1: warning: [-Wunused-imports]
+    The import of ‘forM, void’ from module ‘Control.Monad’ is redundant
+   |
+45 | import           Control.Monad                 (join, replicateM, forM, void, when)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:48:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.Syntax’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.Syntax’
+    To import instances alone, use: import Language.Haskell.Exts.Syntax()
+   |
+48 | import           Language.Haskell.Exts.Syntax  ( Exp (..) )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:51:1: warning: [-Wunused-imports]
+    The import of ‘lift’
+    from module ‘Language.Haskell.Interpreter’ is redundant
+   |
+51 | import           Language.Haskell.Interpreter  ( Interpreter, liftIO, lift )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:53:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Generics’ is redundant
+      except perhaps to import instances from ‘GHC.Generics’
+    To import instances alone, use: import GHC.Generics()
+   |
+53 | import           GHC.Generics                  (Generic)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:54:1: warning: [-Wunused-imports]
+    The import of ‘*, -, CmpNat, Nat’
+    from module ‘GHC.TypeNats’ is redundant
+   |
+54 | import           GHC.TypeNats                  (KnownNat, Nat, CmpNat, type (*), type (-))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:58:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Device’ is redundant
+      except perhaps to import instances from ‘Torch.Device’
+    To import instances alone, use: import Torch.Device()
+   |
+58 | import qualified Torch.Device                  as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:59:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorFactories’ is redundant
+      except perhaps to import instances from ‘Torch.TensorFactories’
+    To import instances alone, use: import Torch.TensorFactories()
+   |
+59 | import qualified Torch.TensorFactories         as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:60:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorOptions’ is redundant
+      except perhaps to import instances from ‘Torch.TensorOptions’
+    To import instances alone, use: import Torch.TensorOptions()
+   |
+60 | import qualified Torch.TensorOptions           as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:66:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+66 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:69:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN’
+    To import instances alone, use: import Torch.Typed.NN()
+   |
+69 | import           Torch.Typed.NN
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:70:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+70 | import           Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:71:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+71 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:73:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Optim’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Optim’
+    To import instances alone, use: import Torch.Typed.Optim()
+   |
+73 | import           Torch.Typed.Optim
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:75:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Autograd’
+    To import instances alone, use: import Torch.Typed.Autograd()
+   |
+75 | import           Torch.Typed.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:76:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Serialize’
+    To import instances alone, use: import Torch.Typed.Serialize()
+   |
+76 | import           Torch.Typed.Serialize
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:89:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Encoder’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Encoder’
+    To import instances alone, use: import Synthesizer.Encoder()
+   |
+89 | import           Synthesizer.Encoder
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:92:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Params’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Params’
+    To import instances alone, use: import Synthesizer.Params()
+   |
+92 | import           Synthesizer.Params
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:164:21: warning: [-Wunused-local-binds]
+    Defined but not used: ‘rule_dim’
+    |
+164 |     let (_hole_dim, rule_dim) :: (Int, Int) = (0, 1)
+    |                     ^^^^^^^^
+
+library/Synthesizer/Train.hs:175:51: warning: [-Wunused-foralls]
+    Unused quantified type variable ‘num_holes’
+    In the type ‘forall rules device shape synthesizer num_holes.
+                 (KnownDevice device,
+                  MatMulDTypeIsValid device 'D.Float,
+                  SumDTypeIsValid device 'D.Float,
+                  BasicArithmeticDTypeIsValid device 'D.Float,
+                  RandDTypeIsValid device 'D.Int64,
+                  KnownNat rules,
+                  Synthesizer device shape rules synthesizer) =>
+                 Bool
+                 -> HashMap String Expr
+                    -> Expr
+                       -> Tp
+                          -> HashMap String Int
+                             -> synthesizer
+                                -> Tensor device 'D.Float shape
+                                   -> HashMap String Expr
+                                      -> HashMap String Int
+                                         -> HashMap String Int
+                                            -> Int
+                                               -> Bool
+                                                  -> [(String, Expr)]
+                                                     -> Interpreter (Tensor device 'D.Float '[])’
+    |
+175 | calcLoss :: forall rules device shape synthesizer num_holes . (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, Synthesizer device shape rules synthesizer) => Bool -> HashMap String Expr -> Expr -> Tp -> HashMap String Int -> synthesizer -> Tensor device 'D.Float shape -> HashMap String Expr -> HashMap String Int -> HashMap String Int -> Int -> Bool -> [(String, Expr)] -> Interpreter (Tensor device 'D.Float '[])
+    |                                                   ^^^^^^^^^
+
+library/Synthesizer/Train.hs:188:32: warning: [-Wunused-matches]
+    Defined but not used: ‘hole_getter’
+    |
+188 |                             (\(hole_getter, hole_setter) -> mapM (fitExpr . hole_setter ppt . snd) variants)
+    |                                ^^^^^^^^^^^
+
+library/Synthesizer/Train.hs:224:27: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Train.hs:88:1-36
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+224 |     let SynthesizerConfig{..} = synthesizerConfig
+    |                           ^^
+
+library/Synthesizer/Train.hs:229:37: warning: [-Wunused-local-binds]
+    Defined but not used: ‘test_set’
+    |
+229 |     let [train_set, validation_set, test_set] :: [[(Expr, (Tp, Tp))]] = lists2pairs <$> (if cheat then replicate 3 . fstOf3 else untuple3) datasets
+    |                                     ^^^^^^^^
+
+library/Synthesizer/Train.hs:255:9: warning: [-Wunused-matches]
+    Defined but not used: ‘model’
+    |
+255 |     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
+    |         ^^^^^
+
+library/Synthesizer/Train.hs:262:152: warning: [-Wname-shadowing]
+    This binding for ‘state’ shadows the existing binding
+      bound at library/Synthesizer/Train.hs:255:77
+    |
+262 |         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+    |                                                                                                                                                        ^^^^^
+
+library/Synthesizer/Train.hs:270:42: warning: [-Wname-shadowing]
+    This binding for ‘gen'’ shadows the existing binding
+      bound at library/Synthesizer/Train.hs:257:26
+    |
+270 |                 let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
+    |                                          ^^^^
+
+library/Synthesizer/Train.hs:290:70: warning: [-Wtype-defaults]
+    • Defaulting the following constraints to type ‘Integer’
+        (Integral b0)
+          arising from a use of ‘^’ at library/Synthesizer/Train.hs:290:70-74
+        (Num b0)
+          arising from the literal ‘12’
+          at library/Synthesizer/Train.hs:290:73-74
+    • In the second argument of ‘(/)’, namely ‘(10 ^ 12)’
+      In the expression: (fromIntegral (end - start)) / (10 ^ 12)
+      In a pattern binding:
+        epochSeconds :: Double = (fromIntegral (end - start)) / (10 ^ 12)
+    |
+290 |         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
+    |                                                                      ^^^^^
+
+library/Synthesizer/Train.hs:296:10: warning: [-Wname-shadowing]
+    This binding for ‘earlyStop’ shadows the existing binding
+      bound at library/Synthesizer/Train.hs:255:105
+    |
+296 |         (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
+    |          ^^^^^^^^^
+
+library/Synthesizer/Train.hs:313:17: warning: [-Wname-shadowing]
+    This binding for ‘earlyStop’ shadows the existing binding
+      bound at library/Synthesizer/Train.hs:255:105
+    |
+313 |             let earlyStop :: Bool = whenOr False (length eval_results' >= 2 * checkWindow) $ let
+    |                 ^^^^^^^^^
+
+library/Synthesizer/Train.hs:319:21: warning: [-Wname-shadowing]
+    This binding for ‘earlyStop’ shadows the existing binding
+      bound at library/Synthesizer/Train.hs:313:17
+    |
+319 |                     earlyStop :: Bool = D.asValue $ F.sub current prev `I.gtScalar` convergenceThreshold
+    |                     ^^^^^^^^^
+
+library/Synthesizer/Train.hs:339:51: warning: [-Wunused-foralls]
+    Unused quantified type variable ‘num_holes’
+    In the type ‘forall device rules shape synthesizer num_holes.
+                 (KnownDevice device,
+                  RandDTypeIsValid device 'D.Float,
+                  MatMulDTypeIsValid device 'D.Float,
+                  SumDTypeIsValid device 'D.Float,
+                  BasicArithmeticDTypeIsValid device 'D.Float,
+                  RandDTypeIsValid device 'D.Int64,
+                  StandardFloatingPointDTypeValidation device 'D.Float,
+                  KnownNat rules,
+                  KnownShape shape,
+                  Synthesizer device shape rules synthesizer,
+                  KnownNat (FromMaybe 0 (ExtractDim BatchDim shape))) =>
+                 TaskFnDataset
+                 -> PreppedDSL
+                    -> Int
+                       -> Bool
+                          -> Bool
+                             -> synthesizer -> [(Expr, (Tp, Tp))] -> Interpreter (Float, Float)’
+    |
+339 | evaluate :: forall device rules shape synthesizer num_holes
+    |                                                   ^^^^^^^^^
+
+library/Synthesizer/Train.hs:378:43: warning: [-Wunused-matches]
+    Defined but not used: ‘used’
+    |
+378 |                         in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
+    |                                           ^^^^
+
+library/Synthesizer/Train.hs:387:37: warning: [-Wname-shadowing]
+    This binding for ‘n’ shadows the existing binding
+      bound at library/Synthesizer/Train.hs:344:9
+    |
+387 |                                     n :: Int = length $ unTuple' $ ins !! 0
+    |                                     ^
+[10 of 16] Compiling Synthesizer.Random ( library/Synthesizer/Random.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Random.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Random.dyn_o )
+
+library/Synthesizer/Random.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘System.Random’ is redundant
+      except perhaps to import instances from ‘System.Random’
+    To import instances alone, use: import System.Random()
+   |
+20 | import           System.Random                 (StdGen, mkStdGen)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:21:1: warning: [-Wunused-imports]
+    The import of ‘System.Timeout’ is redundant
+      except perhaps to import instances from ‘System.Timeout’
+    To import instances alone, use: import System.Timeout()
+   |
+21 | import           System.Timeout                (timeout)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:22:1: warning: [-Wunused-imports]
+    The import of ‘System.Directory’ is redundant
+      except perhaps to import instances from ‘System.Directory’
+    To import instances alone, use: import System.Directory()
+   |
+22 | import           System.Directory              (createDirectoryIfMissing)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:23:1: warning: [-Wunused-imports]
+    The import of ‘System.CPUTime’ is redundant
+      except perhaps to import instances from ‘System.CPUTime’
+    To import instances alone, use: import System.CPUTime()
+   |
+23 | import           System.CPUTime
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:24:1: warning: [-Wunused-imports]
+    The import of ‘Data.Maybe’ is redundant
+      except perhaps to import instances from ‘Data.Maybe’
+    To import instances alone, use: import Data.Maybe()
+   |
+24 | import           Data.Maybe                    (fromMaybe)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:25:1: warning: [-Wunused-imports]
+    The import of ‘Data.Set’ is redundant
+      except perhaps to import instances from ‘Data.Set’
+    To import instances alone, use: import Data.Set()
+   |
+25 | import           Data.Set                      (Set, empty, insert)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:26:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Set’ is redundant
+      except perhaps to import instances from ‘Data.Set’
+    To import instances alone, use: import Data.Set()
+   |
+26 | import qualified Data.Set
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:27:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString’ is redundant
+      except perhaps to import instances from ‘Data.ByteString’
+    To import instances alone, use: import Data.ByteString()
+   |
+27 | import qualified Data.ByteString               as BS
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:28:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString.Internal’ is redundant
+      except perhaps to import instances from ‘Data.ByteString.Internal’
+    To import instances alone, use: import Data.ByteString.Internal()
+   |
+28 | import qualified Data.ByteString.Internal      as BS
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:29:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString.Lazy.Internal’ is redundant
+      except perhaps to import instances from ‘Data.ByteString.Lazy.Internal’
+    To import instances alone, use: import Data.ByteString.Lazy.Internal()
+   |
+29 | import qualified Data.ByteString.Lazy.Internal as BL
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:30:1: warning: [-Wunused-imports]
+    The import of ‘Data.HashMap.Lazy’ is redundant
+      except perhaps to import instances from ‘Data.HashMap.Lazy’
+    To import instances alone, use: import Data.HashMap.Lazy()
+   |
+30 | import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:31:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Csv’ is redundant
+      except perhaps to import instances from ‘Data.Csv’
+    To import instances alone, use: import Data.Csv()
+   |
+31 | import qualified Data.Csv as Csv
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:32:1: warning: [-Wunused-imports]
+    The import of ‘Data.Text.Prettyprint.Doc’ is redundant
+      except perhaps to import instances from ‘Data.Text.Prettyprint.Doc’
+    To import instances alone, use: import Data.Text.Prettyprint.Doc()
+   |
+32 | import           Data.Text.Prettyprint.Doc (pretty)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:33:1: warning: [-Wunused-imports]
+    The import of ‘Text.Printf’ is redundant
+      except perhaps to import instances from ‘Text.Printf’
+    To import instances alone, use: import Text.Printf()
+   |
+33 | import           Text.Printf
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Foreign.Marshal.Utils’ is redundant
+      except perhaps to import instances from ‘Foreign.Marshal.Utils’
+    To import instances alone, use: import Foreign.Marshal.Utils()
+   |
+34 | import           Foreign.Marshal.Utils         (fromBool)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:35:1: warning: [-Wunused-imports]
+    The import of ‘Control.Monad’ is redundant
+      except perhaps to import instances from ‘Control.Monad’
+    To import instances alone, use: import Control.Monad()
+   |
+35 | import           Control.Monad                 (join, replicateM, forM, void, when)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:36:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.Syntax’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.Syntax’
+    To import instances alone, use: import Language.Haskell.Exts.Syntax()
+   |
+36 | import           Language.Haskell.Exts.Syntax  ( Exp (..) )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:38:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Interpreter’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Interpreter’
+    To import instances alone, use: import Language.Haskell.Interpreter()
+   |
+38 | import           Language.Haskell.Interpreter  ( Interpreter, liftIO, lift )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:39:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Exts’ is redundant
+      except perhaps to import instances from ‘GHC.Exts’
+    To import instances alone, use: import GHC.Exts()
+   |
+39 | import           GHC.Exts
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:41:1: warning: [-Wunused-imports]
+    The import of ‘*, -, Nat’ from module ‘GHC.TypeNats’ is redundant
+   |
+41 | import           GHC.TypeNats                  (KnownNat, Nat, type (*), type (-))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:42:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional.Internal’ is redundant
+      except perhaps to import instances from ‘Torch.Functional.Internal’
+    To import instances alone, use: import Torch.Functional.Internal()
+   |
+42 | import qualified Torch.Functional.Internal     as I
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:45:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Device’ is redundant
+      except perhaps to import instances from ‘Torch.Device’
+    To import instances alone, use: import Torch.Device()
+   |
+45 | import qualified Torch.Device                  as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:47:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorOptions’ is redundant
+      except perhaps to import instances from ‘Torch.TensorOptions’
+    To import instances alone, use: import Torch.TensorOptions()
+   |
+47 | import qualified Torch.TensorOptions           as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:48:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Optim’ is redundant
+      except perhaps to import instances from ‘Torch.Optim’
+    To import instances alone, use: import Torch.Optim()
+   |
+48 | import qualified Torch.Optim                   as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:49:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Serialize’
+    To import instances alone, use: import Torch.Serialize()
+   |
+49 | import qualified Torch.Serialize               as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:50:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+50 | import qualified Torch.Autograd                as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:51:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional’ is redundant
+      except perhaps to import instances from ‘Torch.Functional’
+    To import instances alone, use: import Torch.Functional()
+   |
+51 | import qualified Torch.Functional              as F
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:53:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+53 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:56:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN’
+    To import instances alone, use: import Torch.Typed.NN()
+   |
+56 | import           Torch.Typed.NN
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:58:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+58 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:60:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Optim’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Optim’
+    To import instances alone, use: import Torch.Typed.Optim()
+   |
+60 | import           Torch.Typed.Optim
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:62:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Autograd’
+    To import instances alone, use: import Torch.Typed.Autograd()
+   |
+62 | import           Torch.Typed.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:63:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Serialize’
+    To import instances alone, use: import Torch.Typed.Serialize()
+   |
+63 | import           Torch.Typed.Serialize
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:64:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Distributions.Distribution’ is redundant
+      except perhaps to import instances from ‘Torch.Distributions.Distribution’
+    To import instances alone, use: import Torch.Distributions.Distribution()
+   |
+64 | import qualified Torch.Distributions.Distribution as Distribution
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:65:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Distributions.Categorical’ is redundant
+      except perhaps to import instances from ‘Torch.Distributions.Categorical’
+    To import instances alone, use: import Torch.Distributions.Categorical()
+   |
+65 | import qualified Torch.Distributions.Categorical as Categorical
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:68:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Data’ is redundant
+      except perhaps to import instances from ‘Synthesis.Data’
+    To import instances alone, use: import Synthesis.Data()
+   |
+68 | import           Synthesis.Data hiding (GridSearchConfig(..), EvolutionaryConfig(..))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:69:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Utility’ is redundant
+      except perhaps to import instances from ‘Synthesis.Utility’
+    To import instances alone, use: import Synthesis.Utility()
+   |
+69 | import           Synthesis.Utility
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:70:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Ast’ is redundant
+      except perhaps to import instances from ‘Synthesis.Ast’
+    To import instances alone, use: import Synthesis.Ast()
+   |
+70 | import           Synthesis.Ast
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:71:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Generation’ is redundant
+      except perhaps to import instances from ‘Synthesis.Generation’
+    To import instances alone, use: import Synthesis.Generation()
+   |
+71 | import           Synthesis.Generation
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:73:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Hint’ is redundant
+      except perhaps to import instances from ‘Synthesis.Hint’
+    To import instances alone, use: import Synthesis.Hint()
+   |
+73 | import           Synthesis.Hint
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:74:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Types’ is redundant
+      except perhaps to import instances from ‘Synthesis.Types’
+    To import instances alone, use: import Synthesis.Types()
+   |
+74 | import           Synthesis.Types
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:75:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Utility’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Utility’
+    To import instances alone, use: import Synthesizer.Utility()
+   |
+75 | import           Synthesizer.Utility
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:76:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Encoder’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Encoder’
+    To import instances alone, use: import Synthesizer.Encoder()
+   |
+76 | import           Synthesizer.Encoder
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:77:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.R3NN’ is redundant
+      except perhaps to import instances from ‘Synthesizer.R3NN’
+    To import instances alone, use: import Synthesizer.R3NN()
+   |
+77 | import           Synthesizer.R3NN
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Random.hs:78:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Params’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Params’
+    To import instances alone, use: import Synthesizer.Params()
+   |
+78 | import           Synthesizer.Params
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[11 of 16] Compiling Synthesizer.NSPS ( library/Synthesizer/NSPS.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/NSPS.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/NSPS.dyn_o )
+
+library/Synthesizer/NSPS.hs:21:1: warning: [-Wunused-imports]
+    The import of ‘System.Random’ is redundant
+      except perhaps to import instances from ‘System.Random’
+    To import instances alone, use: import System.Random()
+   |
+21 | import           System.Random                 (StdGen, mkStdGen)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:22:1: warning: [-Wunused-imports]
+    The import of ‘System.Timeout’ is redundant
+      except perhaps to import instances from ‘System.Timeout’
+    To import instances alone, use: import System.Timeout()
+   |
+22 | import           System.Timeout                (timeout)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:23:1: warning: [-Wunused-imports]
+    The import of ‘System.Directory’ is redundant
+      except perhaps to import instances from ‘System.Directory’
+    To import instances alone, use: import System.Directory()
+   |
+23 | import           System.Directory              (createDirectoryIfMissing)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:24:1: warning: [-Wunused-imports]
+    The import of ‘System.CPUTime’ is redundant
+      except perhaps to import instances from ‘System.CPUTime’
+    To import instances alone, use: import System.CPUTime()
+   |
+24 | import           System.CPUTime
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:26:1: warning: [-Wunused-imports]
+    The import of ‘Data.Maybe’ is redundant
+      except perhaps to import instances from ‘Data.Maybe’
+    To import instances alone, use: import Data.Maybe()
+   |
+26 | import           Data.Maybe                    (fromMaybe)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:27:1: warning: [-Wunused-imports]
+    The import of ‘Data.Set’ is redundant
+      except perhaps to import instances from ‘Data.Set’
+    To import instances alone, use: import Data.Set()
+   |
+27 | import           Data.Set                      (Set, empty, insert)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:28:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Set’ is redundant
+      except perhaps to import instances from ‘Data.Set’
+    To import instances alone, use: import Data.Set()
+   |
+28 | import qualified Data.Set
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:29:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString’ is redundant
+      except perhaps to import instances from ‘Data.ByteString’
+    To import instances alone, use: import Data.ByteString()
+   |
+29 | import qualified Data.ByteString               as BS
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:30:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString.Internal’ is redundant
+      except perhaps to import instances from ‘Data.ByteString.Internal’
+    To import instances alone, use: import Data.ByteString.Internal()
+   |
+30 | import qualified Data.ByteString.Internal      as BS
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:31:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.ByteString.Lazy.Internal’ is redundant
+      except perhaps to import instances from ‘Data.ByteString.Lazy.Internal’
+    To import instances alone, use: import Data.ByteString.Lazy.Internal()
+   |
+31 | import qualified Data.ByteString.Lazy.Internal as BL
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:32:1: warning: [-Wunused-imports]
+    The import of ‘!, elems, filterWithKey, keys, mapWithKey, size’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+32 | import           Data.HashMap.Lazy             (HashMap, (!), elems, keys, size, mapWithKey, filterWithKey)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:33:1: warning: [-Wunused-imports]
+    The qualified import of ‘Data.Csv’ is redundant
+      except perhaps to import instances from ‘Data.Csv’
+    To import instances alone, use: import Data.Csv()
+   |
+33 | import qualified Data.Csv as Csv
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Data.Text.Prettyprint.Doc’ is redundant
+      except perhaps to import instances from ‘Data.Text.Prettyprint.Doc’
+    To import instances alone, use: import Data.Text.Prettyprint.Doc()
+   |
+34 | import           Data.Text.Prettyprint.Doc (pretty)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:35:1: warning: [-Wunused-imports]
+    The import of ‘Text.Printf’ is redundant
+      except perhaps to import instances from ‘Text.Printf’
+    To import instances alone, use: import Text.Printf()
+   |
+35 | import           Text.Printf
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:36:1: warning: [-Wunused-imports]
+    The import of ‘Foreign.Marshal.Utils’ is redundant
+      except perhaps to import instances from ‘Foreign.Marshal.Utils’
+    To import instances alone, use: import Foreign.Marshal.Utils()
+   |
+36 | import           Foreign.Marshal.Utils         (fromBool)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:37:1: warning: [-Wunused-imports]
+    The import of ‘Control.Monad’ is redundant
+      except perhaps to import instances from ‘Control.Monad’
+    To import instances alone, use: import Control.Monad()
+   |
+37 | import           Control.Monad                 (join, replicateM, forM, void, when)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:38:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Exts.Syntax’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Exts.Syntax’
+    To import instances alone, use: import Language.Haskell.Exts.Syntax()
+   |
+38 | import           Language.Haskell.Exts.Syntax  ( Exp (..) )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:40:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Interpreter’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Interpreter’
+    To import instances alone, use: import Language.Haskell.Interpreter()
+   |
+40 | import           Language.Haskell.Interpreter  ( Interpreter, liftIO, lift )
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:41:1: warning: [-Wunused-imports]
+    The import of ‘GHC.Exts’ is redundant
+      except perhaps to import instances from ‘GHC.Exts’
+    To import instances alone, use: import GHC.Exts()
+   |
+41 | import           GHC.Exts
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:43:1: warning: [-Wunused-imports]
+    The import of ‘-’ from module ‘GHC.TypeNats’ is redundant
+   |
+43 | import           GHC.TypeNats                  (KnownNat, Nat, type (*), type (-))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:44:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional.Internal’ is redundant
+      except perhaps to import instances from ‘Torch.Functional.Internal’
+    To import instances alone, use: import Torch.Functional.Internal()
+   |
+44 | import qualified Torch.Functional.Internal     as I
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:46:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Tensor’ is redundant
+      except perhaps to import instances from ‘Torch.Tensor’
+    To import instances alone, use: import Torch.Tensor()
+   |
+46 | import qualified Torch.Tensor                  as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:48:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorFactories’ is redundant
+      except perhaps to import instances from ‘Torch.TensorFactories’
+    To import instances alone, use: import Torch.TensorFactories()
+   |
+48 | import qualified Torch.TensorFactories         as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:49:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.TensorOptions’ is redundant
+      except perhaps to import instances from ‘Torch.TensorOptions’
+    To import instances alone, use: import Torch.TensorOptions()
+   |
+49 | import qualified Torch.TensorOptions           as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:50:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Optim’ is redundant
+      except perhaps to import instances from ‘Torch.Optim’
+    To import instances alone, use: import Torch.Optim()
+   |
+50 | import qualified Torch.Optim                   as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:51:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Serialize’
+    To import instances alone, use: import Torch.Serialize()
+   |
+51 | import qualified Torch.Serialize               as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:52:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+52 | import qualified Torch.Autograd                as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:53:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Functional’ is redundant
+      except perhaps to import instances from ‘Torch.Functional’
+    To import instances alone, use: import Torch.Functional()
+   |
+53 | import qualified Torch.Functional              as F
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:60:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Typed.Parameter’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Parameter’
+    To import instances alone, use: import Torch.Typed.Parameter()
+   |
+60 | import qualified Torch.Typed.Parameter
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:62:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Optim’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Optim’
+    To import instances alone, use: import Torch.Typed.Optim()
+   |
+62 | import           Torch.Typed.Optim
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:64:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Autograd’
+    To import instances alone, use: import Torch.Typed.Autograd()
+   |
+64 | import           Torch.Typed.Autograd
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:65:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.Serialize’
+    To import instances alone, use: import Torch.Typed.Serialize()
+   |
+65 | import           Torch.Typed.Serialize
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:66:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Distributions.Distribution’ is redundant
+      except perhaps to import instances from ‘Torch.Distributions.Distribution’
+    To import instances alone, use: import Torch.Distributions.Distribution()
+   |
+66 | import qualified Torch.Distributions.Distribution as Distribution
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:67:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Distributions.Categorical’ is redundant
+      except perhaps to import instances from ‘Torch.Distributions.Categorical’
+    To import instances alone, use: import Torch.Distributions.Categorical()
+   |
+67 | import qualified Torch.Distributions.Categorical as Categorical
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:71:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Utility’ is redundant
+      except perhaps to import instances from ‘Synthesis.Utility’
+    To import instances alone, use: import Synthesis.Utility()
+   |
+71 | import           Synthesis.Utility
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:72:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Ast’ is redundant
+      except perhaps to import instances from ‘Synthesis.Ast’
+    To import instances alone, use: import Synthesis.Ast()
+   |
+72 | import           Synthesis.Ast
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:73:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Generation’ is redundant
+      except perhaps to import instances from ‘Synthesis.Generation’
+    To import instances alone, use: import Synthesis.Generation()
+   |
+73 | import           Synthesis.Generation
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:74:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.FindHoles’ is redundant
+      except perhaps to import instances from ‘Synthesis.FindHoles’
+    To import instances alone, use: import Synthesis.FindHoles()
+   |
+74 | import           Synthesis.FindHoles
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:76:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Types’ is redundant
+      except perhaps to import instances from ‘Synthesis.Types’
+    To import instances alone, use: import Synthesis.Types()
+   |
+76 | import           Synthesis.Types
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:81:1: warning: [-Wunused-imports]
+    The import of ‘Synthesizer.Params’ is redundant
+      except perhaps to import instances from ‘Synthesizer.Params’
+    To import instances alone, use: import Synthesizer.Params()
+   |
+81 | import           Synthesizer.Params
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/NSPS.hs:112:37: warning: [-Wname-shadowing]
+    This binding for ‘r3nnBatch’ shadows the existing binding
+      imported from ‘Synthesizer.Params’ at library/Synthesizer/NSPS.hs:81:1-35
+      (and originally defined at library/Synthesizer/Params.hs:23:1-9)
+    |
+112 | nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
+    |                                     ^^^^^^^^^
+[12 of 16] Compiling Synthesizer.Synthesize ( library/Synthesizer/Synthesize.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Synthesize.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Synthesize.dyn_o )
+
+library/Synthesizer/Synthesize.hs:14:1: warning: [-Wunused-imports]
+    The import of ‘GHC.TypeNats’ is redundant
+      except perhaps to import instances from ‘GHC.TypeNats’
+    To import instances alone, use: import GHC.TypeNats()
+   |
+14 | import GHC.TypeNats (type (+))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesize.hs:19:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Interpreter’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Interpreter’
+    To import instances alone, use: import Language.Haskell.Interpreter()
+   |
+19 | import Language.Haskell.Interpreter (Interpreter, liftIO)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesize.hs:26:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+26 | import Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesize.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Data’ is redundant
+      except perhaps to import instances from ‘Synthesis.Data’
+    To import instances alone, use: import Synthesis.Data()
+   |
+34 | import Synthesis.Data (TaskFnDataset (..), SynthesizerConfig (..))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Synthesize.hs:49:23: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Synthesize.hs:37:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+49 |     SynthesizerConfig{..} <- parseSynthesizerConfig
+   |                       ^^
+
+library/Synthesizer/Synthesize.hs:58:27: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Synthesize.hs:37:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+58 |     let SynthesizerConfig{..} = cfg
+   |                           ^^
+
+library/Synthesizer/Synthesize.hs:95:62: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Synthesize.hs:37:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+95 | getMaxStringLength cfg taskFnDataset = let SynthesizerConfig{..} = cfg in (:)
+   |                                                              ^^
+
+library/Synthesizer/Synthesize.hs:100:48: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Synthesize.hs:37:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+100 | getH cfg taskFnDataset = let SynthesizerConfig{..} = cfg in (:)
+    |                                                ^^
+
+library/Synthesizer/Synthesize.hs:108:23: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Synthesize.hs:37:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+108 |     SynthesizerConfig{..} = cfg
+    |                       ^^
+
+library/Synthesizer/Synthesize.hs:110:5: warning: [-Wunused-local-binds]
+    Defined but not used: ‘variants’
+    |
+110 |     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
+    |     ^^^^^^^^
+
+library/Synthesizer/Synthesize.hs:124:21: warning: [-Wname-shadowing]
+    This binding for ‘variants’ shadows the existing binding
+      bound at library/Synthesizer/Synthesize.hs:110:5
+    |
+124 |                     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
+    |                     ^^^^^^^^
+[13 of 16] Compiling Synthesizer.GridSearch ( library/Synthesizer/GridSearch.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/GridSearch.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/GridSearch.dyn_o )
+
+library/Synthesizer/GridSearch.hs:19:1: warning: [-Wunused-imports]
+    The import of ‘System.Log.Logger’ is redundant
+      except perhaps to import instances from ‘System.Log.Logger’
+    To import instances alone, use: import System.Log.Logger()
+   |
+19 | import           System.Log.Logger
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:22:1: warning: [-Wunused-imports]
+    The import of ‘Control.Applicative’ is redundant
+      except perhaps to import instances from ‘Control.Applicative’
+    To import instances alone, use: import Control.Applicative()
+   |
+22 | import           Control.Applicative
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:24:1: warning: [-Wunused-imports]
+    The import of ‘mapM’ from module ‘Control.Monad’ is redundant
+   |
+24 | import           Control.Monad (mapM, join)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:26:1: warning: [-Wunused-imports]
+    The import of ‘GHC.TypeNats’ is redundant
+      except perhaps to import instances from ‘GHC.TypeNats’
+    To import instances alone, use: import GHC.TypeNats()
+   |
+26 | import           GHC.TypeNats (type (+))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:28:1: warning: [-Wunused-imports]
+    The import of ‘Data.Proxy’ is redundant
+      except perhaps to import instances from ‘Data.Proxy’
+    To import instances alone, use: import Data.Proxy()
+   |
+28 | import           Data.Proxy
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:31:1: warning: [-Wunused-imports]
+    The import of ‘HashMap, fromList’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+31 | import           Data.HashMap.Lazy (HashMap, size, fromList)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Interpreter’
+    from module ‘Language.Haskell.Interpreter’ is redundant
+   |
+34 | import           Language.Haskell.Interpreter (Interpreter, liftIO)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:41:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+41 | import           Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:52:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Data’ is redundant
+      except perhaps to import instances from ‘Synthesis.Data’
+    To import instances alone, use: import Synthesis.Data()
+   |
+52 | import           Synthesis.Data
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:55:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Hint’ is redundant
+      except perhaps to import instances from ‘Synthesis.Hint’
+    To import instances alone, use: import Synthesis.Hint()
+   |
+55 | import           Synthesis.Hint
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:65:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: hparCombs :: [HparComb]
+   |
+65 | hparCombs :: [HparComb] = uncurry5 HparComb <$> cartesianProduct5
+   | ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:91:22: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/GridSearch.hs:56:1-36
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+91 |     GridSearchConfig{..} <- parseGridSearchConfig
+   |                      ^^
+
+library/Synthesizer/GridSearch.hs:99:26: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/GridSearch.hs:56:1-36
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+99 |     let GridSearchConfig{..} = gridCfg
+   |                          ^^
+
+library/Synthesizer/GridSearch.hs:124:28: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+124 | getRules cfg taskFnDataset hparCombs = let
+    |                            ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:132:35: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+132 | getEncoderChars cfg taskFnDataset hparCombs = let
+    |                                   ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:139:39: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+139 | getTypeEncoderChars cfg taskFnDataset hparCombs = (:)
+    |                                       ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:144:30: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+144 | getSymbols cfg taskFnDataset hparCombs = let
+    |                              ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:151:38: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+151 | getMaxStringLength cfg taskFnDataset hparCombs = (:)
+    |                                      ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:158:24: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+158 | getH cfg taskFnDataset hparCombs = (:)
+    |                        ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:163:24: warning: [-Wname-shadowing]
+    This binding for ‘hparCombs’ shadows the existing binding
+      defined at library/Synthesizer/GridSearch.hs:65:1
+    |
+163 | getM cfg taskFnDataset hparCombs = (:)
+    |                        ^^^^^^^^^
+
+library/Synthesizer/GridSearch.hs:171:27: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/GridSearch.hs:56:1-36
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+171 |     let SynthesizerConfig{..} = cfg'
+    |                           ^^
+
+library/Synthesizer/GridSearch.hs:187:28: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/GridSearch.hs:56:1-36
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+187 |     let OptimizationConfig{..} = cfg
+    |                            ^^
+[14 of 16] Compiling Synthesizer.Evolutionary ( library/Synthesizer/Evolutionary.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Evolutionary.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Evolutionary.dyn_o )
+
+library/Synthesizer/Evolutionary.hs:23:1: warning: [-Wunused-imports]
+    The import of ‘randomSearch’ from module ‘GA’ is redundant
+   |
+23 | import           GA (Entity(..), GAConfig(..), evolveVerbose, randomSearch)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:25:1: warning: [-Wunused-imports]
+    The import of ‘Data.Text.Internal.Lazy’ is redundant
+      except perhaps to import instances from ‘Data.Text.Internal.Lazy’
+    To import instances alone, use: import Data.Text.Internal.Lazy()
+   |
+25 | import           Data.Text.Internal.Lazy (Text)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:26:1: warning: [-Wunused-imports]
+    The import of ‘!, keys, size’
+    from module ‘Data.HashMap.Lazy’ is redundant
+   |
+26 | import           Data.HashMap.Lazy (HashMap, fromList, (!), size, keys)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:31:1: warning: [-Wunused-imports]
+    The import of ‘Control.Exception’ is redundant
+      except perhaps to import instances from ‘Control.Exception’
+    To import instances alone, use: import Control.Exception()
+   |
+31 | import           Control.Exception (finally)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:34:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Internal.Managed.Type.Context’ is redundant
+      except perhaps to import instances from ‘Torch.Internal.Managed.Type.Context’
+    To import instances alone, use: import Torch.Internal.Managed.Type.Context()
+   |
+34 | import           Torch.Internal.Managed.Type.Context (manual_seed_L)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:39:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Tensor’ is redundant
+      except perhaps to import instances from ‘Torch.Tensor’
+    To import instances alone, use: import Torch.Tensor()
+   |
+39 | import qualified Torch.Tensor                  as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:41:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Autograd’ is redundant
+      except perhaps to import instances from ‘Torch.Autograd’
+    To import instances alone, use: import Torch.Autograd()
+   |
+41 | import qualified Torch.Autograd                as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:42:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.Serialize’ is redundant
+      except perhaps to import instances from ‘Torch.Serialize’
+    To import instances alone, use: import Torch.Serialize()
+   |
+42 | import qualified Torch.Serialize               as D
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:43:1: warning: [-Wunused-imports]
+    The qualified import of ‘Torch.NN’ is redundant
+      except perhaps to import instances from ‘Torch.NN’
+    To import instances alone, use: import Torch.NN()
+   |
+43 | import qualified Torch.NN                      as A
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:74:14: warning: [-Wunused-local-binds]
+    Defined but not used: ‘g'’
+   |
+74 |         (bl, g') = random g
+   |              ^^
+
+library/Synthesizer/Evolutionary.hs:89:23: warning: [-Wunused-local-binds]
+    Defined but not used: ‘g'’
+   |
+89 |         (pw :: Float, g') = randomR (-1.0, 1.0) g
+   |                       ^^
+
+library/Synthesizer/Evolutionary.hs:99:14: warning: [-Wunused-local-binds]
+    Defined but not used: ‘g'’
+   |
+99 |         (pw, g') = randomR (-1.0 :: a, 1.0 :: a) g
+   |              ^^
+
+library/Synthesizer/Evolutionary.hs:105:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      learningRateVar :: Ordinal Float
+    |
+105 | learningRateVar   :: Ordinal Float  = Ordinal learningRateOpts
+    | ^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:106:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      dropoutRateVar :: Ordinal Double
+    |
+106 | dropoutRateVar    :: Ordinal Double = Ordinal dropoutRateOpts
+    | ^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:107:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature:
+      regularizationVar :: Ordinal Float
+    |
+107 | regularizationVar :: Ordinal Float  = Ordinal regularizationOpts
+    | ^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:109:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: mVar :: Ordinal Int
+    |
+109 | mVar              :: Ordinal Int    = Ordinal mOpts
+    | ^^^^
+
+library/Synthesizer/Evolutionary.hs:110:1: warning: [-Wmissing-signatures]
+    Top-level binding with no type signature: hVar :: Ordinal Int
+    |
+110 | hVar              :: Ordinal Int    = Ordinal hOpts
+    | ^^^^
+
+library/Synthesizer/Evolutionary.hs:112:1: warning: [-Worphans]
+    Orphan instance:
+      instance Entity
+                 HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO
+    To avoid this
+        move the instance declaration to the module of the class or of the type, or
+        wrap the type with a newtype and declare the instance on the new type.
+    |
+112 | instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+
+library/Synthesizer/Evolutionary.hs:137:14: warning: [-Wname-shadowing]
+    This binding for ‘e’ shadows the existing binding
+      bound at library/Synthesizer/Evolutionary.hs:134:23
+    |
+137 |           [ \e -> e { learningRate   = mutate seed learningRateVar learningRate }
+    |              ^
+
+library/Synthesizer/Evolutionary.hs:138:14: warning: [-Wname-shadowing]
+    This binding for ‘e’ shadows the existing binding
+      bound at library/Synthesizer/Evolutionary.hs:134:23
+    |
+138 |           , \e -> e { dropoutRate    = mutate seed dropoutRateVar dropoutRate }
+    |              ^
+
+library/Synthesizer/Evolutionary.hs:139:14: warning: [-Wname-shadowing]
+    This binding for ‘e’ shadows the existing binding
+      bound at library/Synthesizer/Evolutionary.hs:134:23
+    |
+139 |           , \e -> e { regularization = mutate seed regularizationVar regularization }
+    |              ^
+
+library/Synthesizer/Evolutionary.hs:140:14: warning: [-Wname-shadowing]
+    This binding for ‘e’ shadows the existing binding
+      bound at library/Synthesizer/Evolutionary.hs:134:23
+    |
+140 |           , \e -> e { m              = mutate seed mVar m }
+    |              ^
+
+library/Synthesizer/Evolutionary.hs:141:14: warning: [-Wname-shadowing]
+    This binding for ‘e’ shadows the existing binding
+      bound at library/Synthesizer/Evolutionary.hs:134:23
+    |
+141 |           , \e -> e { h              = mutate seed hVar h }
+    |              ^
+
+library/Synthesizer/Evolutionary.hs:152:24: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evolutionary.hs:49:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+152 |     EvolutionaryConfig{..} <- parseEvolutionaryConfig
+    |                        ^^
+
+library/Synthesizer/Evolutionary.hs:159:24: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evolutionary.hs:49:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+159 |     EvolutionaryConfig{..} <- parseEvolutionaryConfig
+    |                        ^^
+
+library/Synthesizer/Evolutionary.hs:173:14: warning: [-Wtype-defaults]
+    • Defaulting the following constraints to type ‘Double’
+        (RealFrac a0)
+          arising from a use of ‘ceiling’
+          at library/Synthesizer/Evolutionary.hs:173:14-20
+        (Floating a0)
+          arising from a use of ‘sqrt’
+          at library/Synthesizer/Evolutionary.hs:173:24-27
+        (Num a0)
+          arising from a use of ‘fromIntegral’
+          at library/Synthesizer/Evolutionary.hs:173:38-49
+    • In the first argument of ‘(.)’, namely ‘ceiling’
+      In the expression: ceiling . sqrt . fromIntegral
+      In the first argument of ‘GAConfig’, namely
+        ‘(ceiling . sqrt . fromIntegral $ len)’
+    |
+173 |             (ceiling . sqrt        . fromIntegral $ len) -- population size
+    |              ^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:174:14: warning: [-Wtype-defaults]
+    • Defaulting the following constraints to type ‘Double’
+        (RealFrac a0)
+          arising from a use of ‘ceiling’
+          at library/Synthesizer/Evolutionary.hs:174:14-20
+        (Floating a0)
+          arising from a use of ‘sqrt’
+          at library/Synthesizer/Evolutionary.hs:174:24-27
+        (Num a0)
+          arising from a use of ‘fromIntegral’
+          at library/Synthesizer/Evolutionary.hs:174:38-49
+    • In the first argument of ‘(.)’, namely ‘ceiling’
+      In the expression: ceiling . sqrt . sqrt . fromIntegral
+      In the second argument of ‘GAConfig’, namely
+        ‘(ceiling . sqrt . sqrt . fromIntegral $ len)’
+    |
+174 |             (ceiling . sqrt . sqrt . fromIntegral $ len) -- archive size (best entities to keep track of)
+    |              ^^^^^^^
+
+library/Synthesizer/Evolutionary.hs:175:14: warning: [-Wtype-defaults]
+    • Defaulting the following constraints to type ‘Double’
+        (RealFrac a0)
+          arising from a use of ‘ceiling’
+          at library/Synthesizer/Evolutionary.hs:175:14-20
+        (Floating a0)
+          arising from a use of ‘sqrt’
+          at library/Synthesizer/Evolutionary.hs:175:24-27
+        (Num a0)
+          arising from a use of ‘fromIntegral’
+          at library/Synthesizer/Evolutionary.hs:175:38-49
+    • In the first argument of ‘(.)’, namely ‘ceiling’
+      In the expression: ceiling . sqrt . sqrt . fromIntegral
+      In the third argument of ‘GAConfig’, namely
+        ‘(ceiling . sqrt . sqrt . fromIntegral $ len)’
+    |
+175 |             (ceiling . sqrt . sqrt . fromIntegral $ len) -- maximum number of generations
+    |              ^^^^^^^
+[15 of 16] Compiling Synthesizer.Evaluate ( library/Synthesizer/Evaluate.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Evaluate.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer/Evaluate.dyn_o )
+
+library/Synthesizer/Evaluate.hs:15:1: warning: [-Wunused-imports]
+    The import of ‘GHC.TypeNats’ is redundant
+      except perhaps to import instances from ‘GHC.TypeNats’
+    To import instances alone, use: import GHC.TypeNats()
+   |
+15 | import GHC.TypeNats (type (+))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evaluate.hs:19:1: warning: [-Wunused-imports]
+    The import of ‘Control.Monad’ is redundant
+      except perhaps to import instances from ‘Control.Monad’
+    To import instances alone, use: import Control.Monad()
+   |
+19 | import Control.Monad (void)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evaluate.hs:20:1: warning: [-Wunused-imports]
+    The import of ‘Language.Haskell.Interpreter’ is redundant
+      except perhaps to import instances from ‘Language.Haskell.Interpreter’
+    To import instances alone, use: import Language.Haskell.Interpreter()
+   |
+20 | import Language.Haskell.Interpreter (Interpreter, liftIO)
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evaluate.hs:27:1: warning: [-Wunused-imports]
+    The import of ‘Torch.Typed.NN.Recurrent.LSTM’ is redundant
+      except perhaps to import instances from ‘Torch.Typed.NN.Recurrent.LSTM’
+    To import instances alone, use: import Torch.Typed.NN.Recurrent.LSTM()
+   |
+27 | import Torch.Typed.NN.Recurrent.LSTM
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evaluate.hs:35:1: warning: [-Wunused-imports]
+    The import of ‘Synthesis.Data’ is redundant
+      except perhaps to import instances from ‘Synthesis.Data’
+    To import instances alone, use: import Synthesis.Data()
+   |
+35 | import Synthesis.Data (TaskFnDataset (..), EvaluateConfig (..))
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+library/Synthesizer/Evaluate.hs:50:20: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evaluate.hs:38:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+50 |     EvaluateConfig{..} <- parseEvaluateConfig
+   |                    ^^
+
+library/Synthesizer/Evaluate.hs:59:24: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evaluate.hs:38:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+59 |     let EvaluateConfig{..} = cfg
+   |                        ^^
+
+library/Synthesizer/Evaluate.hs:96:59: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evaluate.hs:38:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+   |
+96 | getMaxStringLength cfg taskFnDataset = let EvaluateConfig{..} = cfg in (:)
+   |                                                           ^^
+
+library/Synthesizer/Evaluate.hs:101:45: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evaluate.hs:38:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+101 | getH cfg taskFnDataset = let EvaluateConfig{..} = cfg in (:)
+    |                                             ^^
+
+library/Synthesizer/Evaluate.hs:109:20: warning: [-Wname-shadowing]
+    This binding for ‘gpu’ shadows the existing binding
+      imported from ‘Synthesizer.Utility’ at library/Synthesizer/Evaluate.hs:38:1-26
+      (and originally defined at library/Synthesizer/Utility.hs:104:1-3)
+    |
+109 |     EvaluateConfig{..} = cfg
+    |                    ^^
+
+library/Synthesizer/Evaluate.hs:111:5: warning: [-Wunused-local-binds]
+    Defined but not used: ‘variants’
+    |
+111 |     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
+    |     ^^^^^^^^
+
+library/Synthesizer/Evaluate.hs:115:28: warning: [-Wname-shadowing]
+    This binding for ‘variants’ shadows the existing binding
+      bound at library/Synthesizer/Evaluate.hs:111:5
+    |
+115 |             let PreppedDSL{..} = prepped_dsl
+    |                            ^^
+[16 of 16] Compiling Synthesizer      ( library/Synthesizer.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer.o, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/build/Synthesizer.dyn_o ) [Synthesizer.Encoder changed]
+
+library/Synthesizer.hs:2:5: warning: [-Wdodgy-exports]
+    The export item ‘module Synthesizer’ exports nothing
+  |
+2 |     module Synthesizer
+  |     ^^^^^^^^^^^^^^^^^^
+Preprocessing executable 'synthesizer' for synthesizer-0.2.0.0..
+Building executable 'synthesizer' for synthesizer-0.2.0.0..
+[1 of 2] Compiling Main             ( synthesizer/Main.hs, /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/x/synthesizer/build/synthesizer/synthesizer-tmp/Main.o ) [Synthesizer.Synthesize changed]
+Linking /home/kiara/hasktorch/dist-newstyle/build/x86_64-linux/ghc-8.10.1/synthesizer-0.2.0.0/x/synthesizer/build/synthesizer/synthesizer ...
+SynthesizerConfig {taskPath = "../synth-gen/run-results/datasets-4.yml", seed = 628, numEpochs = 1001, bestOf = 20, dropoutRate = 0.0, evalFreq = 5, learningRate = 1.0e-2, checkWindow = 2, convergenceThreshold = 0.0, resultFolder = "run-results", learningDecay = 1, regularization = 0.0, verbosity = "warning", m = 32, h = 32, synthesizer = "nsps", maskBad = False, randomHole = False, cheat = False, gpu = False, savedModelPath = "", initialEpoch = 1}
+GenerationConfig {taskFile = "datasets-4.yml", resultFolder = "run-results", crashOnError = True, seed = 521, nestLimit = 1, maxInstances = 5, maxHoles = 4, numInputs = 10, numMin = -20, numMax = 20, charMin = '0', charMax = '9', listMin = 0, listMax = 3, maxInstantiations = 4, training = 0.35, validation = 0.35, test = 0.3, maxDataset = 1000, maxParams = 3, verbosity = "warning"}
+  0/350 [.............] epoch 1 task-fns
+  1/350 [.............] epoch 1 task-fns
+  2/350 [.............] epoch 1 task-fns
+  3/350 [.............] epoch 1 task-fns
+  4/350 [.............] epoch 1 task-fns
+  5/350 [.............] epoch 1 task-fns
+  6/350 [.............] epoch 1 task-fns
+  7/350 [.............] epoch 1 task-fns
+  8/350 [.............] epoch 1 task-fns
+  9/350 [.............] epoch 1 task-fns
+ 10/350 [.............] epoch 1 task-fns
+ 11/350 [.............] epoch 1 task-fns
+ 12/350 [.............] epoch 1 task-fns
+ 13/350 [.............] epoch 1 task-fns
+ 14/350 [.............] epoch 1 task-fns
+ 15/350 [.............] epoch 1 task-fns
+ 16/350 [.............] epoch 1 task-fns
+ 17/350 [.............] epoch 1 task-fns
+ 18/350 [.............] epoch 1 task-fns
+ 19/350 [.............] epoch 1 task-fns
+ 20/350 [.............] epoch 1 task-fns
+ 21/350 [.............] epoch 1 task-fns
+ 22/350 [.............] epoch 1 task-fns

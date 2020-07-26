@@ -1,0 +1,12 @@
+Up to date
+SynthesizerConfig {taskPath = "../synth-gen/run-results/datasets-3.yml", seed = 69, bestOf = 20, dropoutRate = 0.0, evalFreq = 3, learningRate = 1.0e-2, checkWindow = 2, convergenceThreshold = 0.0, resultFolder = "run-results", learningDecay = 1, regularization = 0.0, verbosity = "notice", m = 32, h = 32, synthesizer = "nsps", maskBad = False, randomHole = False, cheat = False}
+GenerationConfig {taskPath = "./run-results/datasets-3.yml", jsonLinesPath = "./run-results/ios.jsonl", crashOnError = True, seed = 1312, nestLimit = 1, maxInstances = 5, maxHoles = 3, numInputs = 10, numMin = -20, numMax = 20, charMin = '0', charMax = '9', listMin = 0, listMax = 3, maxInstantiations = 4, training = 0.35, validation = 0.35, test = 0.3, maxDataset = 1000, maxParams = 3, verbosity = "warning"}
+
+Epoch: 001. Train loss: 3.2788. Val loss: 3.0676. Val accuracy: 0.1329.
+Epoch: 004. Train loss: 2.7118. Val loss: 2.7776. Val accuracy: 0.1772.
+Epoch: 007. Train loss: 2.5195. Val loss: 2.7488. Val accuracy: 0.1392.
+Epoch: 010. Train loss: 2.4865. Val loss: 2.7187. Val accuracy: 0.1456.
+Epoch: 013. Train loss: 2.4533. Val loss: 2.7223. Val accuracy: 0.1456.
+Epoch: 016. Train loss: 2.4394. Val loss: 2.7316. Val accuracy: 0.1266.
+Epoch: 019. Train loss: 2.4240. Val loss: 2.7120. Val accuracy: 0.1709.
+
