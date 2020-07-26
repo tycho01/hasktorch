@@ -310,7 +310,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
             -- write result to csv
-            BS.appendFile resultPath . (<> BS.packChars "\n") . BS.packChars $ BL.unpackChars $ Csv.encodeByNameWith (Csv.defaultEncodeOptions { Csv.encIncludeHeader = False }) evalResultHeader [eval_result]
+            BS.appendFile resultPath . BS.packChars $ BL.unpackChars $ Csv.encodeByNameWith (Csv.defaultEncodeOptions { Csv.encIncludeHeader = False }) evalResultHeader [eval_result]
 
             let eval_results' = (:) eval_result $! eval_results
             let earlyStop :: Bool = whenOr False (length eval_results' >= 2 * checkWindow) $ let
@@ -325,7 +325,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
             return $ (earlyStop, eval_results', gen'')
 
-        let acc_valid :: Float = accValid $ head eval_results'
+        let acc_valid :: Float = if (null eval_results') then prev_acc else accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
         lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
             True -> do
