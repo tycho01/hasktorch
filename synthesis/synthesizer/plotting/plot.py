@@ -10,6 +10,7 @@ folder = os.path.join(os.getcwd(), 'run-results')
 csvs = glob.glob(os.path.join(folder, '*.csv'))
 result = lambda file: os.path.join(folder, file)
 def save_ax(ax, name):
+    ax.set_ylim(0,)
     fig = ax.figure
     fig.savefig(result(f'{name}.png'))
     plt.close(fig)
