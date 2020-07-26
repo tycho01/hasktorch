@@ -322,7 +322,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
             return $ (earlyStop, eval_results', gen'')
 
-        let acc_valid :: Float = accValid $ head eval_results'
+        let acc_valid :: Float = if (null eval_results') then prev_acc else accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
         lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
             True -> do
