@@ -151,6 +151,8 @@ superviseHole randomHole variantMap num_holes task_fn ppt = do
     debug_ $ "hole_idx: " <> show hole_idx
     let (hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
+    -- identify what block is used at this hole in the task function we are modeling,
+    -- then just mimic that so we can proceed to supervising the next prediction step.
     let rule_expr :: Expr = safeIndexHM variantMap . nodeRule . hole_getter $ task_fn
     debug_ $ "rule_expr: " <> pp rule_expr
     let ppt' :: Expr = hole_setter ppt rule_expr
