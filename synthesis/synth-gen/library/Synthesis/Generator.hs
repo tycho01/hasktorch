@@ -250,7 +250,7 @@ main = do
     say_ $ "data written to " <> taskPath
 
     -- clear out tmp files for this run
-    let tmpFiles = ["block_fn_types", "unaliasedBlockTypes", "variantTypes", "fn_types", "task_instantiations", "rest_instantiation_inputs", "instantiated_fn_options", "fn_type_ios", "task_io_pairs"]
+    let tmpFiles = ["block_fn_types", "unaliasedBlockTypes", "variantTypes", "fn_types", "task_instantiations", "rest_instantiation_inputs", "instantiated_fn_options", "fn_type_ios", "task_io_pairs'"]
     forM_ tmpFiles $ \name -> do
         let fpath :: String = fldr <> "/" <> name <> ".jsonl"
         exists :: Bool <- doesFileExist fpath

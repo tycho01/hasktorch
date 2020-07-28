@@ -98,6 +98,29 @@ data SynthesizerConfig = SynthesizerConfig
     , useTypes :: !Bool
     , cheat :: !Bool
     , gpu :: !Bool
+    , savedModelPath :: !String
+    , initialEpoch :: !Int
+    } deriving (Eq, Show, Generic)
+
+data EvaluateConfig = EvaluateConfig
+    { taskPath :: !String
+    , modelPath :: !String
+    , seed :: !Int
+    -- , encoderBatch :: !Int
+    -- , r3nnBatch :: !Int
+    , bestOf :: !Int
+    , dropoutRate :: !Double
+    , regularization :: !Float  -- TODO: use this
+    , verbosity :: !String
+    -- I wish I could just kinda infer m/h from the model but that'd require loading in a separate synthesizer config file...
+    , m :: !Int
+    , h :: !Int
+    , synthesizer :: !String
+    , maskBad :: !Bool
+    , randomHole :: !Bool
+    , useTypes :: !Bool
+    , evaluateSet :: !String
+    , gpu :: !Bool
     } deriving (Eq, Show, Generic)
 
 data GridSearchConfig = GridSearchConfig
@@ -240,6 +263,8 @@ combineConfig optCfg hparComb = cfg
                 , useTypes             = useTypes
                 , cheat                = cheat
                 , gpu                  = gpu
+                , savedModelPath       = ""
+                , initialEpoch         = (1 :: Int)
                 }
 
 data PreppedDSL = PreppedDSL
