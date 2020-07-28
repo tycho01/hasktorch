@@ -1,7 +1,6 @@
 *.log
 *.bin
 *.yml
-*.pt
 *.png
 *.chk
 *.jsonl
