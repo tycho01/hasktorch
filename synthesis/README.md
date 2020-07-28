@@ -13,7 +13,7 @@
 
 ## Usage
 
-You can build and run this project using [Nix](https://nixos.org/nix/) + [Cabal](https://www.haskell.org/cabal/).
+You can build and run this project using [Cabal](https://www.haskell.org/cabal/).
 
 ``` sh
 # cabal
