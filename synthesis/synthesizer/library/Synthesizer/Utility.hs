@@ -73,7 +73,7 @@ import qualified Torch.Distributions.Categorical as Categorical
 
 import Synthesis.Data
 import Synthesis.Orphanage ()
-import Synthesis.Utility (pp, fisherYates, replacements)
+import Synthesis.Utility
 import Synthesis.Ast (genBlockVariants)
 import Synthesis.Hint
 
@@ -493,7 +493,7 @@ sampleTensorWithoutReplacement gen n tensor = (gen', t) where
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String
-ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1"),("learningRate","lr"),("convergenceThreshold","threshold"),("learningDecay","lrDecay")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder","regularization"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
+ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1"),("learningRate","lr"),("convergenceThreshold","threshold"),("learningDecay","lrDecay")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder","regularization","savedModelPath","initialEpoch"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
 
 -- https://hackage.haskell.org/package/relude-0.6.0.0/docs/Relude-Extra-Tuple.html#v:traverseToSnd
 traverseToSnd :: Functor t => (a -> t b) -> a -> t (a, b)
@@ -541,3 +541,12 @@ sampleIdxs t = do
     let ps :: D.Tensor = flip I.unsqueeze 0 . F.flattenAll $ t
     [[idx]] :: [[Int]] <- D.asValue <$> Distribution.sample (Categorical.fromProbs ps) [1]
     return $ unravelIdx t idx
+
+pickDataset :: Tpl3 (HashMap Expr [(Tp, Tp)]) -> String -> [(Expr, (Tp, Tp))]
+pickDataset datasets dataset_str = dataset where
+    (train_set, validation_set, test_set) :: Tpl3 [(Expr, (Tp, Tp))] = mapTuple3 lists2pairs datasets
+    dataset = case dataset_str of
+        "training" -> train_set
+        "validation" -> validation_set
+        "test" -> test_set
+        x -> error $ "dataset " <> x <> " not recognized!"

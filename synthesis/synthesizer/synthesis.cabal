@@ -70,6 +70,7 @@ library
       Synthesizer.Evolutionary
       Synthesizer.GridSearch
       Synthesizer.Synthesize
+      Synthesizer.Evaluate
       Synthesizer.Encoder
       Synthesizer.NSPS
       Synthesizer.Params
@@ -102,6 +103,14 @@ executable synthesizer
   main-is: Main.hs
   hs-source-dirs:
       synthesizer
+  build-depends:
+      synthesizer
+
+executable evaluate
+  import: config, synth
+  main-is: Main.hs
+  hs-source-dirs:
+      evaluate
   build-depends:
       synthesizer
 
