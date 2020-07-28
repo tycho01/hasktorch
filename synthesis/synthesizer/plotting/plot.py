@@ -15,14 +15,11 @@ def save_ax(ax, name):
     fig.savefig(f'{name}.png')
     plt.close(fig)
 
-prefix = 'aggregated-'
 csvs = glob.glob(os.path.join(folder, '{*}.csv'))
 aggregated_csvs = defaultdict(list) 
 # find the differently-seeded runs for each configuration
 for csv in csvs:
-    chunks = list(os.path.split(re.compile(r'seed:(\d+),').sub('', csv)))
-    chunks[-1] = prefix + chunks[-1]
-    agg_csv = os.sep.join(chunks)
+    agg_csv = re.compile(r'seed:(\d+),').sub('', csv)
     aggregated_csvs[agg_csv].append(csv)
 
 # aggregate csvs
