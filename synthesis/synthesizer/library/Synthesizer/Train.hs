@@ -25,9 +25,10 @@ module Synthesizer.Train (module Synthesizer.Train) where
 
 import           System.Random                 (StdGen, mkStdGen, setStdGen)
 import           System.Timeout                (timeout)
-import           System.Directory              (createDirectoryIfMissing)
+import           System.Directory              (createDirectoryIfMissing, doesFileExist)
 import           System.CPUTime
 import           System.ProgressBar
+import qualified Data.Text.Lazy as T
 import           Data.Text.Internal.Lazy (Text)
 import           Data.Maybe                    (fromMaybe)
 import           Data.Set                      (Set, empty, insert)
@@ -150,6 +151,8 @@ superviseHole randomHole variantMap num_holes task_fn ppt = do
     debug_ $ "hole_idx: " <> show hole_idx
     let (hole_getter, hole_setter) :: (Expr -> Expr, Expr -> Expr -> Expr) =
             findHolesExpr ppt !! hole_idx
+    -- identify what block is used at this hole in the task function we are modeling,
+    -- then just mimic that so we can proceed to supervising the next prediction step.
     let rule_expr :: Expr = safeIndexHM variantMap . nodeRule . hole_getter $ task_fn
     debug_ $ "rule_expr: " <> pp rule_expr
     let ppt' :: Expr = hole_setter ppt rule_expr
@@ -230,7 +233,15 @@ train synthesizerConfig taskFnDataset init_model = do
     setStdGen stdGen
     let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
     let modelFolder = resultFolder <> "/" <> ppCfg synthesizerConfig
+    createDirectoryIfMissing True resultFolder
     createDirectoryIfMissing True modelFolder
+
+    let resultPath = resultFolder <> "/" <> ppCfg synthesizerConfig <> ".csv"
+    when (null savedModelPath) $ do
+        exists :: Bool <- doesFileExist resultPath
+        if exists
+            then error $ "path " <> resultPath <> " exists!"
+            else BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader ([] :: [EvalResult])
 
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
@@ -241,13 +252,13 @@ train synthesizerConfig taskFnDataset init_model = do
 
     -- MODELS
     let init_optim :: D.Adam = d_mkAdam 0 0.9 0.999 $ A.flattenParameters init_model
-    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, 1)
+    let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, initialEpoch)
 
     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
         lift $ notice_ $ "epoch: " <> show epoch
         let (train_set', gen') = fisherYates gen train_set    -- shuffle
         let n :: Int = length train_set'
-        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n ("task-fns" :: Text))
+        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n (T.pack $ "epoch " <> show epoch <> " task-fns"))
         start <- lift $ getCPUTime
         -- TRAIN LOOP
         (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
@@ -283,6 +294,9 @@ train synthesizerConfig taskFnDataset init_model = do
         end <- lift $ getCPUTime
         let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
 
+        let modelPath = modelFolder <> printf "/%04d.pt" epoch
+        lift $ D.save (D.toDependent <$> A.flattenParameters model') modelPath
+
         -- EVAL
         (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
             debug_ "evaluating"
@@ -296,10 +310,10 @@ train synthesizerConfig taskFnDataset init_model = do
                 loss_valid
                 acc_valid
 
-            let modelPath = modelFolder <> printf "/%04d.pt" epoch
-            D.save (D.toDependent <$> A.flattenParameters model') modelPath
-
             let eval_result = EvalResult epoch epochSeconds loss_train loss_valid acc_valid
+            -- write result to csv
+            BS.appendFile resultPath . BS.packChars $ BL.unpackChars $ Csv.encodeByNameWith (Csv.defaultEncodeOptions { Csv.encIncludeHeader = False }) evalResultHeader [eval_result]
+
             let eval_results' = (:) eval_result $! eval_results
             let earlyStop :: Bool = whenOr False (length eval_results' >= 2 * checkWindow) $ let
                     losses  :: [Float] = lossValid <$> eval_results'
@@ -313,7 +327,7 @@ train synthesizerConfig taskFnDataset init_model = do
 
             return $ (earlyStop, eval_results', gen'')
 
-        let acc_valid :: Float = accValid $ head eval_results'
+        let acc_valid :: Float = if (null eval_results') then prev_acc else accValid $ head eval_results'
         -- decay the learning rate if accuracy decreases
         lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
             True -> do
@@ -323,14 +337,9 @@ train synthesizerConfig taskFnDataset init_model = do
 
         return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
-    -- write results to csv
-    createDirectoryIfMissing True resultFolder
-    let resultPath = resultFolder <> "/" <> ppCfg synthesizerConfig <> ".csv"
-    let eval_results' = reverse eval_results -- we want the first epoch first
-    BS.writeFile resultPath $ BS.packChars $ BL.unpackChars $ Csv.encodeByName evalResultHeader eval_results'
     info_ $ "data written to " <> resultPath
 
-    return eval_results'
+    return $ reverse eval_results
 
 evaluate :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
