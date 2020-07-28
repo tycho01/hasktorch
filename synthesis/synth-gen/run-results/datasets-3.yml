@@ -13387,14 +13387,15 @@ generationCfg:
   maxHoles: 3
   nestLimit: 1
   charMax: '9'
+  resultFolder: ./run-results
   numMax: 20
-  taskPath: ./run-results/datasets-3.yml
   training: 0.35
   maxParams: 3
   maxInstantiations: 4
   listMin: 0
   numInputs: 10
   validation: 0.35
+  taskFile: datasets-3.yml
   listMax: 3
   maxDataset: 1000
 variantTypes:
