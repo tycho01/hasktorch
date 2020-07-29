@@ -229,6 +229,7 @@ train synthesizerConfig taskFnDataset init_model = do
     -- GENERAL
 
     let [train_set, validation_set, test_set] :: [[(Expr, (Tp, Tp))]] = lists2pairs <$> (if cheat then replicate 3 . fstOf3 else untuple3) datasets
+    let n :: Int = length train_set
     let stdGen :: StdGen = mkStdGen seed
     setStdGen stdGen
     let init_lr :: Tensor device 'D.Float '[] = UnsafeMkTensor . D.asTensor $ learningRate
@@ -255,53 +256,54 @@ train synthesizerConfig taskFnDataset init_model = do
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, initialEpoch)
 
     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
-        lift $ notice_ $ "epoch: " <> show epoch
-        let (train_set', gen') = fisherYates gen train_set    -- shuffle
-        let n :: Int = length train_set'
-        pb <- lift $ newProgressBar pgStyle 1 (Progress 0 n (T.pack $ "epoch " <> show epoch <> " task-fns"))
-        start <- lift $ getCPUTime
-        -- TRAIN LOOP
-        (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- lift $ iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
-                let task_fn_tp :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
-                lift . info_ $ "task_fn_tp: \n" <> pp_ task_fn_tp
-                let task_fn :: Expr = fst task_fn_tp
-                -- lift . info $ "task_fn: \n" <> pp task_fn
-                let tpInstPair :: (Tp, Tp) = snd task_fn_tp
-                let taskType :: Tp = safeIndexHM fnTypes task_fn
-                lift . info_ $ "taskType: " <> pp taskType
-                let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
-                        first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
-                lift . info_ $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
-                let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
-                        rule_encode @device @shape @rules @ruleFeats model variantTypes
-                -- lift . debug_ $ "rule_tp_emb: " <> show (shape' rule_tp_emb)
-                --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
-                -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
-                let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs
-                -- lift . debug $ "io_feats: " <> show (shape' io_feats)
-                loss :: Tensor device 'D.Float '[] <- lift . interpretUnsafe $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
-                -- lift . debug_ $ "loss: " <> show (shape' loss)
-                -- TODO: do once for each mini-batch / fn?
-                -- (newParam, optim') <- D.runStep model optim (toDynamic loss) $ toDynamic lr
-                (newParam, optim') <- lift $ doStep @device @shape @rules @ruleFeats model optim loss lr
-                let model' :: synthesizer = A.replaceParameters model newParam
-                -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
-                let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
-                lift $ incProgress pb 1
-                return (train_loss', model', optim', gen', task_fn_id + 1)
 
-        lift . debug_ $ "finished epoch training"
-        end <- lift $ getCPUTime
-        let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
+        (loss_train, model', optim', gen'', epochSeconds) <- lift $ if epoch == 0 then do
+            loss <- evaluateLoss @device @rules @shape @ruleFeats taskFnDataset prepped_dsl maskBad randomHole model_ train_set
+            return (loss, model_, optim_, gen, 0.0/0.0)
+            else do
+                let (train_set', gen') = fisherYates gen train_set    -- shuffle
+                pb <- newProgressBar pgStyle 1 (Progress 0 n (T.pack $ "epoch " <> show epoch <> " task-fns"))
+                start <- getCPUTime
+                -- TRAIN LOOP
+                (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+                        let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
+                        -- lift . debug_ $ "task_fn: \n" <> pp task_fn
+                        let taskType :: Tp = safeIndexHM fnTypes task_fn
+                        lift . debug_ $ "taskType: " <> pp taskType
+                        let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
+                                first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
+                        lift . debug_ $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+                        let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
+                                rule_encode @device @shape @rules @ruleFeats model variantTypes
+                        -- lift . debug_ $ "rule_tp_emb: " <> show (shape' rule_tp_emb)
+                        --  :: Tensor device 'D.Float '[n'1, t * (2 * Dirs * h)]
+                        -- sampled_feats :: Tensor device 'D.Float '[R3nnBatch, t * (2 * Dirs * h)]
+                        let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs
+                        -- lift . debug $ "io_feats: " <> show (shape' io_feats)
+                        loss :: Tensor device 'D.Float '[] <- lift . interpretUnsafe $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
+                        -- lift . debug_ $ "loss: " <> show (shape' loss)
+                        -- TODO: do once for each mini-batch / fn?
+                        -- (newParam, optim') <- D.runStep model optim (toDynamic loss) $ toDynamic lr
+                        (newParam, optim') <- lift $ doStep @device @shape @rules @ruleFeats model optim loss lr
+                        let model' :: synthesizer = A.replaceParameters model newParam
+                        -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
+                        let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
+                        lift $ incProgress pb 1
+                        return (train_loss', model', optim', gen', task_fn_id + 1)
+
+                debug_ $ "finished epoch training"
+                end <- getCPUTime
+                let epochSeconds :: Double = (fromIntegral (end - start)) / (10^12)
+                return (loss_train, model', optim', gen'', epochSeconds)
 
         let modelPath = modelFolder <> printf "/%04d.pt" epoch
         lift $ D.save (D.toDependent <$> A.flattenParameters model') modelPath
 
         -- EVAL
-        (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod (epoch - 1) evalFreq == 0) $ do
+        (earlyStop, eval_results', gen''') <- lift $ whenOrM (False, eval_results, gen'') (mod epoch evalFreq == 0) $ do
             debug_ "evaluating"
 
-            (acc_valid, loss_valid) <- interpretUnsafe $ evaluate @device @rules @shape @ruleFeats taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
+            (acc_valid, loss_valid) <- evaluate @device @rules @shape @ruleFeats taskFnDataset prepped_dsl bestOf maskBad randomHole model' validation_set
 
             say_ $ printf
                 "Epoch: %03d. Train loss: %.4f. Validation loss: %.4f. Validation accuracy: %.4f.\n"
@@ -331,48 +333,79 @@ train synthesizerConfig taskFnDataset init_model = do
         -- decay the learning rate if accuracy decreases
         lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
             True -> do
-                lift . info_ $ "accuracy decreased, decaying learning rate!"
+                lift . say_ $ "accuracy decreased, decaying learning rate!"
                 return . divScalar learningDecay $ lr
             False -> pure lr
 
         return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
-    info_ $ "data written to " <> resultPath
+    say_ $ "data written to " <> resultPath
 
     return $ reverse eval_results
 
-evaluate :: forall device rules shape ruleFeats synthesizer num_holes
+evaluate :: forall device rules shape ruleFeats synthesizer
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
-         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> Interpreter (Float, Float)
-evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model dataset = do
-    debug "evaluate"
+         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO (Float, Float)
+evaluate taskFnDataset preppedDSL bestOf maskBad randomHole model dataset = do
+    loss <- evaluateLoss @device @rules @shape @ruleFeats taskFnDataset preppedDSL maskBad randomHole model dataset
+    acc <-  evaluateAcc  @device @rules @shape @ruleFeats taskFnDataset preppedDSL bestOf  randomHole model dataset
+    return (acc, loss)
+
+evaluateLoss :: forall device rules shape ruleFeats synthesizer
+          . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
+         => TaskFnDataset -> PreppedDSL -> Bool -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO Float
+evaluateLoss TaskFnDataset{..} PreppedDSL{..} maskBad randomHole model dataset = do
+    debug_ "evaluateLoss"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     let n :: Int = length dataset
-    pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
-    (acc, loss, _) :: (Float, Float, Int) <- iterateLoopT (0.0, 0.0, 0) $ \ !state@(acc, loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
-            let task_fn_tp :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
-            lift . debug $ "task_fn_tp: \n" <> pp_ task_fn_tp
-            let task_fn :: Expr = fst task_fn_tp
+    pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-loss" :: Text)
+    (loss, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+            let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             -- lift . debug $ "task_fn: \n" <> pp task_fn
-            let tpInstPair :: (Tp, Tp) = snd task_fn_tp
             let taskType :: Tp = safeIndexHM fnTypes task_fn
-            lift . debug $ "taskType: " <> pp taskType
+            lift . debug_ $ "taskType: " <> pp taskType
+            let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
+                    singleton tpInstPair $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
+
+            let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs
+            loss_ :: Tensor device 'D.Float '[] <- lift . interpretUnsafe $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
+
+            let loss' :: Float = loss + toFloat loss_      / fromIntegral n
+            lift $ incProgress pb 1
+            return (loss', task_fn_id + 1)
+
+    return loss
+
+evaluateAcc :: forall device rules shape ruleFeats synthesizer num_holes
+          . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
+         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO Float
+evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = do
+    debug_ "evaluateAcc"
+    let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
+                rule_encode @device @shape @rules @ruleFeats model variantTypes
+
+    let n :: Int = length dataset
+    pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-acc" :: Text)
+    (acc, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(acc, task_fn_id) -> if task_fn_id >= n then exitWith state else do
+            let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
+            lift . debug_ $ "task_fn: \n" <> pp task_fn
+            let taskType :: Tp = safeIndexHM fnTypes task_fn
+            lift . debug_ $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     singleton tpInstPair $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
             let type_ins :: HashMap (Tp, Tp) [Expr] = fmap fst <$> target_tp_io_pairs
-            lift . debug $ "type_ins: " <> pp_ type_ins
+            lift . debug_ $ "type_ins: " <> pp_ type_ins
             let target_outputs :: [Either String Expr] =
                     fmap snd $ join . elems $ target_tp_io_pairs
 
             let io_feats :: Tensor device 'D.Float shape = encode @device @shape @rules @ruleFeats model target_tp_io_pairs
-            loss_ :: Tensor device 'D.Float '[] <- lift $ calcLoss @rules @ruleFeats randomHole dsl' task_fn taskType symbolIdxs model io_feats variantMap ruleIdxs variant_sizes max_holes maskBad variants rule_tp_emb
 
             -- sample for best of 100 predictions
             -- TODO: dedupe samples before eval to save evals?
             -- TODO: consider A* / branch-and-bound / beam search instead
-            -- pb <- liftIO $ newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
+            -- pb <- newProgressBar pgStyle 1 $ Progress 0 bestOf ("eval-samples" :: Text)
             sample_matches :: [Bool] <- lift $ replicateM bestOf $ do
                 -- TODO: split io_feats and taskType based on param type instance combo 
                 (program, used, _filled) :: (Expr, Set String, Int) <- let
@@ -380,23 +413,23 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
                         fill = \(ppt, used, filled) -> do
                                 --  :: Tensor device 'D.Float '[num_holes, rules]
                                 let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
-                                debug $ "predicted: " <> show predicted
-                                (ppt', used') <- liftIO $ predictHole randomHole variants ppt used predicted
+                                debug_ $ "predicted: " <> show predicted
+                                (ppt', used') <- predictHole randomHole variants ppt used predicted
                                 return (ppt', used', filled + 1)
                         in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
-                debug $ pp program
+                debug_ $ pp program
                 ok :: Bool <- if hasHoles program then pure False else do
                     let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                     let program' :: Expr = if null defs then program else letIn defs program
 
-                    debug $ "type_ins: " <> pp_ type_ins
+                    debug_ $ "type_ins: " <> pp_ type_ins
                     prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
                             compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
                                     n :: Int = length $ unTuple' $ ins !! 0
                                     -- crash_on_error=False is slower but lets me check if it compiles.
                                     in fnIoPairs False n program' tp_instantiation $ list ins
-                            in sequence $ compileInput `mapWithKey` type_ins
-                    debug $ "prediction_type_ios: " <> pp_ prediction_type_ios
+                            in interpretUnsafe . sequence $ compileInput `mapWithKey` type_ins
+                    debug_ $ "prediction_type_ios: " <> pp_ prediction_type_ios
                     let prediction_io_pairs :: [(Expr, Either String Expr)] =
                             join . elems $ prediction_type_ios
                     let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
@@ -410,10 +443,10 @@ evaluate TaskFnDataset{..} PreppedDSL{..} bestOf maskBad randomHole model datase
                 return ok
 
             let best_works :: Bool = or sample_matches
+            lift . info_ $ "\n" <> show (fromBool best_works :: Int) <> ": " <> pp task_fn
             -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
             let acc'  :: Float = acc  + fromBool best_works / fromIntegral n
-            let loss' :: Float = loss + toFloat loss_      / fromIntegral n
             lift . liftIO $ incProgress pb 1
-            return (acc', loss', task_fn_id + 1)
+            return (acc', task_fn_id + 1)
 
-    return (acc, loss)
+    return acc
