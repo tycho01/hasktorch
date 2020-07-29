@@ -323,7 +323,7 @@ savedModelPathOpt = strOption
 initialEpochOpt = option auto
     ( long "initialEpoch"
     <> short 'i'
-    <> value (1 :: Int)
+    <> value (0 :: Int)
     <> showDefault
     <> help "the epoch from which to start (for when resuming training)" )
 

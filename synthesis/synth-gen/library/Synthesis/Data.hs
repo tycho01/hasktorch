@@ -258,7 +258,7 @@ combineConfig optCfg hparComb = cfg
                 , cheat                = cheat
                 , gpu                  = gpu
                 , savedModelPath       = ""
-                , initialEpoch         = (0 :: Int)
+                , initialEpoch         = (0 :: Int) -- I'm skipping an initialEpochDef to prevent a mutual dependency between the two files
                 }
 
 data PreppedDSL = PreppedDSL
