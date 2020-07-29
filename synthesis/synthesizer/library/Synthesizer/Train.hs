@@ -443,7 +443,7 @@ evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = d
                 return ok
 
             let best_works :: Bool = or sample_matches
-            lift . info_ $ show (fromBool best_works :: Int) <> ": " <> pp task_fn
+            lift . info_ $ "\n" <> show (fromBool best_works :: Int) <> ": " <> pp task_fn
             -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
             let acc'  :: Float = acc  + fromBool best_works / fromIntegral n
             lift . liftIO $ incProgress pb 1
