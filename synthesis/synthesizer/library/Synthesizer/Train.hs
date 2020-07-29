@@ -259,7 +259,7 @@ train synthesizerConfig taskFnDataset init_model = do
         lift $ notice_ $ "epoch: " <> show epoch
 
         (loss_train, model', optim', gen'', epochSeconds) <- lift $ if epoch == 0 then do
-            loss <- evaluateLoss @device @rules @shape @ruleFeats taskFnDataset prepped_dsl maskBad randomHole
+            loss <- evaluateLoss @device @rules @shape @ruleFeats taskFnDataset prepped_dsl maskBad randomHole model_ train_set
             return (loss, model_, optim_, gen, 0.0/0.0)
             else do
                 let (train_set', gen') = fisherYates gen train_set    -- shuffle
@@ -356,7 +356,7 @@ evaluateLoss :: forall device rules shape ruleFeats synthesizer
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
          => TaskFnDataset -> PreppedDSL -> Bool -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO Float
 evaluateLoss TaskFnDataset{..} PreppedDSL{..} maskBad randomHole model dataset = do
-    debug "evaluateLoss"
+    debug_ "evaluateLoss"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
@@ -366,7 +366,7 @@ evaluateLoss TaskFnDataset{..} PreppedDSL{..} maskBad randomHole model dataset =
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             -- lift . debug $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = safeIndexHM fnTypes task_fn
-            lift . debug $ "taskType: " <> pp taskType
+            lift . debug_ $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     singleton tpInstPair $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
 
@@ -383,7 +383,7 @@ evaluateAcc :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
          => PreppedDSL -> Int -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO Float
 evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
-    debug "evaluateAcc"
+    debug_ "evaluateAcc"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
@@ -391,13 +391,13 @@ evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
     pb <- newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
     (acc, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(acc, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
-            -- lift . debug $ "task_fn: \n" <> pp task_fn
+            -- lift . debug_ $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = safeIndexHM fnTypes task_fn
-            lift . debug $ "taskType: " <> pp taskType
+            lift . debug_ $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
                     singleton tpInstPair $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
             let type_ins :: HashMap (Tp, Tp) [Expr] = fmap fst <$> target_tp_io_pairs
-            lift . debug $ "type_ins: " <> pp_ type_ins
+            lift . debug_ $ "type_ins: " <> pp_ type_ins
             let target_outputs :: [Either String Expr] =
                     fmap snd $ join . elems $ target_tp_io_pairs
 
@@ -414,7 +414,7 @@ evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
                         fill = \(ppt, used, filled) -> do
                                 --  :: Tensor device 'D.Float '[num_holes, rules]
                                 let predicted = predict @device @shape @rules @ruleFeats @synthesizer model symbolIdxs ppt rule_tp_emb io_feats
-                                debug $ "predicted: " <> show predicted
+                                debug_ $ "predicted: " <> show predicted
                                 (ppt', used') <- predictHole randomHole variants ppt used predicted
                                 return (ppt', used', filled + 1)
                         in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
@@ -423,14 +423,14 @@ evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
                     let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                     let program' :: Expr = if null defs then program else letIn defs program
 
-                    debug $ "type_ins: " <> pp_ type_ins
+                    debug_ $ "type_ins: " <> pp_ type_ins
                     prediction_type_ios :: HashMap (Tp, Tp) [(Expr, Either String Expr)] <- let
                             compileInput :: (Tp, Tp) -> [Expr] -> Interpreter [(Expr, Either String Expr)] = \ tp_instantiation ins -> let
                                     n :: Int = length $ unTuple' $ ins !! 0
                                     -- crash_on_error=False is slower but lets me check if it compiles.
                                     in fnIoPairs False n program' tp_instantiation $ list ins
                             in sequence . interpretUnsafe $ compileInput `mapWithKey` type_ins
-                    debug $ "prediction_type_ios: " <> pp_ prediction_type_ios
+                    debug_ $ "prediction_type_ios: " <> pp_ prediction_type_ios
                     let prediction_io_pairs :: [(Expr, Either String Expr)] =
                             join . elems $ prediction_type_ios
                     let outputs_match :: Bool = case length target_outputs == length prediction_io_pairs of
