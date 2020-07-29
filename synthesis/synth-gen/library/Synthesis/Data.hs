@@ -258,7 +258,7 @@ combineConfig optCfg hparComb = cfg
                 , cheat                = cheat
                 , gpu                  = gpu
                 , savedModelPath       = ""
-                , initialEpoch         = (1 :: Int)
+                , initialEpoch         = (0 :: Int)
                 }
 
 data PreppedDSL = PreppedDSL
