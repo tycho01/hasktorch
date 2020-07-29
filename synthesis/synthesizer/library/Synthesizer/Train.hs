@@ -361,7 +361,7 @@ evaluateLoss TaskFnDataset{..} PreppedDSL{..} maskBad randomHole model dataset =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     let n :: Int = length dataset
-    pb <- newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
+    pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-loss" :: Text)
     (loss, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             -- lift . debug $ "task_fn: \n" <> pp task_fn
@@ -388,7 +388,7 @@ evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = d
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
 
     let n :: Int = length dataset
-    pb <- newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
+    pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-acc" :: Text)
     (acc, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(acc, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             -- lift . debug_ $ "task_fn: \n" <> pp task_fn
