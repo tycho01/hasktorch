@@ -354,7 +354,7 @@ evaluateLoss TaskFnDataset{..} PreppedDSL{..} maskBad randomHole model dataset =
     debug_ "evaluateLoss"
 
     let n :: Int = length dataset
-    pb <- newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
+    pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-loss" :: Text)
     (loss, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(loss, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             -- lift . debug $ "task_fn: \n" <> pp task_fn
@@ -379,7 +379,7 @@ evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = d
     debug_ "evaluateAcc"
 
     let n :: Int = length dataset
-    pb <- newProgressBar pgStyle 1 (Progress 0 n ("eval-fn" :: Text))
+    pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-acc" :: Text)
     (acc, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(acc, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
             -- lift . debug_ $ "task_fn: \n" <> pp task_fn
