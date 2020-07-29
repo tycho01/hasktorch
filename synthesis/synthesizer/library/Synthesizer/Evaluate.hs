@@ -119,17 +119,16 @@ getM cfg taskFnDataset = let
         (do
             let prepped_dsl = prep_dsl taskFnDataset
             let PreppedDSL{..} = prepped_dsl
-            params <- fmap D.IndependentTensor <$> D.load modelPath
             let dataset = pickDataset datasets evaluateSet
             (acc, loss) <- case synthesizer of
                 "random" -> do
                     model <- A.sample RandomSynthesizerSpec
-                    let model' = A.replaceParameters model params
-                    interpretUnsafe $ evaluate @device @rules @'[] @0 @RandomSynthesizer taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
+                    evaluate @device @rules @'[] @0 @RandomSynthesizer taskFnDataset prepped_dsl bestOf maskBad randomHole model dataset
                 "nsps" -> do
+                    params <- fmap D.IndependentTensor <$> D.load modelPath
                     model <- A.sample spec
                     let model' = A.replaceParameters model params
-                    interpretUnsafe $ evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
+                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
                     where
                     useTypes = natValI @featMult > 1
                     charMap = if useTypes then bothCharMap else exprCharMap
