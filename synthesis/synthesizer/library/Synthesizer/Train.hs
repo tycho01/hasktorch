@@ -333,7 +333,7 @@ train synthesizerConfig taskFnDataset init_model = do
         -- decay the learning rate if accuracy decreases
         lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
             True -> do
-                lift . say_ $ "accuracy decreased, decaying learning rate!"
+                lift . info_ $ "accuracy decreased, decaying learning rate!"
                 return . divScalar learningDecay $ lr
             False -> pure lr
 
