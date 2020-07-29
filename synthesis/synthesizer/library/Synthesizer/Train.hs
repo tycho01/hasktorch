@@ -349,7 +349,7 @@ evaluate :: forall device rules shape ruleFeats synthesizer
          => TaskFnDataset -> PreppedDSL -> Int -> Bool -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO (Float, Float)
 evaluate taskFnDataset preppedDSL bestOf maskBad randomHole model dataset = do
     loss <- evaluateLoss @device @rules @shape @ruleFeats taskFnDataset preppedDSL maskBad randomHole model dataset
-    acc <-  evaluateAcc  @device @rules @shape @ruleFeats preppedDSL bestOf                randomHole model dataset
+    acc <-  evaluateAcc  @device @rules @shape @ruleFeats taskFnDataset preppedDSL bestOf  randomHole model dataset
     return (acc, loss)
 
 evaluateLoss :: forall device rules shape ruleFeats synthesizer
@@ -381,8 +381,8 @@ evaluateLoss TaskFnDataset{..} PreppedDSL{..} maskBad randomHole model dataset =
 
 evaluateAcc :: forall device rules shape ruleFeats synthesizer num_holes
           . ( KnownDevice device, RandDTypeIsValid device 'D.Float, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, StandardFloatingPointDTypeValidation device 'D.Float, KnownNat rules, KnownNat ruleFeats, KnownShape shape, Synthesizer device shape rules ruleFeats synthesizer, KnownNat (FromMaybe 0 (ExtractDim BatchDim shape)))
-         => PreppedDSL -> Int -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO Float
-evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
+         => TaskFnDataset -> PreppedDSL -> Int -> Bool -> synthesizer -> [(Expr, (Tp, Tp))] -> IO Float
+evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = do
     debug_ "evaluateAcc"
     let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                 rule_encode @device @shape @rules @ruleFeats model variantTypes
@@ -418,7 +418,7 @@ evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
                                 (ppt', used') <- predictHole randomHole variants ppt used predicted
                                 return (ppt', used', filled + 1)
                         in while_ (\(ppt, used, filled) -> hasHoles ppt && filled < max_holes) fill (skeleton taskType, empty, 0 :: Int)
-                debug $ pp program
+                debug_ $ pp program
                 ok :: Bool <- if hasHoles program then pure False else do
                     let defs :: HashMap String Expr = pickKeysSafe (Data.Set.toList used) dsl'
                     let program' :: Expr = if null defs then program else letIn defs program
@@ -429,7 +429,7 @@ evaluateAcc PreppedDSL{..} bestOf randomHole model dataset = do
                                     n :: Int = length $ unTuple' $ ins !! 0
                                     -- crash_on_error=False is slower but lets me check if it compiles.
                                     in fnIoPairs False n program' tp_instantiation $ list ins
-                            in sequence . interpretUnsafe $ compileInput `mapWithKey` type_ins
+                            in interpretUnsafe . sequence $ compileInput `mapWithKey` type_ins
                     debug_ $ "prediction_type_ios: " <> pp_ prediction_type_ios
                     let prediction_io_pairs :: [(Expr, Either String Expr)] =
                             join . elems $ prediction_type_ios
