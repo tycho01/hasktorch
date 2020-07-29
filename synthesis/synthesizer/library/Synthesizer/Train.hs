@@ -256,7 +256,6 @@ train synthesizerConfig taskFnDataset init_model = do
     let init_state = (stdGen, init_model, init_optim, False, [], init_lr, 0.0, initialEpoch)
 
     (_, model, _, _, eval_results, _, _, _) <- iterateLoopT init_state $ \ !state@(gen, model_, optim_, earlyStop, eval_results, lr, prev_acc, epoch) -> if earlyStop || epoch >= numEpochs then exitWith state else do
-        lift $ notice_ $ "epoch: " <> show epoch
 
         (loss_train, model', optim', gen'', epochSeconds) <- lift $ if epoch == 0 then do
             loss <- evaluateLoss @device @rules @shape @ruleFeats taskFnDataset prepped_dsl maskBad randomHole model_ train_set
@@ -268,12 +267,12 @@ train synthesizerConfig taskFnDataset init_model = do
                 -- TRAIN LOOP
                 (loss_train, model', optim', gen'', _) :: (Float, synthesizer, D.Adam, StdGen, Int) <- iterateLoopT (0.0, model_, optim_, gen', 0) $ \ !state@(train_loss, model, optim, gen_, task_fn_id) -> if task_fn_id >= n then exitWith state else do
                         let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = train_set' !! task_fn_id
-                        -- lift . info $ "task_fn: \n" <> pp task_fn
+                        -- lift . debug_ $ "task_fn: \n" <> pp task_fn
                         let taskType :: Tp = safeIndexHM fnTypes task_fn
-                        lift . info_ $ "taskType: " <> pp taskType
+                        lift . debug_ $ "taskType: " <> pp taskType
                         let (target_tp_io_pairs, gen') :: (HashMap (Tp, Tp) [(Expr, Either String Expr)], StdGen) =
                                 first (singleton tpInstPair) . fixSize (natValI @R3nnBatch) gen_ $ safeIndexHM (safeIndexHM fnTypeIOs task_fn) tpInstPair
-                        lift . info_ $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
+                        lift . debug_ $ "target_tp_io_pairs: " <> pp_ target_tp_io_pairs
                         let rule_tp_emb :: Tensor device 'D.Float '[rules, ruleFeats] =
                                 rule_encode @device @shape @rules @ruleFeats model variantTypes
                         -- lift . debug_ $ "rule_tp_emb: " <> show (shape' rule_tp_emb)
@@ -334,13 +333,13 @@ train synthesizerConfig taskFnDataset init_model = do
         -- decay the learning rate if accuracy decreases
         lr' :: Tensor device 'D.Float '[] <- case (acc_valid < prev_acc) of
             True -> do
-                lift . info_ $ "accuracy decreased, decaying learning rate!"
+                lift . say_ $ "accuracy decreased, decaying learning rate!"
                 return . divScalar learningDecay $ lr
             False -> pure lr
 
         return (gen''', model', optim', earlyStop, eval_results', lr', acc_valid, epoch + 1)
 
-    info_ $ "data written to " <> resultPath
+    say_ $ "data written to " <> resultPath
 
     return $ reverse eval_results
 
@@ -391,7 +390,7 @@ evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = d
     pb <- newProgressBar pgStyle 1 $ Progress 0 n ("eval-acc" :: Text)
     (acc, _) :: (Float, Int) <- iterateLoopT (0.0, 0) $ \ !state@(acc, task_fn_id) -> if task_fn_id >= n then exitWith state else do
             let (task_fn, tpInstPair) :: (Expr, (Tp, Tp)) = dataset !! task_fn_id
-            -- lift . debug_ $ "task_fn: \n" <> pp task_fn
+            lift . debug_ $ "task_fn: \n" <> pp task_fn
             let taskType :: Tp = safeIndexHM fnTypes task_fn
             lift . debug_ $ "taskType: " <> pp taskType
             let target_tp_io_pairs :: HashMap (Tp, Tp) [(Expr, Either String Expr)] =
@@ -406,7 +405,7 @@ evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = d
             -- sample for best of 100 predictions
             -- TODO: dedupe samples before eval to save evals?
             -- TODO: consider A* / branch-and-bound / beam search instead
-            -- pb <- newProgressBar pgStyle 1 (Progress 0 bestOf ("eval-samples" :: Text))
+            -- pb <- newProgressBar pgStyle 1 $ Progress 0 bestOf ("eval-samples" :: Text)
             sample_matches :: [Bool] <- lift $ replicateM bestOf $ do
                 -- TODO: split io_feats and taskType based on param type instance combo 
                 (program, used, _filled) :: (Expr, Set String, Int) <- let
@@ -444,6 +443,7 @@ evaluateAcc TaskFnDataset{..} PreppedDSL{..} bestOf randomHole model dataset = d
                 return ok
 
             let best_works :: Bool = or sample_matches
+            lift . info_ $ show (fromBool best_works :: Int) <> ": " <> pp task_fn
             -- let score :: Tensor device 'D.Float '[] = UnsafeMkTensor . F.mean . D.asTensor $ (fromBool :: (Bool -> Float)) <$> sample_matches
             let acc'  :: Float = acc  + fromBool best_works / fromIntegral n
             lift . liftIO $ incProgress pb 1
