@@ -1,3 +1,6 @@
+{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -13,6 +16,7 @@ module Torch.Tensor where
 
 import Control.Monad (forM_, forM)
 import Control.Exception.Safe (throwIO)
+import GHC.Generics
 import Foreign.ForeignPtr
 import Foreign.Ptr
 import Foreign.Storable
@@ -23,6 +27,7 @@ import Data.Word (Word8)
 import Data.List (intercalate)
 import Data.Proxy
 import Data.Reflection
+import qualified Data.Vector as V
 import Numeric
 
 import Torch.Internal.Cast
@@ -269,17 +274,18 @@ toCUDA t = unsafePerformIO $ (cast1 ATen.tensor_cuda) t
 newtype RawTensorIndexList = RawTensorIndexList (ForeignPtr (ATen.StdVector ATen.TensorIndex))
 newtype RawTensorIndex = RawTensorIndex (ForeignPtr ATen.TensorIndex)
 
-(@@) :: TensorIndex a => Tensor -> a -> Tensor
-(Unsafe t) @@ idx = unsafePerformIO $ do
+(!) :: TensorIndex a => Tensor -> a -> Tensor
+(Unsafe t) ! idx = unsafePerformIO $ do
   let idxs = pushIndex [] idx
   vec <- ATen.newTensorIndexList
   forM_ idxs $ \(RawTensorIndex i) -> do
     ATen.tensorIndexList_push_back vec i
   ATen.index t vec >>= (return . Unsafe)
 
-(@=) :: TensorIndex a => Tensor -> (a,Tensor) -> Tensor
-(Unsafe t') @= (idx,(Unsafe v)) = unsafePerformIO $ do
+maskedFill :: (TensorIndex a, TensorLike t) => Tensor -> a -> t -> Tensor
+maskedFill (Unsafe t') idx v' = unsafePerformIO $ do
   let idxs = pushIndex [] idx
+      (Unsafe v) = asTensor v'
   t <- ATen.clone_t t'
   vec <- ATen.newTensorIndexList
   forM_ idxs $ \(RawTensorIndex i) -> do
@@ -416,7 +422,7 @@ float_opts = withDType Float defaultOpts
 withTensor :: Tensor -> (Ptr () -> IO a) -> IO a
 withTensor t fn = cast t $ \t' -> withForeignPtr t' $ \tensor_ptr -> Unmanaged.tensor_data_ptr tensor_ptr >>= fn
 
-instance (Reifies a DType, Storable a) => TensorLike a where
+instance {-# OVERLAPPING #-} (Reifies a DType, Storable a) => TensorLike a where
   asTensor' v opts = unsafePerformIO $ do
     t <- ((cast2 LibTorch.empty_lo) :: [Int] -> TensorOptions -> IO Tensor) [] $ withDType (_dtype @a) opts
     withTensor t $ \ptr -> do
@@ -440,7 +446,7 @@ instance (Reifies a DType, Storable a) => TensorLike a where
   _pokeElemOff ptr offset v = pokeElemOff (castPtr ptr) offset v
 
 
-instance {-# OVERLAPPING #-}TensorLike Bool where
+instance {-# OVERLAPPING #-} TensorLike Bool where
   asTensor' v opts = unsafePerformIO $ do
     t <- ((cast2 LibTorch.empty_lo) :: [Int] -> TensorOptions -> IO Tensor) [] $ withDType (_dtype @Bool) opts
     withTensor t $ \ptr -> do
@@ -464,7 +470,7 @@ instance {-# OVERLAPPING #-}TensorLike Bool where
   _pokeElemOff ptr offset v = pokeElemOff (castPtr ptr) offset ((if v then 1 else 0) :: Word8)
 
 
-instance {-# OVERLAPPING #-}TensorLike a => TensorLike [a] where
+instance {-# OVERLAPPING #-} TensorLike a => TensorLike [a] where
   asTensor' v opts = unsafePerformIO $ do
     t <- ((cast2 LibTorch.empty_lo) :: [Int] -> TensorOptions -> IO Tensor) (_dims v) $ withDType (_dtype @a) opts
     withTensor t $ \ptr -> do
@@ -509,6 +515,30 @@ instance {-# OVERLAPPING #-}TensorLike a => TensorLike [a] where
          then (_pokeElemOff @a) ptr (offset+i*width) d
          else throwIO $ userError $ "There are lists having different length."
 
+class AsTensors as where
+  toTensors :: as -> V.Vector Tensor
+  default toTensors ::  (Generic as, GAsTensors (Rep as)) => as -> V.Vector Tensor
+  toTensors a = gToTensors $ from a
+
+instance TensorLike a => AsTensors a where
+  toTensors = pure . asTensor
+  
+class GAsTensors record where
+  gToTensors :: record as -> V.Vector Tensor
+
+instance (GAsTensors ls, GAsTensors rs ) => GAsTensors (ls :*: rs) where
+  gToTensors (g :*: d) = gToTensors  g V.++ gToTensors d
+
+instance (GAsTensors ls , GAsTensors rs ) => GAsTensors (ls :+: rs) where
+  gToTensors (L1 g) = gToTensors g 
+  gToTensors (R1 g) = gToTensors g 
+  
+instance (GAsTensors ls) => GAsTensors (M1 i c ls) where
+  gToTensors (M1 g) = gToTensors g 
+
+instance (TensorLike ls) => GAsTensors (K1 i ls) where
+  gToTensors (K1 g) = pure $ asTensor g 
+
 --------------------------------------------------------------------------------
 -- Show
 --------------------------------------------------------------------------------
@@ -522,7 +552,7 @@ instance Show Tensor where
     where
       -- TODO: this is obviously not the right way to do it,
       -- and will be terribly slow, so please fix it.
-      showElems elemShow sep t = "[" ++ (intercalate sep $ map elemShow [t @@ i | i <- [0..((size 0 t) - 1)]]) ++ "]"
+      showElems elemShow sep t = "[" ++ (intercalate sep $ map elemShow [t ! i | i <- [0..((size 0 t) - 1)]]) ++ "]"
       padPositive x s = if x >= 0 then " " ++ s else s
       -- TODO: this assumes that scientific notation only uses one-digit exponents, which is not
       --       true in general

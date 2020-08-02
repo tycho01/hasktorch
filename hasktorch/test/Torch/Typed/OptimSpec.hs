@@ -183,6 +183,7 @@ optimize
 optimize initModel initOptim loss learningRate numIters =
   foldLoop (initModel, initOptim) numIters
     $ \(model, optim) _ -> runStep model optim (loss model) learningRate
+  
 -- optimize initModel initOptim loss learningRate numIters = do
 --   print $ "initial model: " <> show initModel
 --   print $ "initial loss:" <> show (loss initModel)
@@ -258,7 +259,8 @@ instance
         learningRate = 0.002
         numIter      = 15000
     (model, _optim) <- optimize initModel' initOptim loss learningRate numIter
-    (toList . Just) (isclose 1e-04 1e-04 False (cat @0 . hmap' ToDependent . flattenParameters $ model) ones) `shouldBe` [True, True]
+    let close =  isclose 1e-01 1e-01 False (cat @0 . hmap' ToDependent . flattenParameters $ model) ones
+    (toList . Just) close `shouldBe` [True,True]
     isNonZero (isclose 1e-04 1e-04 False (loss model) zeros) `shouldBe` True
   apply' GDMRosenbrockSpec (_, agg) = agg >> do
     manual_seed_L 123
@@ -271,7 +273,8 @@ instance
         learningRate = 0.001
         numIter      = 10000
     (model, _optim) <- optimize initModel' initOptim loss learningRate numIter
-    (toList . Just) (isclose 1e-04 1e-04 False (cat @0 . hmap' ToDependent . flattenParameters $ model) ones) `shouldBe` [True, True]
+    let close =  (isclose 1e-01 1e-01 False (cat @0 . hmap' ToDependent . flattenParameters $ model) ones)
+    (toList . Just) close `shouldBe` [True,True]
     isNonZero (isclose 1e-04 1e-04 False (loss model) zeros) `shouldBe` True
   apply' AdamRosenbrockSpec (_, agg) = agg >> do
     manual_seed_L 123
@@ -284,7 +287,8 @@ instance
         learningRate = 0.005
         numIter      = 5000
     (model, _optim) <- optimize initModel' initOptim loss learningRate numIter
-    (toList . Just) (isclose 1e-04 1e-04 False (cat @0 . hmap' ToDependent . flattenParameters $ model) ones) `shouldBe` [True, True]
+    let close =  (isclose 1e-02 1e-02 False (cat @0 . hmap' ToDependent . flattenParameters $ model) ones)
+    (toList . Just) close `shouldBe` [True, True]
     isNonZero (isclose 1e-04 1e-04 False (loss model) zeros) `shouldBe` True
 
 data OptimAckleySpec = GDAckleySpec | GDMAckleySpec | AdamAckleySpec
@@ -310,7 +314,8 @@ instance
         numIter      = 5000
     (model, _optim) <- optimize initModel' initOptim loss learningRate numIter
     let finalLoss = loss model
-    (toList . Just) (isclose 1e-04 1e-04 False (cat @0 . hmap' ToDependent . flattenParameters $ model) zeros) `shouldBe` [True, True]
+    let close =  isclose 1e-03 1e-03 False (cat @0 . hmap' ToDependent . flattenParameters $ model) zeros
+    (toList . Just) close `shouldBe` [True, True]
     isNonZero (isclose 1e-04 1e-04 False (loss model) zeros) `shouldBe` True
   apply' GDMAckleySpec (_, agg) = agg >> do
     manual_seed_L 123
@@ -325,7 +330,8 @@ instance
         numIter      = 5000
     (model, _optim) <- optimize initModel' initOptim loss learningRate numIter
     let finalLoss = loss model
-    (toList . Just) (isclose 1e-04 1e-04 False (cat @0 . hmap' ToDependent . flattenParameters $ model) zeros) `shouldBe` [True, True]
+    let close =  isclose 1e-03 1e-03 False (cat @0 . hmap' ToDependent . flattenParameters $ model) zeros
+    (toList . Just) close `shouldBe` [True, True]
     isNonZero (isclose 1e-04 1e-04 False (loss model) zeros) `shouldBe` True
   apply' AdamAckleySpec (_, agg) = agg >> do
     manual_seed_L 123
@@ -340,7 +346,8 @@ instance
         numIter      = 2000
     (model, _optim) <- optimize initModel' initOptim loss learningRate numIter
     let finalLoss = loss model
-    (toList . Just) (isclose 1e-04 1e-04 False (cat @0 . hmap' ToDependent . flattenParameters $ model) zeros) `shouldBe` [True, True]
+    let close =  isclose 1e-03 1e-03 False (cat @0 . hmap' ToDependent . flattenParameters $ model) zeros
+    (toList . Just) close `shouldBe` [True,True]
     isNonZero (isclose 1e-04 1e-04 False (loss model) zeros) `shouldBe` True
 
 spec = foldMap spec' availableDevices
