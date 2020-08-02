@@ -556,4 +556,4 @@ clipGradients' :: Float -> D.Gradients -> D.Gradients
 clipGradients' v (D.Gradients gradients) = D.Gradients $ F.clamp (-v) v <$> gradients
 
 decayWeights' :: (Scalar a, Num a) => a -> [D.IndependentTensor] -> D.Gradients -> D.Gradients
-decayWeights' v parameters (D.Gradients gradients) = D.Gradients $ zipWith (\ param gradient -> (if v == 0.0 then id else F.add (F.mulScalar v param)) gradient) parameters gradients
+decayWeights' v parameters (D.Gradients gradients) = D.Gradients $ zipWith (\ param gradient -> (if v == 0.0 then id else F.add (F.mulScalar v param)) gradient) (toDependent <$> parameters) gradients
