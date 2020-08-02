@@ -52,6 +52,7 @@ synthesizerConfig = SynthesizerConfig
     <*> resultFolderOpt
     <*> learningDecayOpt
     <*> regularizationOpt
+    <*> clipOpt
     <*> verbosityOpt
     <*> mOpt
     <*> hOpt
@@ -82,6 +83,7 @@ evaluateConfig = EvaluateConfig
     <*> bestOfOpt
     <*> dropoutRateOpt
     <*> regularizationOpt
+    <*> clipOpt
     <*> verbosityOpt
     <*> mOpt
     <*> hOpt
@@ -116,6 +118,7 @@ gridSearchConfig = GridSearchConfig
     <*> resultFolderOpt
     <*> learningDecayOpt
     -- <*> regularizationOpt
+    -- <*> clipOpt
     <*> verbosityOpt
     <*> evalRoundsOpt
     <*> maskBadOpt
@@ -148,6 +151,7 @@ evolutionaryConfig = EvolutionaryConfig
     <*> resultFolderOpt
     <*> learningDecayOpt
     -- <*> regularizationOpt
+    -- <*> clipOpt
     <*> verbosityOpt
     -- <*> evalRoundsOpt
     <*> maskBadOpt
@@ -413,12 +417,19 @@ learningDecayOpt = option auto
     <> showDefault
     <> help "by how much to divide the learning rate when accuracy decreases" )
 
-regularizationDef = 0.0
+regularizationDef :: Float = 0.01
 regularizationOpt = option auto
     ( long "regularization"
     <> value regularizationDef
     <> showDefault
     <> help "L2 weight decay used in the optimizer" )
+
+clipDef :: Float = 1.0
+clipOpt = option auto
+    ( long "clip"
+    <> value clipDef
+    <> showDefault
+    <> help "maximum value (positive or negative) at which to clip gradients" )
 
 verbosityOpt = strOption
     ( long "verbosity"
