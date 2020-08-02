@@ -120,7 +120,7 @@ getM cfg taskFnDataset = let
                     model' <- if null savedModelPath
                         then pure model
                         else A.replaceParameters model . fmap D.IndependentTensor <$> D.load savedModelPath
-                    void $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] cfg taskFnDataset model'
+                    void $ train @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) cfg taskFnDataset model'
                     where
                     variants :: [(String, Expr)] = (\(_k, v) -> (nodeRule v, v)) <$> exprBlocks
                 _ -> error "synthesizer not recognized"

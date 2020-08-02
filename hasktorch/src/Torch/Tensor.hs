@@ -552,7 +552,7 @@ instance Show Tensor where
     where
       -- TODO: this is obviously not the right way to do it,
       -- and will be terribly slow, so please fix it.
-      showElems elemShow sep t = "[" ++ (intercalate sep $ map elemShow [t ! i | i <- [0..((size t 0) - 1)]]) ++ "]"
+      showElems elemShow sep t = "[" ++ (intercalate sep $ map elemShow [t ! i | i <- [0..((size 0 t) - 1)]]) ++ "]"
       padPositive x s = if x >= 0 then " " ++ s else s
       -- TODO: this assumes that scientific notation only uses one-digit exponents, which is not
       --       true in general

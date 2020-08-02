@@ -117,13 +117,13 @@ getM cfg taskFnDataset = let
             (acc, loss) <- case synthesizer of
                 "random" -> do
                     model :: RandomSynthesizer <- A.sample RandomSynthesizerSpec
-                    evaluate @device @rules @'[] taskFnDataset prepped_dsl bestOf maskBad randomHole model dataset
+                    evaluate @device @rules @'[] @0 taskFnDataset prepped_dsl bestOf maskBad randomHole model dataset
                 "nsps" -> do
                     params <- fmap D.IndependentTensor <$> D.load modelPath
                     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
                             <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
                     let model' = A.replaceParameters model params
-                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] prepped_dsl bestOf maskBad randomHole model' dataset
+                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) prepped_dsl bestOf maskBad randomHole model' dataset
                 _ -> error "synthesizer not recognized"
             say_ $ printf
                     "Loss: %.4f. Accuracy: %.4f.\n"
