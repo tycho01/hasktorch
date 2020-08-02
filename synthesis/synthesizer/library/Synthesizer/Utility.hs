@@ -56,6 +56,7 @@ import qualified Torch.Typed.Parameter
 import           Torch.Typed.NN
 import           Torch.Typed.NN.Recurrent.LSTM
 import           Torch.HList
+import           Torch.Scalar
 import qualified Torch.NN                      as A
 import           Torch.Autograd                as D
 import           Torch.TensorFactories         as D
@@ -551,8 +552,8 @@ pickDataset datasets dataset_str = dataset where
         "test" -> test_set
         x -> error $ "dataset " <> x <> " not recognized!"
 
-clipGradients' :: (Scalar a, Num a) => a -> Gradients -> Gradients
-clipGradients' v (Gradients gradients) = Gradients $ F.clamp (-v) v <$> gradients
+clipGradients' :: (Scalar a, Num a) => a -> D.Gradients -> D.Gradients
+clipGradients' v (D.Gradients gradients) = D.Gradients $ F.clamp (-v) v <$> gradients
 
-decayWeights' :: (Scalar a, Num a) => a -> [D.IndependentTensor] -> Gradients -> Gradients
-decayWeights' v parameters (Gradients gradients) = Gradients $ zipWith (\ param gradient -> (if a == 0.0 then id else F.add (F.mulScalar a param)) gradient) parameters gradients
+decayWeights' :: (Scalar a, Num a) => a -> [D.IndependentTensor] -> D.Gradients -> D.Gradients
+decayWeights' v parameters (D.Gradients gradients) = D.Gradients $ zipWith (\ param gradient -> (if a == 0.0 then id else F.add (F.mulScalar a param)) gradient) parameters gradients
