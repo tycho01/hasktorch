@@ -116,23 +116,14 @@ getM cfg taskFnDataset = let
             let dataset = pickDataset datasets evaluateSet
             (acc, loss) <- case synthesizer of
                 "random" -> do
-                    model <- A.sample RandomSynthesizerSpec
-                    evaluate @device @rules @'[] @RandomSynthesizer taskFnDataset prepped_dsl bestOf maskBad randomHole model dataset
+                    model :: RandomSynthesizer <- A.sample RandomSynthesizerSpec
+                    evaluate @device @rules @'[] taskFnDataset prepped_dsl bestOf maskBad randomHole model dataset
                 "nsps" -> do
                     params <- fmap D.IndependentTensor <$> D.load modelPath
-                    model <- A.sample spec
+                    model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
+                            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
                     let model' = A.replaceParameters model params
-                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult) taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
-                    where
-                    charMap = exprCharMap
-                    encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
-                        LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-                    r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
-                        initR3nn variants r3nnBatch dropoutRate ruleCharMap
-                    rule_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
-                        TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropoutRate
-                    spec :: NSPSSpec device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult =
-                        NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
+                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] prepped_dsl bestOf maskBad randomHole model' dataset
                 _ -> error "synthesizer not recognized"
             say_ $ printf
                     "Loss: %.4f. Accuracy: %.4f.\n"

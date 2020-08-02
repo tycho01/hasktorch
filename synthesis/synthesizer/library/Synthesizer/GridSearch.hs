@@ -62,10 +62,11 @@ import           Synthesizer.NSPS
 import           Synthesizer.Train
 import           Synthesizer.Params
 
-hparCombs :: [HparComb] = uncurry5 HparComb <$> cartesianProduct5
+hparCombs :: [HparComb] = uncurry6 HparComb <$> cartesianProduct6
     learningRateOpts
     dropoutRateOpts
     regularizationOpts
+    clipOpts
     mOpts
     hOpts
 
@@ -77,6 +78,9 @@ dropoutRateOpts = [dropoutRateDef] -- 0 : reverse ((\x -> 2 ** (-x)) <$> [1..5])
 
 regularizationOpts :: [Float]
 regularizationOpts = [regularizationDef] -- 0 : reverse ((\x -> 10 ** (-x)) <$> [1..4])
+
+clipOpts :: [Float]
+clipOpts = [clipDef] -- (2 **) <$> [0..4]
 
 -- | skip `m=1`: must be an even number for H.
 mOpts :: [Int]
@@ -176,7 +180,7 @@ evalHparComb taskFnDataset cfg hparComb = do
     -- say_ . show $ cfg'
     manual_seed_L $ fromIntegral seed
     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
-            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
+            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
     lastEvalResult :: EvalResult <- last <$> train @device @rules @shape cfg' taskFnDataset model
     let testEval :: IO () = finalEval @device @featMult @m @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h @shape cfg taskFnDataset hparComb lastEvalResult
     return (lastEvalResult, testEval)
@@ -194,15 +198,8 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     let test_set :: [(Expr, (Tp, Tp))] = lists2pairs $ (if cheat then fstOf3 else thdOf3) datasets
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
-    let charMap = exprCharMap
-    let encoder_spec :: LstmEncoderSpec device maxStringLength EncoderBatch encoderChars h featMult =
-            LstmEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-    let r3nn_spec :: R3NNSpec device m symbols rules maxStringLength R3nnBatch h typeEncoderChars featMult =
-            initR3nn variants r3nnBatch dropoutRate charMap
-    let rule_encoder_spec :: TypeEncoderSpec device maxStringLength typeEncoderChars m =
-            TypeEncoderSpec charMap $ LSTMSpec $ DropoutSpec dropoutRate
-    model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult <-
-            liftIO $ A.sample $ NSPSSpec encoder_spec rule_encoder_spec r3nn_spec
+    model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
+            <- liftIO $ A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
     let synthCfg :: SynthesizerConfig = combineConfig cfg bestHparComb
     let modelPath :: String = printf "%s/%s/%04d.pt" resultFolder (ppCfg synthCfg) epoch
     params :: [D.Tensor] <- D.load modelPath

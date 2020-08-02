@@ -78,6 +78,8 @@ import           Synthesizer.R3NN
 import           Synthesizer.Params
 
 class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules synthesizer where
+    regularization :: synthesizer -> Float = const regularizationDef
+    clip        :: synthesizer -> Float = const clipDef
     encode    :: synthesizer
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
                 -> Tensor device 'D.Float shape
@@ -98,9 +100,5 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
                 -> IO ([A.Parameter], optimizer)
-    doStep model optim loss lr = D.runStep model optim (toDynamic loss) $ toDynamic lr
-
--- | fixing which dimension of `shape` indicates the used number of i/o samples
--- | for prediction purposes lets us sample before encoding, saving on compute.
--- | (in the event of '[] shape as for random synthesizer, we'll presume none.)
-type BatchDim = 0
+    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' clip . decayWeights' regularization params $ D.grad (toDynamic loss) params
+        where params = A.flattenParameters model

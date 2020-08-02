@@ -88,7 +88,8 @@ data SynthesizerConfig = SynthesizerConfig
     , convergenceThreshold :: !Float
     , resultFolder :: !String
     , learningDecay :: !Int
-    , regularization :: !Float  -- TODO: use this
+    , regularization :: !Float
+    , clip :: !Float
     , verbosity :: !String
     , m :: !Int
     , h :: !Int
@@ -109,7 +110,8 @@ data EvaluateConfig = EvaluateConfig
     -- , r3nnBatch :: !Int
     , bestOf :: !Int
     , dropoutRate :: !Double
-    , regularization :: !Float  -- TODO: use this
+    , regularization :: !Float
+    , clip :: !Float
     , verbosity :: !String
     -- I wish I could just kinda infer m/h from the model but that'd require loading in a separate synthesizer config file...
     , m :: !Int
@@ -135,6 +137,7 @@ data GridSearchConfig = GridSearchConfig
     , resultFolder :: !String
     , learningDecay :: !Int
     -- , regularization :: !Float
+    -- , clip :: !Float
     , verbosity :: !String
     , evalRounds :: !Int
     , maskBad :: !Bool
@@ -160,6 +163,7 @@ data EvolutionaryConfig = EvolutionaryConfig
     , resultFolder :: !String
     , learningDecay :: !Int
     -- , regularization :: !Float
+    -- , clip :: !Float
     , verbosity :: !String
     -- , evalRounds :: !Int
     , maskBad :: !Bool
@@ -182,6 +186,7 @@ data OptimizationConfig = OptimizationConfig
     , resultFolder :: !String
     , learningDecay :: !Int
     -- , regularization :: !Float
+    -- , clip :: !Float
     , verbosity :: !String
     -- , evalRounds :: !Int
     , maskBad :: !Bool
@@ -194,6 +199,7 @@ data HparComb = HparComb
     { learningRate :: !Float
     , dropoutRate :: !Double
     , regularization :: !Float
+    , clip :: !Float
     , m :: !Int
     , h :: !Int
     } deriving (Eq, Show, Generic, Ord, Read)
@@ -226,11 +232,12 @@ instance ToNamedRecord (HparComb, EvalResult) where
         namedRecord [ "learningRate"   .= learningRate
                     , "dropoutRate"    .= dropoutRate
                     , "regularization" .= regularization
+                    , "clip"           .= clip
                     , "m"              .= m
                     , "h"              .= h
                     ] `union` toNamedRecord evalResult
 
-gridSearchHeader :: Header = header ["dropoutRate", "regularization", "m", "h"] <> evalResultHeader
+gridSearchHeader :: Header = header ["dropoutRate", "regularization", "clip", "m", "h"] <> evalResultHeader
 
 combineConfig :: OptimizationConfig -> HparComb -> SynthesizerConfig
 combineConfig optCfg hparComb = cfg
@@ -249,6 +256,7 @@ combineConfig optCfg hparComb = cfg
                 , resultFolder         = resultFolder
                 , learningDecay        = learningDecay
                 , regularization       = regularization
+                , clip                 = clip
                 , verbosity            = verbosity
                 , m                    = m
                 , h                    = h
