@@ -78,8 +78,10 @@ import           Synthesizer.R3NN
 import           Synthesizer.Params
 
 class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules ruleFeats synthesizer where
-    regularization :: synthesizer -> Float = const regularizationDef
-    clip        :: synthesizer -> Float = const clipDef
+    weightDecay :: synthesizer -> Float
+    weightDecay _ = regularizationDef
+    clipVal        :: synthesizer -> Float
+    clipVal _ = clipDef
     encode    :: synthesizer
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
                 -> Tensor device 'D.Float shape
@@ -104,5 +106,5 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
                 -> IO ([A.Parameter], optimizer)
-    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' clip . decayWeights' regularization params $ D.grad (toDynamic loss) params
+    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' (clipVal synthesizer) . decayWeights' (weightDecay synthesizer) params $ D.grad (toDynamic loss) params
         where params = A.flattenParameters model
