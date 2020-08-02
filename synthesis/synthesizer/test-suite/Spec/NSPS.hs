@@ -245,7 +245,8 @@ nsps = parallel $ let
         let type_encoder_spec :: TypeEncoderSpec Device MaxStringLength TypeEncoderChars M =
                 TypeEncoderSpec ruleCharMap $ LSTMSpec $ DropoutSpec dropOut
         model :: NSPS Device M Symbols Rules MaxStringLength EncoderBatch' R3nnBatch' EncoderChars TypeEncoderChars H FeatMultWithTypes
-                <- A.sample $ NSPSSpec encoder_spec type_encoder_spec r3nn_spec
+                <- A.sample $ NSPSSpec encoder_spec type_encoder_spec r3nn_spec regularizationDef clipDef
+                -- <- A.sample $ nspsSpec taskFnDataset? variants r3nnBatch' dropOut regularizationDef clipDef
         
         let gen :: StdGen = mkStdGen seedDef
         let sampled_feats :: Tensor Device 'D.Float '[R3nnBatch', MaxStringLength * (2 * FeatMultWithTypes * Dirs * H)]

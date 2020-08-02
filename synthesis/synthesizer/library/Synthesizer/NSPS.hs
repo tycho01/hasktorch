@@ -81,7 +81,15 @@ import           Synthesizer.R3NN
 import           Synthesizer.Params
 import           Synthesizer.Synthesizer
 
-instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult, shape ~ '[r3nnBatch, maxStringLength * (2 * featMult * Dirs * h)], ruleFeats ~ (maxStringLength * m) ) => Synthesizer device shape rules ruleFeats (NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult) where
+instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult, KnownNat regularization, KnownNat clip, shape ~ '[r3nnBatch, maxStringLength * (2 * featMult * Dirs * h)], ruleFeats ~ (maxStringLength * m) ) => Synthesizer device shape rules ruleFeats (NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult) regularization clip where
+
+    regularization :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
+                -> Float
+    regularization = weight_decay
+
+    clip :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
+                -> Float
+    clip = max_clip_val
 
     encode :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
@@ -114,8 +122,8 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
                 -> Tensor device 'D.Float '[]
     patchLoss = patchR3nnLoss . r3nn
 
-nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
-nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
+nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> Float -> Float -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
+nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate weight_decay max_clip_val = spec where
     useTypes = natValI @featMult > 1
     charMap = if useTypes then bothCharMap else exprCharMap
     encoder_spec :: LstmEncoderSpec device maxStringLength encoderBatch encoderChars h featMult =
@@ -125,13 +133,16 @@ nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate = spec where
     r3nn_spec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult =
         initR3nn variants r3nnBatch dropoutRate ruleCharMap
     spec :: NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult =
-        NSPSSpec encoder_spec type_encoder_spec r3nn_spec
+        NSPSSpec encoder_spec type_encoder_spec r3nn_spec weight_decay max_clip_val
 
 data NSPSSpec (device :: (D.DeviceType, Nat)) (m :: Nat) (symbols :: Nat) (rules :: Nat) (maxStringLength :: Nat) (encoderBatch :: Nat) (r3nnBatch :: Nat) (encoderChars :: Nat) (typeEncoderChars :: Nat) (h :: Nat) (featMult :: Nat) where
   NSPSSpec :: forall device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
      . { encoderSpec :: LstmEncoderSpec device maxStringLength encoderBatch encoderChars h featMult
        , typeEncoderSpec :: TypeEncoderSpec device maxStringLength typeEncoderChars m
-       , r3nnSpec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult }
+       , r3nnSpec :: R3NNSpec device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult
+       , weight_decay :: Float
+       , max_clip_val :: Float
+       }
     -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
  deriving (Show)
 
@@ -139,7 +150,10 @@ data NSPS (device :: (D.DeviceType, Nat)) (m :: Nat) (symbols :: Nat) (rules :: 
   NSPS :: forall device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
         . { encoder :: LstmEncoder device maxStringLength encoderBatch encoderChars h featMult
           , rule_encoder :: TypeEncoder device maxStringLength typeEncoderChars m
-          , r3nn :: R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult }
+          , r3nn :: R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult
+          , weight_decay :: Float
+          , max_clip_val :: Float
+          }
        -> NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
  deriving (Show, Generic)
 
@@ -164,4 +178,4 @@ instance ( KnownDevice device, RandDTypeIsValid device 'D.Float, KnownNat m, Kno
         encoder     <- A.sample encoderSpec
         typeEncoder <- A.sample typeEncoderSpec
         r3nn        <- A.sample r3nnSpec
-        return $ NSPS encoder typeEncoder r3nn
+        return $ NSPS encoder typeEncoder r3nn weight_decay max_clip_val

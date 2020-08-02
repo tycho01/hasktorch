@@ -512,11 +512,11 @@ liftA7 :: Applicative f => (a -> b -> c -> d -> e -> f' -> g -> h) -> f a -> f b
 liftA7 f a b c d e f' g = liftA6 f a b c d e f' <*> g
 
 -- | calculate a cartesian product, used for hyper-parameter combinations
-cartesianProduct5 :: [a] -> [b] -> [c] -> [d] -> [e] -> [(a, b, c, d, e)]
-cartesianProduct5 = liftA5 (,,,,)
+cartesianProduct6 :: [a] -> [b] -> [c] -> [d] -> [e] -> [f] -> [(a, b, c, d, e, f)]
+cartesianProduct6 = liftA6 (,,,,,)
 
-uncurry5 :: (a -> b -> c -> d -> e -> f') -> (a, b, c, d, e) -> f'
-uncurry5 f ~(a, b, c, d, e) = f a b c d e
+uncurry6 :: (a -> b -> c -> d -> e -> f' -> g) -> (a, b, c, d, e, f') -> g
+uncurry6 f ~(a, b, c, d, e, f') = f a b c d e f'
 
 writeCsv :: Csv.ToNamedRecord a => FilePath -> Csv.Header -> [a] -> IO ()
 writeCsv filePath header =
@@ -550,3 +550,9 @@ pickDataset datasets dataset_str = dataset where
         "validation" -> validation_set
         "test" -> test_set
         x -> error $ "dataset " <> x <> " not recognized!"
+
+clipGradients' :: (Scalar a, Num a) => a -> Gradients -> Gradients
+clipGradients' v (Gradients gradients) = Gradients $ F.clamp (-v) v <$> gradients
+
+decayWeights' :: (Scalar a, Num a) => a -> [D.IndependentTensor] -> Gradients -> Gradients
+decayWeights' v parameters (Gradients gradients) = Gradients $ zipWith (\ param gradient -> (if a == 0.0 then id else F.add (F.mulScalar a param)) gradient) parameters gradients
