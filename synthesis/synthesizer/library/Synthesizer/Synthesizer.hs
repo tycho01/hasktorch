@@ -66,6 +66,7 @@ import qualified Torch.Distributions.Categorical as Categorical
 
 import           Synthesis.Orphanage ()
 import           Synthesis.Data hiding (GridSearchConfig(..), EvolutionaryConfig(..))
+import           Synthesis.Configs
 import           Synthesis.Utility
 import           Synthesis.Ast
 import           Synthesis.Generation
@@ -102,5 +103,5 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
                 -> IO ([A.Parameter], optimizer)
-    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' (clipVal model) . decayWeights' (weightDecay model) params $ D.grad (toDynamic loss) params
+    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' (clipVal model) . decayWeights' (weightDecay model) params . D.Gradients $ D.grad (toDynamic loss) params
         where params = A.flattenParameters model
