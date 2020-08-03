@@ -121,7 +121,7 @@ getM cfg taskFnDataset = let
                 "nsps" -> do
                     params <- fmap D.IndependentTensor <$> D.load modelPath
                     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
-                            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
+                            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
                     let model' = A.replaceParameters model params
                     evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) prepped_dsl bestOf maskBad randomHole model' dataset
                 _ -> error "synthesizer not recognized"

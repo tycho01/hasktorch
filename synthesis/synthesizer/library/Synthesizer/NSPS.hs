@@ -83,14 +83,6 @@ import           Synthesizer.Synthesizer
 
 instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult, shape ~ '[r3nnBatch, maxStringLength * (2 * featMult * Dirs * h)], ruleFeats ~ (maxStringLength * m) ) => Synthesizer device shape rules ruleFeats (NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult) where
 
-    weightDecay :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
-                -> Float
-    weightDecay = weight_decay
-
-    clipVal :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
-                -> Float
-    clipVal = max_clip
-
     encode :: NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
                 -> Tensor device 'D.Float shape
@@ -115,15 +107,6 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
     patchLoss = patchR3nnLoss . r3nn
-
-    doStep    :: forall optimizer . (D.Optimizer optimizer)
-                => NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
-                -> optimizer
-                -> Tensor device 'D.Float '[]
-                -> Tensor device 'D.Float '[]
-                -> IO ([A.Parameter], optimizer)
-    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' (clipVal model) . decayWeights' (weightDecay model) params $ D.grad' (toDynamic loss) params
-        where params = A.flattenParameters model
 
 nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> Float -> Float -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
 nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate weight_decay_val max_clip_val = spec where

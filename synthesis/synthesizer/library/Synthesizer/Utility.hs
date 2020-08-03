@@ -494,7 +494,7 @@ sampleTensorWithoutReplacement gen n tensor = (gen', t) where
 
 -- | pretty-print a configuration for use in file names of result files, which requires staying within a 256-character limit.
 ppCfg :: Aeson.ToJSON a => a -> String
-ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1"),("learningRate","lr"),("convergenceThreshold","threshold"),("learningDecay","lrDecay")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder","regularization","savedModelPath","initialEpoch"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
+ppCfg cfg = replacements [("\"",""),("\\",""),("/","\\"),("false","0"),("true","1"),("learningRate","lr"),("convergenceThreshold","threshold"),("learningDecay","lrDecay")] . show . Aeson.encode . filterWithKey (\ k _v -> k `Set.notMember` Set.fromList (Text.pack <$> ["verbosity","resultFolder","savedModelPath","initialEpoch"])) . fromJust $ (Aeson.decode (Aeson.encode cfg) :: Maybe Aeson.Object)
 
 -- https://hackage.haskell.org/package/relude-0.6.0.0/docs/Relude-Extra-Tuple.html#v:traverseToSnd
 traverseToSnd :: Functor t => (a -> t b) -> a -> t (a, b)
@@ -557,3 +557,7 @@ clipGradients' v (D.Gradients gradients) = D.Gradients $ F.clamp (-v) v <$> grad
 
 decayWeights' :: Float -> [D.IndependentTensor] -> D.Gradients -> D.Gradients
 decayWeights' v parameters (D.Gradients gradients) = D.Gradients $ zipWith (\ param gradient -> (if v == (0.0 :: Float) then id else F.add (F.mulScalar v param)) gradient) (D.toDependent <$> parameters) gradients
+
+instance A.Parameterized Float where
+  flattenParameters _ = []
+  replaceOwnParameters = return

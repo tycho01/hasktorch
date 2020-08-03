@@ -180,7 +180,7 @@ evalHparComb taskFnDataset cfg hparComb = do
     -- say_ . show $ cfg'
     manual_seed_L $ fromIntegral seed
     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
-            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
+            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
     lastEvalResult :: EvalResult <- last <$> train @device @rules @shape @ruleFeats cfg' taskFnDataset model
     let testEval :: IO () = finalEval @device @featMult @m @rules @encoderChars @typeEncoderChars @symbols @maxStringLength @h @shape @ruleFeats cfg taskFnDataset hparComb lastEvalResult
     return (lastEvalResult, testEval)
@@ -199,7 +199,7 @@ finalEval cfg taskFnDataset bestHparComb bestEvalResult = do
     let prepped_dsl = prep_dsl taskFnDataset
     let PreppedDSL{..} = prepped_dsl
     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
-            <- liftIO $ A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
+            <- liftIO $ A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
     let synthCfg :: SynthesizerConfig = combineConfig cfg bestHparComb
     let modelPath :: String = printf "%s/%s/%04d.pt" resultFolder (ppCfg synthCfg) epoch
     params :: [D.Tensor] <- D.load modelPath
