@@ -133,7 +133,6 @@ data NSPSSpec (device :: (D.DeviceType, Nat)) (m :: Nat) (symbols :: Nat) (rules
 data NSPS (device :: (D.DeviceType, Nat)) (m :: Nat) (symbols :: Nat) (rules :: Nat) (maxStringLength :: Nat) (encoderBatch :: Nat) (r3nnBatch :: Nat) (encoderChars :: Nat) (typeEncoderChars :: Nat) (h :: Nat) (featMult :: Nat) where
   NSPS :: forall device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
         . { encoder :: LstmEncoder device maxStringLength encoderBatch encoderChars h featMult
-          , rule_encoder :: TypeEncoder device maxStringLength typeEncoderChars m
           , r3nn :: R3NN device m symbols rules maxStringLength r3nnBatch h typeEncoderChars featMult
           }
        -> NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
