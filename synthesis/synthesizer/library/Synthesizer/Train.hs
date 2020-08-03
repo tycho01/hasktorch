@@ -284,7 +284,10 @@ train synthesizerConfig taskFnDataset init_model = do
                         -- lift . debug_ $ "loss: " <> show (shape' loss)
                         -- TODO: do once for each mini-batch / fn?
                         -- (newParam, optim') <- D.runStep model optim (toDynamic loss) $ toDynamic lr
-                        (newParam, optim') <- lift $ doStep @device @shape @rules @ruleFeats model optim loss lr
+                        let params = A.flattenParameters model
+                        -- regularize (weight decay) and clip gradients
+                        let gradients = clipGradients' clip . decayWeights' regularization params $ D.grad' (toDynamic loss) params
+                        (newParam, optim') <- lift $ doStep @device @shape @rules @ruleFeats model optim lr gradients
                         let model' :: synthesizer = A.replaceParameters model newParam
                         -- aggregating over task fns, which in turn had separately aggregated over any holes encountered across the different synthesis steps (so multiple times for a hole encountered across various PPTs along the way). this is fair, right?
                         let train_loss' :: Float = train_loss + toFloat loss / fromIntegral n
