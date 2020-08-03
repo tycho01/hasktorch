@@ -328,7 +328,7 @@ train synthesizerConfig taskFnDataset init_model = do
                     prev    :: D.Tensor = F.mean . D.asTensor $ prev_losses
                     earlyStop :: Bool = D.asValue $ F.sub current prev `I.gtScalar` convergenceThreshold
                     in earlyStop
-            when earlyStop $ debug_ "validation loss has converged, stopping early!"
+            when earlyStop $ info_ "validation loss has converged, stopping early!"
 
             return $ (earlyStop, eval_results', gen'')
 
