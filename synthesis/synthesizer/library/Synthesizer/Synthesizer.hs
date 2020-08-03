@@ -79,10 +79,6 @@ import           Synthesizer.R3NN
 import           Synthesizer.Params
 
 class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid device 'D.Float, BasicArithmeticDTypeIsValid device 'D.Float, RandDTypeIsValid device 'D.Int64, KnownNat rules, A.Parameterized synthesizer) => Synthesizer device shape rules ruleFeats synthesizer where
-    weightDecay :: synthesizer -> Float
-    weightDecay _ = regularizationDef
-    clipVal        :: synthesizer -> Float
-    clipVal _ = clipDef
     encode    :: synthesizer
                 -> HashMap (Tp, Tp) [(Expr, Either String Expr)]
                 -> Tensor device 'D.Float shape
