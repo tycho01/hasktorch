@@ -129,7 +129,7 @@ getM cfg taskFnDataset = let
                     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
                             <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
                     let model' = A.replaceParameters model params
-                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) prepped_dsl bestOf maskBad randomHole model' dataset
+                    evaluate @device @rules @'[R3nnBatch, maxStringLength * (2 * featMult * Dirs * h)] @(maxStringLength * m) taskFnDataset prepped_dsl bestOf maskBad randomHole model' dataset
                 _ -> error "synthesizer not recognized"
             say_ $ printf
                     "Loss: %.4f. Accuracy: %.4f.\n"
