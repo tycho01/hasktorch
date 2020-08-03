@@ -101,8 +101,9 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 => synthesizer
                 -> optimizer
                 -> Tensor device 'D.Float '[]
-                -> Tensor device 'D.Float '[]
+                -> Gradients
                 -> IO ([A.Parameter], optimizer)
+    doStep model optim lr gradients = D.runStep' model optim (toDynamic lr) gradients
 
 -- | fixing which dimension of `shape` indicates the used number of i/o samples
 -- | for prediction purposes lets us sample before encoding, saving on compute.

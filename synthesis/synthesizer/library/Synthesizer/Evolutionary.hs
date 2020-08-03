@@ -105,6 +105,7 @@ instance (Show a, Fractional a) => Variable (Continuous a) a where
 learningRateVar   :: Ordinal Float  = Ordinal learningRateOpts
 dropoutRateVar    :: Ordinal Double = Ordinal dropoutRateOpts
 regularizationVar :: Ordinal Float  = Ordinal regularizationOpts
+clipVar           :: Ordinal Float  = Ordinal clipOpts
 -- | skip `m=1`: must be an even number for H.
 mVar              :: Ordinal Int    = Ordinal mOpts
 hVar              :: Ordinal Int    = Ordinal hOpts
@@ -115,6 +116,7 @@ instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
         (genRand seed learningRateVar)
         (genRand seed dropoutRateVar)
         (genRand seed regularizationVar)
+        (genRand seed clipVar)
         (genRand seed mVar)
         (genRand seed hVar)
 
@@ -122,14 +124,15 @@ instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
     where
       anE = \bl -> if bl then e1 else e2
       g = mkStdGen seed
-      [b1,b2,b3,b4,b5] =
-          take 5 $ randoms g
+      [b1,b2,b3,b4,b5,b6] =
+          take 6 $ randoms g
       e = HparComb
         (learningRate   $ anE b1)
         (dropoutRate    $ anE b2)
         (regularization $ anE b3)
-        (m              $ anE b4)
-        (h              $ anE b5)
+        (clip           $ anE b4)
+        (m              $ anE b5)
+        (h              $ anE b6)
 
   mutation () _p seed e = return $ Just e' where
       HparComb{..} = e
@@ -137,6 +140,7 @@ instance Entity HparComb Float (HparComb -> IO (EvalResult, IO ())) () IO where
           [ \e -> e { learningRate   = mutate seed learningRateVar learningRate }
           , \e -> e { dropoutRate    = mutate seed dropoutRateVar dropoutRate }
           , \e -> e { regularization = mutate seed regularizationVar regularization }
+          , \e -> e { clip           = mutate seed clipVar clip }
           , \e -> e { m              = mutate seed mVar m }
           , \e -> e { h              = mutate seed hVar h }
           ]

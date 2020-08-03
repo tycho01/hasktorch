@@ -123,7 +123,7 @@ getM cfg taskFnDataset = let
                     void $ train @device @rules @'[] @0 @RandomSynthesizer cfg taskFnDataset model
                 "nsps" -> do
                     model :: NSPS device m symbols rules maxStringLength EncoderBatch R3nnBatch encoderChars typeEncoderChars h featMult
-                            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate regularization clip
+                            <- A.sample $ nspsSpec taskFnDataset variants r3nnBatch dropoutRate
                     model' <- if null savedModelPath
                         then pure model
                         else A.replaceParameters model . fmap D.IndependentTensor <$> D.load savedModelPath
