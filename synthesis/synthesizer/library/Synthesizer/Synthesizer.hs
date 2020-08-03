@@ -97,7 +97,7 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 => synthesizer
                 -> optimizer
                 -> Tensor device 'D.Float '[]
-                -> Gradients
+                -> D.Gradients
                 -> IO ([A.Parameter], optimizer)
     doStep model optim lr gradients = D.runStep' model optim (toDynamic lr) gradients
 
