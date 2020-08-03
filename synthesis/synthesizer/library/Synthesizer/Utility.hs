@@ -557,3 +557,7 @@ clipGradients' v (D.Gradients gradients) = D.Gradients $ F.clamp (-v) v <$> grad
 
 decayWeights' :: Float -> [D.IndependentTensor] -> D.Gradients -> D.Gradients
 decayWeights' v parameters (D.Gradients gradients) = D.Gradients $ zipWith (\ param gradient -> (if v == (0.0 :: Float) then id else F.add (F.mulScalar v param)) gradient) (D.toDependent <$> parameters) gradients
+
+instance A.Parameterized Float where
+  flattenParameters _ = []
+  replaceOwnParameters = return
