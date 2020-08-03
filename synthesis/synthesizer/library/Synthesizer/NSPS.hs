@@ -116,6 +116,15 @@ instance ( KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsVal
                 -> Tensor device 'D.Float '[]
     patchLoss = patchR3nnLoss . r3nn
 
+    doStep    :: forall optimizer . (D.Optimizer optimizer)
+                => NSPS device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
+                -> optimizer
+                -> Tensor device 'D.Float '[]
+                -> Tensor device 'D.Float '[]
+                -> IO ([A.Parameter], optimizer)
+    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' (clipVal model) . decayWeights' (weightDecay model) params $ D.grad' (toDynamic loss) params
+        where params = A.flattenParameters model
+
 nspsSpec :: forall device m symbols maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h rules featMult . (KnownNat rules, KnownNat m, KnownNat symbols, KnownNat rules, KnownNat maxStringLength, KnownNat encoderBatch, KnownNat r3nnBatch, KnownNat encoderChars, KnownNat typeEncoderChars, KnownNat h, KnownNat featMult) => TaskFnDataset -> [(String, Expr)] -> Int -> Double -> Float -> Float -> NSPSSpec device m symbols rules maxStringLength encoderBatch r3nnBatch encoderChars typeEncoderChars h featMult
 nspsSpec TaskFnDataset{..} variants r3nnBatch dropoutRate weight_decay max_clip_val = spec where
     useTypes = natValI @featMult > 1

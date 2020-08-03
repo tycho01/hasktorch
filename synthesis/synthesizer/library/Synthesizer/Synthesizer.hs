@@ -103,5 +103,3 @@ class (KnownDevice device, MatMulDTypeIsValid device 'D.Float, SumDTypeIsValid d
                 -> Tensor device 'D.Float '[]
                 -> Tensor device 'D.Float '[]
                 -> IO ([A.Parameter], optimizer)
-    doStep model optim loss lr = D.runStep' model optim (toDynamic lr) . clipGradients' (clipVal model) . decayWeights' (weightDecay model) params . D.Gradients $ D.grad (toDynamic loss) params
-        where params = A.flattenParameters model
