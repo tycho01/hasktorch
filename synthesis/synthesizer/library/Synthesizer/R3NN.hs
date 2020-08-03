@@ -51,6 +51,7 @@ import Synthesis.FindHoles
 import Synthesis.Utility
 import Synthesizer.Utility
 import Synthesizer.UntypedMLP
+import Synthesizer.TypedMLP
 import Synthesizer.TypeEncoder
 import Synthesizer.Params
 
@@ -89,7 +90,7 @@ data R3NN
     -- I imagine NSPS fixed their batch to the sample size, but I have those for each type instantiation, making this harder for me to fix. as a work-around, I'm sampling instead.
  where
     R3NN :: forall m symbols rules maxStringLength batch_size device h numChars featMult
-      . { condition_model :: LSTMWithInit (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
+      . { condition_model :: TypedMLP (m + batch_size * maxStringLength * (2 * featMult * Dirs * h)) (Div m Dirs) h 'D.Float device
         , score_model     :: LSTMWithInit  m                                    (Div m Dirs) NumLayers Dir 'ConstantInitialization 'D.Float device
         -- NSPS: for each production rule r∈R, a nnet f_r from x∈R^(Q⋅M) to y∈R^M,
         -- with Q as the number of symbols on the RHS of the production rule r.
@@ -133,7 +134,7 @@ instance ( KnownDevice device
     sample R3NNSpec {..} = do
         join . return $ R3NN
             -- condition_model
-            <$> A.sample (LSTMWithZerosInitSpec conditionSpec)
+            <$> A.sample (TypedMLPSpec conditionSpec)
             -- score_model
             <*> A.sample (LSTMWithZerosInitSpec scoreSpec)
             -- left: untyped as q is not static
@@ -207,17 +208,11 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
     -- conditioning can use an MLP or (bidir) LSTM; LSTM learns more about the relative position of each leaf node in the tree.
     conditioned' :: Tensor device 'D.Float '[symbols, m] = 
             -- asUntyped to type-check m*2/2
-            asUntyped (\t -> I.squeezeDim t 0) .
-            fstOf3 . lstmForwardWithDropout @'SequenceFirst condition_model . unsqueeze @0 $ conditioned
+            asUntyped id .
+            forward condition_model $ conditioned
     root_emb :: Tensor device 'D.Float '[1, m] = forwardPass @m r3nn symbolIdxs conditioned' ppt
     node_embs :: Tensor device 'D.Float '[num_holes, m] = 
             UnsafeMkTensor $ F.cat (F.Dim 0) $ toDynamic <$> reversePass @m r3nn root_emb ppt
-    -- | bidirectional LSTM to process the global leaf representations right before calculating the scores.
-    node_embs' :: Tensor device 'D.Float '[num_holes, m] =
-            -- asUntyped to type-check m*2/2
-            asUntyped (\t -> I.squeezeDim t 0) .
-            fstOf3 . lstmDynamicBatch @'SequenceFirst dropoutOn score_model . unsqueeze @0 $ node_embs
-                    where dropoutOn = True
     getters = fst <$> findHolesExpr ppt
     -- TODO: propagate constraints through to the hole types
     holeTypes :: [Tp] = holeType . (\gtr -> gtr ppt) <$> getters
@@ -227,7 +222,7 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
     useTypes = natValI @featMult > 1
     scores :: Tensor device 'D.Float '[num_holes, rules] =
         if useTypes then matmul (cat @1
-                (  node_embs'
+                (  node_embs
                 :. holeTypeEmb
                 :. HNil
                 ))
@@ -237,7 +232,7 @@ runR3nn r3nn symbolIdxs ppt rule_tp_emb io_feats = scores where
                 :. rule_tp_emb
                 :. HNil
                 )
-        else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs' . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
+        else add (mulScalar (0.0 :: Float) $ sumAll $ holeTypeEmb) $ matmul node_embs . Torch.Typed.Tensor.toDevice . transpose @0 @1 $ Torch.Typed.Parameter.toDependent rule_emb
     -- delay softmax for log-sum-exp trick (crossEntropy)
 
 variantInt :: Expr -> (String, Int)
