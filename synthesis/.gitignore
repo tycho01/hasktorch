@@ -4,7 +4,6 @@
 *.png
 *.chk
 *.jsonl
-!*.pt
 !**/run-results/datasets-*.yml
 
 # Created by https://www.gitignore.io/api/haskell
